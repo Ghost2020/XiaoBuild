@@ -6,7 +6,7 @@ XiaoBuild 静默安装下，您可以使用命令行安装 XiaoBuild 组件。�
 从版本 10.2 及更高版本开始，您只能生成一个自动 Installer 文件来安装 XiaoBuild Agents。如果您希望通过 Automated Installer 来安装 Coordinator，请点击此处下载 Installer。
 
 
-## 生成 Silent Installer 文件 ##
+> ## 生成 Silent Installer 文件 ##
 
 1. 运行 XiaoBuild 设置文件。
 

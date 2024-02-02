@@ -4,7 +4,7 @@ Coordinator 安装的一部分包括创建一个 Grid Admin 用户，该用户�
 
 您可以创建和编辑其他用户。每个用户都分配了一个角色，该角色决定了他们在 Coordinator Manager 中的权限等级。
 
-## 用户角色 ##
+> ## 用户角色 ##
 * **Grid Admin**：具有查看和编辑 Coordinator Manager 中所有项目的全部权限。创建的第一个用户将被自动分配 Grid Admin 的角色。
 
 * **Group Manager**：具有编辑 Agent List 中的 Agents 以及查看（但不编辑）Settings 和 License 区域的权限。
@@ -13,7 +13,7 @@ Coordinator 安装的一部分包括创建一个 Grid Admin 用户，该用户�
 
 
 ---
-## 创建一个新的用户 ##
+> ## 创建一个新的用户 ##
 
 1. 在 **User Management** 区域中，点击 **Add User**。
 ![](/documents/resource/user_management.png)
@@ -25,7 +25,7 @@ Coordinator 安装的一部分包括创建一个 Grid Admin 用户，该用户�
 
 
 ---
-## 编辑现有用户 ##
+> ## 编辑现有用户 ##
 
 **Grid Admin** 用户可通过点击单个用户旁的编辑图标并修改详情来编辑任何用户的详细信息。
 ![](/documents/resource/edit_user.png)
@@ -37,7 +37,7 @@ Coordinator 安装的一部分包括创建一个 Grid Admin 用户，该用户�
 
 
 ---
-## 忘记用户名或密码 ##
+> ## 忘记用户名或密码 ##
 
 非管理员用户
 
