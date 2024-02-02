@@ -28,6 +28,7 @@ Build Monitor 也可以通过以下方式打开：
 以下部分描述了各种不同的构建显示，要选中其一，需点击 **构建监视器** 左侧垂直菜单中的相关图标：
 
 > 进度视图
+
 ![](/documents/resource/progress_view.png)
 
 **进度视图**，作为 **构建监视器** 的主视图，呈现了分布式构建进程的可视化表示。
@@ -62,12 +63,14 @@ Build Monitor 也可以通过以下方式打开：
 
 
 > 依赖视图
+
 ![](/documents/resource/dependency_view.png)
 
 
 
 
 > 输出视图
+
 ![](/documents/resource/output_view.png)
 
 **输出视图** 可显示整个执行的构建输出，或者说，它可以显示由 XiaoBuild 运行的所有内容。其输出与 Microsoft Visual C++ 的输出类似，令习惯于这种输出的用户感到更加方便。

@@ -37,6 +37,7 @@ Keep last Agent state–Agent 以上次系统关闭时所处的有效状态启�
 选择此选项，以防止 XiaoBuild 建议在此计算机的 MS Windows 防火墙中打开 XiaoBuild 端口。
 
 ## CPU利用率 ##
+
 ![](/documents/resource/agent_settings_helper_cpu0.png)
 
 CPU 利用率 - CPU 作为 Initiator 时
