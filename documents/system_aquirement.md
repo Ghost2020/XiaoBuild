@@ -32,7 +32,7 @@
 * **调度器:** Coordinator 需要有一个静态 IP 或者 DNS 识别的主机名。
 
 * **许可证激活:** 需要 Coordinator 机器之间的通信
-    和 https://lvep.incredibuild.com:443（我们的许可证验证服务）。
+    和 https://lvep.xiaobuild.com:443（我们的许可证验证服务）。
     * 代理管理：如果使用代理来管理本地机器的出站通信，则应定义一个名为 HTTPS_PROXY 的 windows 环境变量，并将代理的 URL 作为 Coordinator 机器上的值。这允许我们通过代理路由流量。代理需要有一个静态 IP 或者 DNS 识别的主机名。
 
 
