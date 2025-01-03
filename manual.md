@@ -3,7 +3,7 @@
 ## 版本信息
 
 当前版本：v1.0.0
-发布日期：2024-11-16
+发布日期：2025-01-03
 
 ---
 
@@ -53,11 +53,11 @@
 
 描述软件的运行环境和硬件要求：
 
-- **操作系统**：Windows/Linux/MacOS（指定版本）
+- **操作系统**：Windows 10/11
 - **硬件需求**：
   - CPU：XXXX
-  - 内存：XXXX
-  - 存储空间：XXXX
+  - 内存：4GB
+  - 存储空间：10GB SSSD
 - **其他依赖**：如需要特定的软件或库
 
 ---
@@ -66,9 +66,9 @@
 
 详细说明软件的安装步骤：
 
-1. 下载安装包：[下载链接](#)
+1. 下载安装包：[下载链接](https://github.com/Ghost2020/XiaoBuild/releases)
 2. 双击安装文件并按照提示完成安装。
-3. 配置环境变量（如有需要）。
+3. 配置环境变量（如有需要）
 4. 启动软件进行初始化设置。
 
 ---
@@ -78,21 +78,25 @@
 分步骤说明如何使用软件的主要功能：
 
 ### 安装配置工具
+![Installer](./documents/resource/Installer.png)
 
 1. **操作步骤1**：XXXX
 2. **操作步骤2**：XXXX
 
 ### 构建实时分析工具
+![Monitor](./documents/resource/Monitor.png)
 
 1. **操作步骤1**：XXXX
 2. **操作步骤2**：XXXX
 
 ### 构建协调器工具
+![Coordinator](./documents/resource/Coordinator.png)
 
 1. **功能1**：XXXX
 2. **功能2**：XXXX
 
 ### 代理设置工具
+![AgentSettings](./documents/resource/AgentSettings.png)
 
 1. **功能1**：XXXX
 2. **功能2**：XXXX
