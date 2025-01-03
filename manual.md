@@ -4,7 +4,7 @@
 
 简要介绍软件的用途、目标用户及核心价值。例如：
 
-> 本软件是一款用于UnrealEngin的工具，旨在提高用户在源码编译和材质编译方面的效率和体验，具备IncrediBuild的常规功能。
+> 本软件主要基于UE5.5的UBA开发，用于UnrealEngin的工具，旨在提高用户在源码编译和材质编译方面的效率和体验，具备IncrediBuild的常规功能。
 
 ---
 
@@ -134,7 +134,13 @@
 
 ---
 
-**Step5::网络安装-调度器**
+**Step5::网络安装-调度器** CoordiPort.png
+
+![CoordiPort](./documents/resource/CoordiPort.png)
+
+上述的各项端口是调度服务和web服务所需的，默认就好，如果被占用，可选取其他端口进行测试
+
+---
 
 ### 二.托盘工具 ###
 
@@ -143,11 +149,12 @@
 `托盘工具是其他工具程序的管理入口`
 
 ### 二.构建实时分析工具
-![Monitor](./documents/resource/Monitor.png)
 
 构建进度查看主要功能如下:
 
 1. **构建进度实时查看**
+![Monitor](./documents/resource/Monitor.png)
+
 2. **历史构建进度查看**
   
 ![BuildHistory](./documents/resource/BuildHistory.png)
@@ -157,17 +164,24 @@
 ![AgentConnectivity](./documents/resource/AgentConnectivity.png)
 
 ### 三.构建协调器工具
-![Coordinator](./documents/resource/Coordinator.png)
 
-1. **功能1**：调整系统中代理的参数，用以分配计算资源
-2. **功能2**：查看处于系统中代理的实时各项参数
-3. **功能3**: 具备简单的用户管理机制，管理员具有最高权限可修改系统中各项参数，观察者，只能查看系统的各项参数
-4. **功能4**：查看同步到系统中异常错误
+  **功能1**：查看，调整系统中代理的参数，用以分配计算资源
+![Coordinator](./documents/resource/Coordinator.png)
+  
+  **功能2**: 具备简单的用户管理机制，管理员具有最高权限可修改系统中各项参数，观察者，只能查看系统的各项参数
+   
+![UserManager](./documents/resource/user_management.png)
+
+  **功能3**：查看同步到系统中异常错误 SystemSettings.png
+
+![SystemSettings](./documents/resource/SystemSettings.png)
+
+---
 
 ### 四.代理设置工具
 ![AgentSettings](./documents/resource/AgentSettings.png)
 
-1. **主要功能**：UBA代理相关参数设置
+  **主要功能**：系统相关参数设置
 
 ---
 
