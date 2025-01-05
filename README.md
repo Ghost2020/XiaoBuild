@@ -119,13 +119,13 @@
 
 `网络地址` 是调度器所在机器的ip地址，设置之后，可以点击测试按钮是否网络通讯是否通常
 
-**Step6 确定代理服务的网络端口 **
+**Step6 确定代理服务的网络端口**
 
 ![AgentPort](./documents/resource/AgentPort.png)
 
 除非提示端口被占用，一般情况下使用默认的就好
 
-**Step7 确定哪些UE引擎需要安装联合编译 **
+**Step7 确定哪些UE引擎需要安装联合编译**
 
 ![EngineInstall](./documents/resource/EngineInstall.png)
 
@@ -135,7 +135,7 @@
 
 ---
 
-**Step5::网络安装-调度器** CoordiPort.png
+**Step5::网络安装-调度器**
 
 ![CoordiPort](./documents/resource/CoordiPort.png)
 
@@ -236,4 +236,4 @@
 - **官网**：[www.xiaobuild.com](#)
 - **QQ**：794569465
 - **微信**：c794569465
-  ![WeChat](./documents/resource/wechat_qr_code.jpg)
+![WeChat](./documents/resource/wechat_qr_code.jpg)
