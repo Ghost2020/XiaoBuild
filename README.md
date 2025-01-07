@@ -76,6 +76,11 @@
   - 内存：4GB
   - 存储空间：10GB SSD
 
+- **系统架构**：
+  XiaoBuild 包含两种类型的机器：Agent 和 Coordinator。
+
+![architecture](./documents/resource/architecture.png)
+
 ---
 
 ## 安装指南
