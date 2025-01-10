@@ -253,7 +253,6 @@
 提供用户支持的联系方式：
 
 - **邮箱**：cxx2020@outlook.com
-- **官网**：[www.xiaobuild.com](#)
 - **QQ**：794569465
 - **微信**：c794569465
 ![WeChat](./documents/resource/wechat_qr_code.jpg)
