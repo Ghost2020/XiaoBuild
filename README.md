@@ -19,12 +19,12 @@
 |---------|----------|----------|
 | 4_26    | ✔        | ✔       |
 | 4_27    | ✔        | ✔       |
-| 5_0     | ✔ [BuildInight](https://www.bilibili.com/video/BV1p9cieiEQc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_1     | ✔ [BuildInight](https://www.bilibili.com/video/BV1dCr3YqExS/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_2     | ✔ [BuildInight](https://www.bilibili.com/video/BV1k9cieiEdQ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_3     | ✔ [BuildInight](https://www.bilibili.com/video/BV1C9cieiEV8/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_4     | ✔ [BuildInight](https://www.bilibili.com/video/BV1p9cieiEsZ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_5     | ✔ [BuildInight](https://www.bilibili.com/video/BV1p9cieiEyc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_0     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1p9cieiEQc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_1     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1dCr3YqExS/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_2     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1k9cieiEdQ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_3     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1C9cieiEV8/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_4     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1p9cieiEsZ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_5     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1p9cieiEyc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
 
 ## 目录
 
