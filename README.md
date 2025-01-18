@@ -8,8 +8,8 @@
 
 ## 版本信息
 
-当前版本：v1.0.4
-发布日期：2025-01-14
+当前版本：v1.0.5
+发布日期：2025-01-18
 
 ---
 
@@ -43,7 +43,6 @@
     - [四.构建协调器工具](#四构建协调器工具)
     - [五.代理设置工具](#五代理设置工具)
   - [常见问题](#常见问题)
-    - [用户登录时无法连接服务器?](#用户登录时无法连接服务器)
     - [启动项目之后卡在%45编译材质，进度久久没有变化?](#启动项目之后卡在45编译材质进度久久没有变化)
     - [通过构建进度查看工具会发现，有时代理会超过系统设置的最大同时能运行的进程数?](#通过构建进度查看工具会发现有时代理会超过系统设置的最大同时能运行的进程数)
     - [备份机器](#备份机器)
@@ -78,7 +77,7 @@ https://www.bilibili.com/video/BV1dCr3YqExS/?spm_id_from=333.999.0.0&vd_source=e
 
   - CPU: i5
   - 内存：4GB
-  - 存储空间：10GB SSD
+  - 存储空间：推荐 10GB以上 SSD
 
 - **系统架构**：
   XiaoBuild 包含两种类型的机器：Agent 和 Coordinator。
@@ -212,11 +211,6 @@ https://www.bilibili.com/video/BV1dCr3YqExS/?spm_id_from=333.999.0.0&vd_source=e
 
 ## 常见问题
 
-### 用户登录时无法连接服务器?
-
-这种情况是本地开启了代理服务，但是没有使用VPN导致无法连接
-![DisableProxyServer](./documents/resource/ProxyServer.png)
-
 ### 启动项目之后卡在%45编译材质，进度久久没有变化?
 
 在这种情况下是XiaoScheduler这个程序出现异常崩溃了，重启就能解决这样的问题
@@ -258,5 +252,6 @@ https://www.bilibili.com/video/BV1dCr3YqExS/?spm_id_from=333.999.0.0&vd_source=e
 
 - **邮箱**：cxx2020@outlook.com
 - **QQ**：794569465
+- **QQ群**：910420853
 - **微信**：c794569465
 ![WeChat](./documents/resource/wechat_qr_code.jpg)
