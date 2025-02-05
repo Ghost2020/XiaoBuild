@@ -1,257 +1,259 @@
 # XiaoBuild
 
-## 简介
+## Introduction
 
-> 本软件主要基于UE5.5的UBA开发，用于UnrealEngine开发过程中，旨在提高用户在源码编译和材质编译方面的效率和体验，具备IncrediBuild的常规功能。
-
----
-
-## 版本信息
-
-当前版本：v1.0.5
-发布日期：2025-01-18
+> This software is primarily developed based on UE5.5's UBA, designed for the Unreal Engine development process. It aims to enhance user efficiency and experience in source code compilation and material compilation, providing the standard functionalities of IncrediBuild.
 
 ---
 
-## 引擎支持情况
+## Version Information
 
-| 引擎版本 | 源码编译 | 材质编译  |
-|---------|----------|----------|
+Current Version：v1.0.5
+Release Date: ：2025-01-18
+
+---
+
+## Engine Support
+
+| Engine Version     | Source Compilation | Material Compilation  |
+|--------------------|--------------------|-----------------------|
 | 4_26    | ✔        | ✔       |
 | 4_27    | ✔        | ✔       |
-| 5_0     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1p9cieiEQc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_1     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1dCr3YqExS/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_2     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1k9cieiEdQ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_3     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1C9cieiEV8/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_4     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1p9cieiEsZ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_5     | ✔ [BuildInight查看](https://www.bilibili.com/video/BV1p9cieiEyc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_0     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1p9cieiEQc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_1     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1dCr3YqExS/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_2     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1k9cieiEdQ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_3     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1C9cieiEV8/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_4     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1p9cieiEsZ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_5     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1p9cieiEyc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
 
-## 目录
+## Table of contents
 
 - [XiaoBuild](#xiaobuild)
-  - [简介](#简介)
-  - [版本信息](#版本信息)
-  - [引擎支持情况](#引擎支持情况)
-  - [目录](#目录)
-  - [功能特点](#功能特点)
-  - [系统要求](#系统要求)
-  - [安装指南](#安装指南)
-  - [使用说明](#使用说明)
-    - [一.安装配置工具](#一安装配置工具)
-    - [二.托盘工具](#二托盘工具)
-    - [三.构建实时分析工具](#三构建实时分析工具)
-    - [四.构建协调器工具](#四构建协调器工具)
-    - [五.代理设置工具](#五代理设置工具)
-  - [常见问题](#常见问题)
-    - [启动项目之后卡在%45编译材质，进度久久没有变化?](#启动项目之后卡在45编译材质进度久久没有变化)
-    - [通过构建进度查看工具会发现，有时代理会超过系统设置的最大同时能运行的进程数?](#通过构建进度查看工具会发现有时代理会超过系统设置的最大同时能运行的进程数)
-    - [备份机器](#备份机器)
-  - [更新日志](#更新日志)
+  - [Introduction](#introduction)
+  - [Version Information](#version-information)
+  - [Engine Support](#engine-support)
+  - [Table of contents](#table-of-contents)
+  - [Features](#features)
+  - [System Requirements](#system-requirements)
+  - [Installation Guide](#installation-guide)
+  - [User Manual](#user-manual)
+    - [1.Installing and Configuring the Tool](#1installing-and-configuring-the-tool)
+    - [2.Tray Tool](#2tray-tool)
+    - [3.Real-time Build Insight Tool](#3real-time-build-insight-tool)
+    - [4.Build Coordinator Tool](#4build-coordinator-tool)
+    - [5.Agent Settings Tool](#5agent-settings-tool)
+  - [QA](#qa)
+    - [The project gets stuck at 45% during material compilation, and the progress does not change for a long time?](#the-project-gets-stuck-at-45-during-material-compilation-and-the-progress-does-not-change-for-a-long-time)
+    - [Sometimes the agent exceeds the maximum number of concurrent processes set by the system?](#sometimes-the-agent-exceeds-the-maximum-number-of-concurrent-processes-set-by-the-system)
+    - [Backup Machine Setup](#backup-machine-setup)
+  - [Changelog](#changelog)
     - [v1.0.0](#v100)
-  - [许可协议](#许可协议)
-  - [联系我们](#联系我们)
+  - [License Agreement](#license-agreement)
+  - [Contact Us](#contact-us)
 
 ---
 
-## 功能特点
+## Features
 
-软件的主要功能：
+Main functionalities of the software:
 
-- **主要功能1**：UnrealEngine源码、材质联合编译
-- **主要功能2**：系统的运行并不要求安装UE引擎
-- **主要功能3**：实时查看源码、材质编译的过程
-- **主要功能4**：通过配置系统和代理的参数，使调度系统动态获取释放计算资源，充分利用系统中的计算资源
-- **主要功能5**：对于用户使用相对友好，无须专业知识
+- **Feature 1**：Unified compilation of Unreal Engine source code and materials
+- **Feature 2**：Does not require UE Engine installation for operation
+- **Feature 3**：Real-time monitoring of source code and material compilation
+- **Feature 4**：Configurable system and agent parameters to dynamically allocate and release computing resources, maximizing resource utilization
+- **Feature 5**：User-friendly interface, requiring no specialized knowledge
 
-构建UE5_1全过程 
+Complete UE5_1 build process: 
 https://www.bilibili.com/video/BV1dCr3YqExS/?spm_id_from=333.999.0.0&vd_source=e4b1cc7dae1637f7c09704300ea43634
 
 ---
 
-## 系统要求
+## System Requirements
 
-描述软件的运行环境和硬件要求：
+Description of the software's runtime environment and hardware requirements:
 
-- **操作系统**：x64 Windows 10/11
-- **硬件需求**：
+- **Operating System**：x64 Windows 10/11
+- **Hardware Requirements**：
 
   - CPU: i5
-  - 内存：4GB
-  - 存储空间：推荐 10GB以上 SSD
+  - Memory：4GB
+  - Storage: Recommended 10GB+ SSD
 
-- **系统架构**：
-  XiaoBuild 包含两种类型的机器：Agent 和 Coordinator。
+- **System Architecture**：
+  XiaoBuild consists of two machine types: Agent and Coordinator.
 
 ![architecture](./documents/resource/architecture.png)
 
 ---
 
-## 安装指南
+## Installation Guide
 
-详细说明软件的安装步骤：
+Detailed steps for software installation:
 
-1. 下载安装包：[下载链接](https://github.com/Ghost2020/XiaoBuild/releases)
-2. 双击安装文件并按照提示完成安装。
-3. 如有安装"某60"和类似电脑管家等各种杀毒软件，注意允许其安装
-4. 配置环境变量（如有需要）
-5. 启动软件进行初始化设置。
+1. Download the installation package：[Download Link](https://github.com/Ghost2020/XiaoBuild/releases)
+2. Double-click the installation file and follow the prompts to complete the installation.
+3. If you have installed "Certain 360" and similar antivirus software such as Computer Manager, make sure to allow the installation.
+4. Configure environment variables (if needed).
+5. Launch the software for initial setup.
 
 ---
 
-## 使用说明
+## User Manual
 
-分步骤说明如何使用软件的主要功能：
+Step-by-step instructions on how to use the software's main features:
 
-### 一.安装配置工具
+### 1.Installing and Configuring the Tool
 
-**Step1::启动界面如下**
+**Step1::Initial Launch Screen**
 
 ![Installer](./documents/resource/Installer.png)
 
-**Step2::协议条款**
+**Step2::Agreement Terms**
 
 ![Agreetment](./documents/resource/Agreement.png)
 
-**Step3::安装类型**
+**Step3::Installation Type**
 
 ![InstallType](./documents/resource/InstallType.png)
 
-`选项一`::绝大多数情况下使用第一种
+`Option 1`::Recommended for most cases.
 
-`选项二`::通过配置文件自动化安装
+`Option 2`::Automated installation via a configuration file.
 
-`选项三`::卸载操作
+`Option 3`::Uninstallation process.
 
 ---
 
-**Step4::组件安装**
+**Step4::Component Installation**
 
 ![InstallType](./documents/resource/InstallComponent.png)
 
-`代理`::将会注册安装代理服务，可以发起联合编译任务，同时也作为代理接受其他发起者的联合编译请求(建议首次配置系统时,先安装 `网络` 类型)
+`Agent`::Registers the installation of an agent service, which can initiate collaborative compilation tasks and also act as an agent to accept collaborative compilation requests from other initiators. (It is recommended to install the Network type first when configuring the system.)
 
-`网络`::(主要是服务程序)在代理安装的基础上还会额外注册安装调度器服务，调度器服务用于同步所有代理的各种数据，在此数据基础上用于分发构建任务。
+`Network`::(Mainly a service program) In addition to the agent installation, it will also register and install the scheduler service, which synchronizes all agent data and distributes build tasks based on this data.
 
-`自定义`::可以选择进一步细化安装的组件
+`Custom`::Allows further selection of installation components.
+
 
 ---
 
-**Step5::代理安装-确定调度器的位置**
+**Step5::Agent Installation - Setting the Scheduler Location**
 
 ![Connect2Coordinator](./documents/resource/Connect2Coordinator.png)
 
-`网络地址` 是调度器所在机器的ip地址，设置之后，可以点击测试按钮是否网络通讯是否通常
+`Network Address` The Network Address is the IP address of the scheduler machine. After setting it, you can click the test button to check if network communication is normal.
 
-**Step6 确定代理服务的网络端口**
+**Step6 Setting the Network Port for Agent Service**
 
 ![AgentPort](./documents/resource/AgentPort.png)
 
-除非提示端口被占用，一般情况下使用默认的就好
+Unless the port is occupied, the default setting is recommended.
 
-**Step7 确定哪些UE引擎需要安装联合编译**
+**Step7 Selecting Unreal Engine Versions for Collaborative Compilation**
 
 ![EngineInstall](./documents/resource/EngineInstall.png)
 
-`代理Cas目录`用于存放UBA系统的缓存数据文件，对于硬盘I/O有要求，最好放在SSD盘上，空余的存储文件至少10GB是最好的
+`Agent Cas Directory` The Agent Cas Directory is used to store cache data files for the UBA system. Since it has high I/O requirements, it is best to place it on an SSD with at least 10GB of available storage.
 
-`上面的UnrealEngine的表格用显示了当前机器上装了哪些UE引擎，是源码版本还是公版引擎，以及是否安装对于联合编译的支持，(安装之后，后续有其他的引擎也可以通过设置来动态卸载和安装)`
+`The table above shows which Unreal Engine versions are installed on the machine, whether they are source or public versions, and whether collaborative compilation support is installed. (After installation, additional Unreal Engine versions can be dynamically uninstalled and installed as needed.)`
 
 ---
 
-**Step5::网络安装-调度器**
+**Step5::Network Installation - Scheduler Setup**
 
 ![CoordiPort](./documents/resource/CoordiPort.png)
 
-上述的各项端口是调度服务和web服务所需的，默认就好，如果被占用，可选取其他端口进行测试
+The ports listed above are required for the scheduling and web services. The default settings are recommended, but if they are occupied, alternative ports can be tested.
 
 ---
 
-### 二.托盘工具
+### 2.Tray Tool
 
 ![Tray](./documents/resource/Tray.png)
 
-`托盘工具是其他工具程序的管理入口`
+`The Tray Tool serves as the management entry point for other utility programs.`
 
-### 三.构建实时分析工具
+### 3.Real-time Build Insight Tool
 
-构建进度查看主要功能如下:
+The main functions of build progress monitoring:
 
-1. **构建进度实时查看**
-   ![Monitor](./documents/resource/Monitor.png)
-2. **历史构建进度查看**
+1. **Real-time Build Progress Monitoring**
+![Monitor](./documents/resource/Monitor.png)
+
+2. **Viewing Historical Build Progress**
 
 ![BuildHistory](./documents/resource/BuildHistory.png)
 
-3. **代理连通性测试**
+3. **Agent Connectivity Testing**
 
 ![AgentConnectivity](./documents/resource/AgentConnectivity.png)
 
-### 四.构建协调器工具
+### 4.Build Coordinator Tool
 
-  **功能1**：查看，调整系统中代理的参数，用以分配计算资源
+**Function 1**：View and adjust agent parameters in the system to allocate computing resources.
+
 ![Coordinator](./documents/resource/Coordinator.png)
 
-  **功能2**: 具备简单的用户管理机制，管理员具有最高权限可修改系统中各项参数，观察者，只能查看系统的各项参数
+ **Function 2**: Basic user management mechanism where administrators have full permissions to modify system parameters, while observers can only view them.
 
 ![UserManager](./documents/resource/user_management.png)
 
-  **功能3**：查看同步到系统中异常错误 SystemSettings.png
+**Function 3**：View system errors synchronized into the system.
 
 ![SystemSettings](./documents/resource/SystemSettings.png)
 
 ---
 
-### 五.代理设置工具
+### 5.Agent Settings Tool
 
 ![AgentSettings](./documents/resource/AgentSettings.png)
 
-  **主要功能**：代理系统相关参数设置
+  **Main Function**：Configuring agent system parameters.
 
 ---
 
-## 常见问题
+## QA
 
-### 启动项目之后卡在%45编译材质，进度久久没有变化?
+### The project gets stuck at 45% during material compilation, and the progress does not change for a long time?
 
-在这种情况下是XiaoScheduler这个程序出现异常崩溃了，重启就能解决这样的问题
+In this case, the XiaoScheduler program has crashed. Restarting the program should resolve the issue.
 
-### 通过构建进度查看工具会发现，有时代理会超过系统设置的最大同时能运行的进程数?
+### Sometimes the agent exceeds the maximum number of concurrent processes set by the system?
 
-这种情况是UBA底层调度有bug，看后续是否有时间去解决(短时间内超过限制，不会机器的运行有太大的影响)
+This is a bug in the UBA scheduling system. It will be addressed in future updates. (A temporary excess of processes will not significantly impact system performance.)
 
-### 备份机器
+### Backup Machine Setup
 
-在网络服务已经运行注册安装之后，选择一台网络稳定，存储空间足够的机器按照普通安装的顺序，只是在安装类型时选择`自定义类型`，
-然后在其中的选项中选择`备份服务器`类型
+After the network service is installed and registered, choose a stable machine with sufficient storage and follow the normal installation process. However, select `Custom Installation` type and choose the `Backup Server` option.
 
 ![BackupCoordi](./documents/resource/BackupCoordi.png)
 
 ---
 
-## 更新日志
+## Changelog
 
-记录软件的版本更新内容：
+Documenting software version updates:
 
 ### v1.0.0
 
-- 基本具备IncreaiBuild的功能，但是在材质编译时还是会有概率性会崩溃的问题，导致打包或者依赖材质编译的流程阻塞
+- Basic functionality equivalent to IncrediBuild, but material compilation may occasionally cause crashes, blocking packaging or material-dependent workflows.
 
 ---
 
-## 许可协议
+## License Agreement
 
-简要描述软件的使用许可，或附上完整的许可协议链接：
+A brief description of the software license, or a link to the full license agreement:
 
-> 本软件遵循MIT License许可协议，详情请参阅[协议链接](#)。
+> This software follows the MIT License. For details, please refer to `License Link`.
 
 ---
 
-## 联系我们
+## Contact Us
 
-提供用户支持的联系方式：
+Providing user support contact information:
 
-- **邮箱**：cxx2020@outlook.com
+- **Email**：cxx2020@outlook.com
 - **QQ**：794569465
-- **QQ群**：910420853
-- **微信**：c794569465
+- **QQ Group**：910420853
+- **WeChat**：c794569465
 ![WeChat](./documents/resource/wechat_qr_code.jpg)
