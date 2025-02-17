@@ -1,5 +1,7 @@
 # XiaoBuild
 
+![BuildInsight](./documents/resource/BuildInsight.gif)
+
 ## Introduction
 
 > This software is primarily developed based on UE5.5's UBA, designed for the Unreal Engine development process. It aims to enhance user efficiency and experience in source code compilation and material compilation, providing the standard functionalities of IncrediBuild.
