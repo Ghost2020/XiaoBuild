@@ -59,11 +59,11 @@ Release Date: ：2025-01-18
 
 Main functionalities of the software:
 
-- **Feature 1**：Unified compilation of Unreal Engine source code and materials
-- **Feature 2**：Does not require UE Engine installation for operation
-- **Feature 3**：Real-time monitoring of source code and material compilation
-- **Feature 4**：Configurable system and agent parameters to dynamically allocate and release computing resources, maximizing resource utilization
-- **Feature 5**：User-friendly interface, requiring no specialized knowledge
+- Unified compilation of Unreal Engine source code and materials
+- Does not require UE Engine installation for operation
+- Real-time monitoring of source code and material compilation
+- Configurable system and agent parameters to dynamically allocate and release computing resources, maximizing resource utilization
+- User-friendly interface, requiring no specialized knowledge
 
 Complete UE5_1 build process: 
 https://www.bilibili.com/video/BV1dCr3YqExS/?spm_id_from=333.999.0.0&vd_source=e4b1cc7dae1637f7c09704300ea43634
