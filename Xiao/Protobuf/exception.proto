@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message FException
+{
+	string TimeStamp = 1;
+	string BuildId = 2;
+	string ExecHost = 3;
+	string Mac = 4;
+	int32 ExitCode = 5;
+	string Application = 6;
+	string Arguments = 7;
+	string WorkingDir = 8;
+	string Description = 9;
+	string LogFile = 10;
+}

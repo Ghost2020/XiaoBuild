@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+// 已注册代理详细信息
+message FAgentProto
+{
+	// 状态
+	int32 Status = 1;
+	// 账户名
+	string Username = 2;
+	// 类型
+	int32 Type = 3;
+	// 描述
+	string Desc = 4;
+	// 构建分组
+	string Group = 5;
+	// cpu利用率
+	float CpuAva = 6;
+	// 最后连接时间
+	string LastCon = 7;
+	// 总共帮助缓存大小
+	float TotalHelpCache = 8;
+	// 使用缓存大小
+	float UseHelpCache = 9;
+	// 协助核心数
+	int32 HelperCore = 10;
+	// 是否使用构建缓存
+	bool bBuildCache = 11;
+	// 构建优先级
+	int32 BuildPriority = 12;
+	// CPU详细信息
+	string CpuInfo = 13;
+	// 总共硬盘大小
+	float TotalHardSpace = 14;
+	// 已使用硬盘大小
+	float UseHardSpace = 15;
+	// IP地址
+	string Ip = 16;
+	// 日志等级
+	int32 LogLevel = 17;
+	// 登录用户
+	string LoginUser = 18;
+	// 分配优先级
+	int32 AllocationPriority = 19;
+	// 总共内存大小
+	float TotalMemory = 20;
+	// 已使用内存
+	float UseMemory = 21;
+	// 逻辑核心数
+	int32 LogicCore = 22;
+	// Mac地址
+	string MacAddress = 23;
+	// 连接方式 true::本地连接 false::外部连接
+	bool bLocalConnection = 24;
+	// 网络速率
+	float NetworkSpeed = 25;
+	// 操作系统
+	string OpSystem = 26;
+	// 物理核心数
+	int32 PhysicalCore = 27;
+	// 路由IP地址
+	string RouterIp = 28;
+	// 网络上下行
+	bool bUpOrDown = 29;
+	// 上下行时间
+	string UpDownTime = 30;
+	// 是否作为Initator
+	bool bEnableInitator = 31;
+	// 是否固定为Initator
+	bool bFixedInitator = 32;
+	// 是否作为Helper
+	bool bEnableHelper = 33;
+	// 是否固定为Helper
+	bool bFixedHelper = 34;
+	// UNIQE ID
+	string Id = 35;
+	// 是否订阅
+	bool bSubscribe = 36;
+	// 传递的消息
+	string message = 37;
+	// Helper端口
+	int32 HelperPort = 38;
+	// 表格内临时索引
+	int32 Index = 39;
+	// 上次更新时间
+	int64 LastUpdate = 40;
+	// 最大连接代理数量
+	int32 MaxCon = 41;
+	// 最大调用进程数量
+	int32 MaxCpu = 42;
+	// Trace端口
+	int32 TracePort = 43;
+	// 最大本地启动进程数
+	int32 LocalMaxCpu = 44;
+	// 网络利用率
+	float AvalNet = 45;
+	// GPU利用率
+	float AvaGpu = 46;
+	// Cpu架构
+	string CpuArch = 47;
+	// Port-MappedAddress
+	string PortMappedAddress = 48;
+}
+
+// 代理信息列表
+message FAgentArrayProto
+{
+	repeated FAgentProto Agents = 1;
+}

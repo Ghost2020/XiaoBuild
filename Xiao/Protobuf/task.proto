@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+// 任务信息
+message FTaskProto
+{
+	// 描述
+	string caption = 1;
+	// 命令
+	string cmd = 2;
+	// 参数
+	string params = 3;
+	// 构建组
+	string group = 4;
+	// 依赖组
+	repeated string dependence = 5;
+	// 是否允许远程执行
+	bool allow_remote = 6;
+	// 是否等待
+	bool wait = 7;
+	// 优先级
+	int32 priority = 8;
+}

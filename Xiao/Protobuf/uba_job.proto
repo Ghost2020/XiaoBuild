@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+message FUbaJob
+{
+	string application = 1;
+	string arguments = 2;
+	string description = 3;
+	string workingDir = 4;
+	bool bWriteOutputFilesOnFail = 5;
+	string logFile = 6;
+
+	string inputFile = 7;
+	string OutputFile = 8;
+
+	float weight = 9;
+	
+	string knownInputs = 10;
+
+	int32 jobId = 11;
+}
+
+enum ELogType
+{
+	Lt_Error = 0;
+	Lt_Warning = 1;
+	Lt_Info = 2;
+	Lt_Detail = 3;
+	Lt_Debug = 4;
+}
+
+
+message FLogLine
+{
+	string text = 1;
+	ELogType type = 2;
+}
+
+
+message FUbaStats
+{
+	uint32 queued = 1;
+	uint32 activeLocal = 2;
+	uint32 activeRemote = 3;
+	uint32 finished = 4;
+}
+
+
+message FUbaOutput
+{
+	int32 exitCode = 1;
+	string outputs = 2;
+	FUbaStats stats = 3;
+	int32 jobId = 4;
+}
+
+message FUbaExit
+{
+	bool bExit = 1;
+}

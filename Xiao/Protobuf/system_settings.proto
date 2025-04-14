@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+
+// 系统设置
+message FSystemSettings
+{
+	// 硬盘空间最小值
+	float HardDiskMinimal = 1;
+	// 虚拟内存最小值
+	float VirtualMemoryMinimal = 2;
+	// 物理内存大小
+	float PhysicalMemory = 3;
+	// Cpu可用百分比
+	float CpuAvailableMinimal = 4;
+	// 协助核心百分比
+	float HelperCoreAvailablePercentMinimal = 5;
+	// 网络利用率
+	float NetworkAvaMin = 6;
+	// GPU利用率
+	float GpuAvaMin = 7;
+	// 是否允许代理设置作为协助者
+	bool bEnableHelper = 8;
+
+	// 代理连接端口
+	uint32 AgentServicePort = 9;
+	// WebUI端口
+	uint32 WebUIPort = 10;
+	// 调度器端口
+	uint32 CoordiServicePort = 11;
+	// License端口
+	uint32 LicenseServicePort = 12;
+	// 缓存服务端口
+	uint32 CacheServicePort = 13;
+
+	// 状态同步频率
+	uint32 SyncFreq = 14;
+	// 是否加密传输
+	bool bEncyptTransport = 15;
+	// 是否阻止Standby
+	bool bForbidenStanby = 16;
+	// 是否不显示Windows的防火墙信息
+	bool bShowWindowsFire = 17;
+	// 是否帮助改善产品和服务
+	bool bHelperEnhance = 18;
+
+	// 每次构建的最大核心数
+	uint32 MaxCoreNum = 19;
+	// 最大同时运行发起者
+	uint32 MaxInitiatorNum = 20;
+	// 单次最大协助数量
+	uint32 MaxConNum = 21;
+
+	// 是否定时清理代理CAS数据
+	bool bScheduleClean = 22;
+	// 定期清理天数
+	uint32 ScheduleTime = 24;
+
+	// 是否忽略cpu架构
+	bool bIgnoreArch = 25;
+}

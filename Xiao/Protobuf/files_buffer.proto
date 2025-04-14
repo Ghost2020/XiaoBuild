@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+// 任务信息
+message FFilesBuffer
+{	
+	// 文件路径
+	repeated string Files = 1;
+	repeated string Buffers = 2;
+}

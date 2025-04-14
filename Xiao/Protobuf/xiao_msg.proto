@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+// 消息类型
+enum EXiaoMsgType
+{
+	Xmt_Undefined = 0;
+
+	// 保持活跃的消息
+	Xmt_KeepAlive = 1;
+	// 消息接受到的回复
+	Xmt_Accepted = 2;
+	// 消息拒绝接受
+	Xmt_Declined = 3;
+
+	//------------------------------<<发起构建消息Begin>>------------------------------
+	// 尝试连接
+	Xmt_TryConnect = 4;
+	// 任务描述
+	Xmt_TaskDesc = 5;
+	// 杀死任务
+	Xmt_TaskKill = 6;
+	// 构建结束，用于断开连接前的消息
+	Xmt_Disconnect = 7;
+	//------------------------------<<发起构建消息Finish>>-----------------------------
+
+	Xmt_Data = 8;
+	// 接受完整数据
+	Xmt_EchoAcceptFullData = 9;
+	// 接受残缺数据
+	Xmt_EchoAcceptBrokenData = 10;
+	// 重新发送数据
+	Xmt_ReSendData = 11;
+
+	//------------------------------<<远程代理消息Begin>>------------------------------
+	// 代表接受连接
+	Xmt_AgentAcceptConnect = 12;
+	// 代理拒绝连接
+	Xmt_AgentDeclinedConnect = 13;
+	
+	// 代理统计信息
+	Xmt_AgentStat = 14;
+	// 代理运行任务
+	Xmt_AgentRunTask = 15;
+	// 代理运行输出
+	Xmt_AgentOutputLog = 16;
+	// 代理运行结果
+	Xmt_AgentOutput = 17;
+	// 代理执行失败
+	Xmt_AgentFailed = 18;
+	// 代理重启任务
+	Xmt_AgentRestart = 19;
+	// 代理断开连接
+	Xmt_AgentDisconnect = 20;
+	//------------------------------<<远程代理消息Finish>>------------------------------
+}
+
+// 数据类型
+enum EXiaoDataType
+{
+	Xdt_UnDefined = 0;
+	Xdt_Binary = 1;
+}
+
+// 可执行程序描述
+message FRemoteTaskDesc
+{
+	// 任务GUID
+	string GUID = 1; 
+	// 可执行程序名称
+	string Proc = 2;
+	// 命令行参数
+	string Params = 3;
+	// 工作目录
+	string WorkingDir = 4;
+	// 优先级
+	int32 Priority = 5;
+	// 进程核心索引
+	int32 CoreIndex = 6;
+}
+
+// 核心的数据
+message FCoreStatus
+{
+	int32 Index = 1;
+	bool Status = 2;
+	float LastActiveTime = 3;
+}
+
+// 代理核心相关数据
+message FAgentStatCore
+{
+	float CpuAva = 1;
+	float HardAva = 2;
+	repeated FCoreStatus Cores = 3;
+}
+
+// Xiao消息Protobuf
+message FXiaoMsg
+{
+	// 消息类型
+	EXiaoMsgType Type = 1;
+	// 消息ID
+	string Id = 2;
+	// 是否回复
+	bool bEcho = 3;
+	//  任务描述
+	FRemoteTaskDesc TaskDesc = 4;
+	// 额外消息
+	string Msg = 5;
+	// 代理状态消息
+	FAgentStatCore Stats = 6;
+}
