@@ -1,0 +1,26 @@
+{
+    "service":
+    {
+        "port":
+        {
+			"coordi_port": 37000,
+			"license_port": 37020,
+			"cache_port": 37040,
+			"perf_port": 37060,
+            "agent_port": 38000
+		},
+
+        "license_service":
+        {
+            "thread_num": 0,
+            "log_path": "",
+            "log_level": 0
+        }
+    },
+
+    "initial_login":
+    {
+        "username": "admin",
+        "password": "A1234567"
+    }
+}
