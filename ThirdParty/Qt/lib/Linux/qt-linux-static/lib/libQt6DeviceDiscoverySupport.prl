@@ -1,0 +1,5 @@
+QMAKE_PRL_TARGET = libQt6DeviceDiscoverySupport.a
+QMAKE_PRL_CONFIG = static
+QMAKE_PRL_VERSION = 6.8.3
+QMAKE_PRL_LIBS = $$[QT_INSTALL_LIBS]/libQt6Core.a -lz -lm -licui18n -licuuc -licudata -lpcre2-16 -ldl -lglib-2.0 -lgthread-2.0 -lrt -lpthread -ludev
+QMAKE_PRL_LIBS_FOR_CMAKE = $$[QT_INSTALL_LIBS]/libQt6Core.a;-lz;-lm;-licui18n;-licuuc;-licudata;-lpcre2-16;-ldl;-lglib-2.0;-lgthread-2.0;-lrt;-lpthread;-ludev

@@ -1,0 +1,5 @@
+QMAKE_PRL_TARGET = QtCore
+QMAKE_PRL_CONFIG = shared lib_bundle
+QMAKE_PRL_VERSION = 6.10.0
+QMAKE_PRL_LIBS = -framework IOKit -framework DiskArbitration -framework UniformTypeIdentifiers
+QMAKE_PRL_LIBS_FOR_CMAKE = -framework IOKit;-framework DiskArbitration;-framework UniformTypeIdentifiers
