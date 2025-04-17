@@ -36,7 +36,7 @@ TSharedRef<SWidget> SAgentExceptionRow::GenerateWidgetForColumn(const FName& InC
 			}
 			if (InColumnName == GExceptTableColumnIDContent)
 			{
-				const FString Content = FString::Printf(TEXT("BuildId::%s\nExecHost::%s\nApplication::%s\nArguments::%s\nWorkingDir::%s\nDescription::%s\nExitCode::%u\nLogFile::%s"),
+				const FString RowContent = FString::Printf(TEXT("BuildId::%s\nExecHost::%s\nApplication::%s\nArguments::%s\nWorkingDir::%s\nDescription::%s\nExitCode::%u\nLogFile::%s"),
 					UTF8_TO_TCHAR(Desc->buildid().c_str()),
 					UTF8_TO_TCHAR(Desc->exechost().c_str()),
 					UTF8_TO_TCHAR(Desc->application().c_str()),
@@ -49,7 +49,7 @@ TSharedRef<SWidget> SAgentExceptionRow::GenerateWidgetForColumn(const FName& InC
 				return V_FILL_WIGET(SNew(SMultiLineEditableTextBox)
 					.IsReadOnly(true)
 					.AutoWrapText(true)
-					.Text(FText::FromString(Content))
+					.Text(FText::FromString(RowContent))
 					.Justification(ETextJustify::Type::Left));
 			}
 		}

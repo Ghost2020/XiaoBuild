@@ -8,9 +8,6 @@
 #include "Widgets/Views/SHeaderRow.h"
 #include "Widgets/Views/SListView.h"
 #include "XiaoShare.h"
-#include <unordered_map>
-#include <unordered_set>
-#include <map>
 
 class FAgentProto;
 namespace Xiao
@@ -25,6 +22,8 @@ public:
 	SLATE_BEGIN_ARGS(SAgentView){}
 		SLATE_EVENT(FOnQueueNotification, OnQueueNotification)
 	SLATE_END_ARGS()
+
+	SAgentView();
 	
 	void Construct(const FArguments& InArgs);
 

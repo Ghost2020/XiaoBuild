@@ -12,7 +12,8 @@ public class XiaoSchedulerTarget : TargetRules
 	{
 		LaunchModuleName = "XiaoScheduler";
 		bUsePCHFiles = false; // if include Core must be false
-		XiaoAgentTarget.CommonUbaSettings(this, Target, LaunchModuleName);
+		UbaAgentTarget.CommonUbaSettings(this, Target);
+		SolutionDirectory = "Programs/XiaoBuild";
 		bWarningsAsErrors = false;
 		bForceEnableExceptions = true;
 		bUseStaticCRT = false;

@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "HAL/PlatformProcess.h"
-#include <unordered_map>
 #include "UbaCommon.h"
 
 class IMappedFileRegion;
@@ -17,7 +16,7 @@ namespace Xiao
 	class FNetworkTrace;
 	struct FBinaryReader;
 
-	static FString BytesToText(const uint64 bytes)
+	static FORCEINLINE FString BytesToText(const uint64 bytes)
 	{
 		if (bytes < 1000)
 			return FString::Printf(TEXT("%ub"), uint64(bytes));

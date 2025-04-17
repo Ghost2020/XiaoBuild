@@ -10,7 +10,7 @@
 
 #if PLATFORM_WINDOWS
 #include "Windows/AllowWindowsPlatformTypes.h"
-#include "Windows/PreWindowsApi.h"
+// #include "Windows/PreWindowsApi.h"
 #endif
 
 class FWindowsXiaoUtilities : public FGenericXiaoUtilities
@@ -34,6 +34,6 @@ public:
 typedef FWindowsXiaoUtilities FXiaoUtilities;
 
 #if PLATFORM_WINDOWS
-#include "Windows/PostWindowsApi.h"
+// #include "Windows/PostWindowsApi.h"
 #include "Windows/HideWindowsPlatformTypes.h"
 #endif

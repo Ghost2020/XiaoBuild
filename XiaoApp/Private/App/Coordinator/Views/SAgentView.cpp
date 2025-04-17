@@ -149,8 +149,12 @@ namespace
 static const FString SAgentTableConfigPath = FPaths::ConvertRelativePathToFull(FPlatformProcess::UserSettingsDir(), TEXT("XiaoBuild/coordi_agent_table.json"));
 static const FString SAgentTableColumeName(TEXT("columns"));
 
+SAgentView::SAgentView()
+{
+}
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
+
 void SAgentView::Construct(const FArguments& InArgs)
 {
 	XIAO_LOG(Log, TEXT("SAgentView::Construct::Begin"));

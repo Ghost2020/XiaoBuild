@@ -38,6 +38,6 @@ static bool GbResetAgentCache = true;
 static uint32 SPPID = 0;
 
 
-static bool OnInstall();
-static bool UnInstall();
-static bool OnUpdate();
+bool OnInstall();
+bool UnInstall();
+bool OnUpdate();

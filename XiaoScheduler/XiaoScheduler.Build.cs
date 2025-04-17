@@ -5,6 +5,7 @@ using UnrealBuildBase;
 using UnrealBuildTool;
 
 [SupportedPlatforms(UnrealPlatformClass.Desktop)]
+[SupportedPlatforms("LinuxArm64")]
 public class XiaoScheduler : ModuleRules
 {
 	public XiaoScheduler(ReadOnlyTargetRules Target) : base(Target)
