@@ -10,8 +10,8 @@
 
 ## Version Information
 
-Current Version：v1.0.5
-Release Date: ：2025-01-18
+Current Version：v1.0.7
+Release Date: ：2025-04-17
 
 ---
 
@@ -249,7 +249,7 @@ Documenting software version updates:
 
 A brief description of the software license, or a link to the full license agreement:
 
-> This software follows the MIT License. For details, please refer to `License Link`.
+> This software follows the MIT License. For details, please [refer to](.COPYRIGHT).
 
 ---
 
