@@ -63,6 +63,7 @@ Main functionalities of the software:
 - Does not require UE Engine installation for operation
 - Real-time monitoring of source code and material compilation
 - Configurable system and agent parameters to dynamically allocate and release computing resources, maximizing resource utilization
+- Supports Unreal Engine versions from 4.26 to 5.5, with one-click installation for both source-built and launcher (binary) versions.
 - User-friendly interface, requiring no specialized knowledge
 
 Complete UE5_1 build process: 
