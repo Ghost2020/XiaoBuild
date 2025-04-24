@@ -11,7 +11,7 @@
 DEFINE_LOG_CATEGORY_STATIC(LogXiao, Log, All);
 
 
-static bool GNeedFlush = false;
+inline bool GNeedFlush = false;
 
 #define XIAO_LOG(Verbosity, FMT, ...) \
 	UE_LOG(LogXiao, Verbosity, (FMT), ##__VA_ARGS__); \

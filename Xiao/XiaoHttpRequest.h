@@ -12,18 +12,18 @@
 
 namespace XiaoHttp
 {
-	static FString SGetVerb(TEXT("GET"));
-	static FString SDeleteVerb(TEXT("DELETE"));
-	static FString SPutVerb(TEXT("PUT"));
-	static FString SPatchVerb(TEXT("PATCH"));
-	static FString SPostVerb(TEXT("POST"));
-	static FString SOptionsVerb(TEXT("OPTIONS"));
+	static const FString SGetVerb(TEXT("GET"));
+	static const FString SDeleteVerb(TEXT("DELETE"));
+	static const FString SPutVerb(TEXT("PUT"));
+	static const FString SPatchVerb(TEXT("PATCH"));
+	static const FString SPostVerb(TEXT("POST"));
+	static const FString SOptionsVerb(TEXT("OPTIONS"));
 
-	static FString SEncryptKey(TEXT("encrypt-length"));
+	static const FString SEncryptKey(TEXT("encrypt-length"));
 
-	static FText SCantConnect = LOCTEXT("ConnectFailed_Text", "无法连接");
-	static FText SUpdateSuccess = LOCTEXT("UpdateSuccess_Text", "更新完成");
-	static FText SUpdateFailed = LOCTEXT("UpdateFailed_Text", "更新失败");
+	static const FText SCantConnect = LOCTEXT("ConnectFailed_Text", "无法连接");
+	static const FText SUpdateSuccess = LOCTEXT("UpdateSuccess_Text", "更新完成");
+	static const FText SUpdateFailed = LOCTEXT("UpdateFailed_Text", "更新失败");
 
 	void DoHttpRequest(
 		const FString& InVerb,

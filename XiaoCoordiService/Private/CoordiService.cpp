@@ -6,8 +6,8 @@
 #include "XiaoShareField.h"
 #include "XiaoCompressor.h"
 #include "XiaoAgent.h"
-#include "Protobuf/system_settings.pb.h"
-#include "Protobuf/agent.pb.h"
+#include "system_settings.pb.h"
+#include "agent.pb.h"
 #include <tuple>
 #include <unordered_map>
 #include <algorithm>

@@ -13,13 +13,13 @@
 #include "App/Monitor/Tracks/UbaTraceReader.h"
 #include "HAL/PlatformFileManager.h"
 
-static FDateTime GDateTime;
+inline FDateTime GDateTime;
 
-static FAgentSettings GAgentSettings;
+inline FAgentSettings GAgentSettings;
 
-static XiaoDB::FUserDesc GCurrentUser;
+inline XiaoDB::FUserDesc GCurrentUser;
 
-static bool GCanUpdate = true;
+inline bool GCanUpdate = true;
 
 // 显示系统相关数据标志
 struct FSystemGraphShowFlags
@@ -321,4 +321,4 @@ struct FMonitorSettings final : FJsonSerializable
 	END_JSON_SERIALIZER
 };
 
-static FMonitorSettings GMonitorSettings;
+inline FMonitorSettings GMonitorSettings;

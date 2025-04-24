@@ -10,32 +10,32 @@
 
 static FString GTaskFile;
 
-static bool GAgentAutoSelectPort = false;
-static FString GAgentBuildGroup = TEXT("default");
-static bool GAgentInstallAddsOn = false;
-static EAgentType GAgentType = AT_Helper;
-static EInitiatorType GInitiatorType = InitiatorType_Fixed;
-static EHelperType GHelperType = ET_Fixed;
-static uint32 GHelperCores = 0;
-static FString GAgentDesc = TEXT("");
-static bool GAgentBuildCache = false;
-static FString GAgentDbDir = TEXT("");
-static FString GAgentCacheDir = TEXT("");
-static uint32 GAgentMaxFileCacheSize = 4096;
+extern bool GAgentAutoSelectPort = false;
+extern FString GAgentBuildGroup = TEXT("default");
+extern bool GAgentInstallAddsOn = false;
+extern EAgentType GAgentType = AT_Helper;
+extern EInitiatorType GInitiatorType = InitiatorType_Fixed;
+extern EHelperType GHelperType = ET_Fixed;
+extern uint32 GHelperCores = 0;
+extern FString GAgentDesc = TEXT("");
+extern bool GAgentBuildCache = false;
+extern FString GAgentDbDir = TEXT("");
+extern FString GAgentCacheDir = TEXT("");
+extern uint32 GAgentMaxFileCacheSize = 4096;
 
 // Coordinator
-static FString GCoordiDatabaseDir = TEXT("");
+extern FString GCoordiDatabaseDir = TEXT("");
 
-static bool GbWatchDogThread = false;
-static bool GbNoUncSync = true;
-static bool GbStopOnerror = false;
-static bool GbOnlyFallLocally = false;
-static bool GbShowCmd = false; 
-static bool GbOpenMonitor = false; 
-static bool GbUseIdeMonitor = false;
-static bool GbEnableAgent = true;
-static bool GbResetAgentCache = true;
-static uint32 SPPID = 0;
+extern bool GbWatchDogThread = false;
+extern bool GbNoUncSync = true;
+extern bool GbStopOnerror = false;
+extern bool GbOnlyFallLocally = false;
+extern bool GbShowCmd = false; 
+extern bool GbOpenMonitor = false; 
+extern bool GbUseIdeMonitor = false;
+extern bool GbEnableAgent = true;
+extern bool GbResetAgentCache = true;
+extern uint32 SPPID = 0;
 
 
 bool OnInstall();

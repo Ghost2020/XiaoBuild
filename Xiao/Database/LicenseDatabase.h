@@ -9,7 +9,7 @@
 #include "XiaoLog.h"
 #include "XiaoShare.h"
 #include "XiaoShareField.h"
-#include "Protobuf/system_settings.pb.h"
+#include "system_settings.pb.h"
 
 static const FString SLicenseDatabaseFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::ApplicationSettingsDir(), TEXT("XiaoBuild/License.xdb")));
 

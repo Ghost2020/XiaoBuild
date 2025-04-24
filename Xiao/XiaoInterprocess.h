@@ -76,7 +76,7 @@ THIRD_PARTY_INCLUDES_END
 namespace XiaoIPC
 {
 #ifdef XIAO_USE_BOOST
-	static boost::interprocess::permissions Permissions;
+	inline boost::interprocess::permissions Permissions;
 
 	// 命令队列
 	static const std::string SInputQueueName("Xiao-Input-Queue");

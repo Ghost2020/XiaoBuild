@@ -6,7 +6,7 @@
 #include "Misc/CommandLine.h"
 #include "XiaoAgent.h"
 #include "XiaoShareRedis.h"
-#include "Protobuf/exception.pb.h"
+#include "exception.pb.h"
 #include "Scheduler.h"
 
 #if PLATFORM_WINDOWS

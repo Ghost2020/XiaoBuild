@@ -384,8 +384,8 @@ struct FAgentSettings : FSettingsBase
 	// 0::Chinese 1::English
 	FString Localization = TEXT("zh-CN");
 };
-static FAgentSettings SModifiedAgentSettings;
-static FAgentSettings SOriginalAgentSettings;
+inline FAgentSettings SModifiedAgentSettings;
+inline FAgentSettings SOriginalAgentSettings;
 static const TMap<FString, FString> GLauguage2Loc = {
 	{TEXT("简体中文"), TEXT("zh-CN")},
 	{TEXT("English"), TEXT("en")}

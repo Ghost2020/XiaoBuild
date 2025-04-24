@@ -5,7 +5,7 @@
 #include "AgentService.h"
 #include "Global.h"
 
-#include "Protobuf/system_settings.pb.h"
+#include "system_settings.pb.h"
 #include "XiaoShareRedis.h"
 #include "XiaoAgent.h"
 #include "XiaoShareNetwork.h"

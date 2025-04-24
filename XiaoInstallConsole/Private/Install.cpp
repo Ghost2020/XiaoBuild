@@ -7,7 +7,7 @@
 #include "XmlFile.h"
 #include "XiaoShareRedis.h"
 #include "XiaoCompressor.h"
-#include "Protobuf/agent.pb.h"
+#include "agent.pb.h"
 
 using namespace XiaoAppName;
 

@@ -7,7 +7,7 @@
 #include "Containers/Array.h"
 #include "Templates/Tuple.h"
 #include "XiaoLog.h"
-#include "Protobuf/agent.pb.h"
+#include "agent.pb.h"
 
 
 class FGenericAgentStatsMonitor

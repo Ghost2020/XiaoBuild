@@ -12,7 +12,7 @@
 #include "XiaoAgent.h"
 #include "XiaoShareRedis.h"
 #include "XiaoCompressor.h"
-#include "Protobuf/agent.pb.h"
+#include "agent.pb.h"
 #include "Misc/CommandLine.h"
 
 #ifdef verify

@@ -380,7 +380,7 @@ static const FText GPriorityHigh = LOCTEXT("Priority_High_Text", "5-High");
 static const FText GPriorityRealtime = LOCTEXT("Priority_Realtime_Text", "6-Realtime");
 static const FText GMultiValue = LOCTEXT("Multi_Text", "Multi");
 
-static FString GLocalization = TEXT("zh-CN");
+inline FString GLocalization = TEXT("zh-CN");
 
 static bool IsValidDir()
 {
@@ -909,7 +909,7 @@ static void GetHelp(const FString& InParam)
 
 static FString GetBuildVersion()
 {
-	return TEXT("Version 1.0.6(build 1)");
+	return TEXT("Version 1.0.8(build 1)");
 }
 
 #ifdef WITH_UNREALPNG
@@ -1130,12 +1130,12 @@ static bool OpenFolderDialog(const FString& InTitle, const FString& InDefaultPat
 #endif
 
 #if PLATFORM_WINDOWS
-static HANDLE GAppMutex = nullptr;
+inline HANDLE GAppMutex = nullptr;
 #else
 #include <fcntl.h>
 #include <sys/file.h>
 #include <unistd.h>
-static int GAppLockId = -1;
+inline int GAppLockId = -1;
 #endif
 
 static bool CheckSingleton(const FString& InAppName = TEXT(""))
@@ -1238,21 +1238,21 @@ static void ReleaseAppMutex()
 #endif
 }
 
-static bool GbQueryLicense = true;
-static FString GOutputFile;
-static FString GLogFile;
-static FString GMonitorFile;
-static int GLogLevel = 3;
-static int GMaxCpus = MAX_int16;
-static int GStopBuildId = -1;
-static FString GAppendText{TEXT(""});
-static EWinVersion GMinWinVer = EWinVersion::Win_XP;
-static EWinVersion GMaxWinVer = EWinVersion::Win_11;
-static TArray<TSharedPtr<FString>> GGroupArray;
-static TArray<TSharedPtr<FText>> GPriorityArray;
-static TArray<TSharedPtr<FText>> GLevelArray;
-static TArray<TSharedPtr<FText>> GRoleArray;
-static TArray<TSharedPtr<FText>> GMasterSlaveArray;
-static TArray<TSharedPtr<FText>> GStatusArray;
+inline bool GbQueryLicense = true;
+inline FString GOutputFile;
+inline FString GLogFile;
+inline FString GMonitorFile;
+inline int GLogLevel = 3;
+inline int GMaxCpus = MAX_int16;
+inline int GStopBuildId = -1;
+inline FString GAppendText{TEXT(""});
+inline EWinVersion GMinWinVer = EWinVersion::Win_XP;
+inline EWinVersion GMaxWinVer = EWinVersion::Win_11;
+inline TArray<TSharedPtr<FString>> GGroupArray;
+inline TArray<TSharedPtr<FText>> GPriorityArray;
+inline TArray<TSharedPtr<FText>> GLevelArray;
+inline TArray<TSharedPtr<FText>> GRoleArray;
+inline TArray<TSharedPtr<FText>> GMasterSlaveArray;
+inline TArray<TSharedPtr<FText>> GStatusArray;
 
 #undef LOCTEXT_NAMESPACE

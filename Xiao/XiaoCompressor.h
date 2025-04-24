@@ -4,7 +4,7 @@
 #include "Misc/FileHelper.h"
 #include "Misc/SecureHash.h"
 #include "HAL/PlatformFileManager.h"
-#include "Protobuf/files_buffer.pb.h"
+#include "files_buffer.pb.h"
 #include "XiaoShare.h"
 
 THIRD_PARTY_INCLUDES_START

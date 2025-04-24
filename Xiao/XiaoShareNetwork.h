@@ -79,22 +79,22 @@ namespace XiaoNetwork
 	static const uint16 SProbeRange = 20;
 
 	// 默认使用监听端口
-	static uint16 SCoordiServicePort = 37000;
-	static uint16 SLicenseServicePort = 37020;
-	static uint16 SCacheServicePort = 37040;
-	static uint16 SUIServicePort = 37060;
-	static uint16 SIPerfServicePort = 37080;
-	static uint16 SAgentServicePort = 1345;
-	static uint16 SSchedulerServerPort = 1346;
-	static uint16 SHelpListenPort = SAgentServicePort;
+	inline uint16 SCoordiServicePort = 37000;
+	inline uint16 SLicenseServicePort = 37020;
+	inline uint16 SCacheServicePort = 37040;
+	inline uint16 SUIServicePort = 37060;
+	inline uint16 SIPerfServicePort = 37080;
+	inline uint16 SAgentServicePort = 1345;
+	inline uint16 SSchedulerServerPort = 1346;
+	inline uint16 SHelpListenPort = SAgentServicePort;
 
 	// 服务地址端口
-	static uint16 SListenPort = 0;
-	static FString SLocalAgentListen = FString::Printf(TEXT("http://localhost:%d"), SAgentServicePort);
-	static FString SLicenseServiceListen = FString::Printf(TEXT("http://localhost:%d"), SLicenseServicePort);
-	static FString SCoordiServiceListen = FString::Printf(TEXT("http://localhost:%d"), SCoordiServicePort);
-	static FString SCacheServiceListen = FString::Printf(TEXT("http://localhost:%d"), SCacheServicePort);
-	static FString SPerfServiceListen = FString::Printf(TEXT("http://localhost:%d"), SIPerfServicePort);
+	inline uint16 SListenPort = 0;
+	inline FString SLocalAgentListen = FString::Printf(TEXT("http://localhost:%d"), SAgentServicePort);
+	inline FString SLicenseServiceListen = FString::Printf(TEXT("http://localhost:%d"), SLicenseServicePort);
+	inline FString SCoordiServiceListen = FString::Printf(TEXT("http://localhost:%d"), SCoordiServicePort);
+	inline FString SCacheServiceListen = FString::Printf(TEXT("http://localhost:%d"), SCacheServicePort);
+	inline FString SPerfServiceListen = FString::Printf(TEXT("http://localhost:%d"), SIPerfServicePort);
 
 	static bool ReadConfig(TSharedPtr<FJsonObject>& ConfigObject)
 	{

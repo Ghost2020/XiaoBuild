@@ -109,8 +109,8 @@ using namespace boost::interprocess;
 
 #define JSON_MCI_VALUE(var) JSON_SERIALIZE(#var, var)
 
-static TSharedPtr<shared_memory_object> GProgressShm = nullptr;
-static TSharedPtr<mapped_region> GProgressRegion = nullptr;
+inline TSharedPtr<shared_memory_object> GProgressShm = nullptr;
+inline TSharedPtr<mapped_region> GProgressRegion = nullptr;
 
 bool static TryCreateIPC()
 {
@@ -170,7 +170,7 @@ struct FInstallProgress : FJsonSerializable
 		JSON_MCI_VALUE(Status);
 		JSON_MCI_VALUE(Message);
 	END_JSON_SERIALIZER
-};static FInstallProgress GProgress;
+}; inline FInstallProgress GProgress;
 
 struct FInstallSettings : FJsonSerializable
 {
@@ -265,7 +265,7 @@ struct FInstallSettings : FJsonSerializable
 		JSON_SERIALIZE_ARRAY("EngineTypes", EngineTypes);
 		JSON_SERIALIZE_ARRAY("EngineVersions", EngineVersions);
 	END_JSON_SERIALIZER
-}; static FInstallSettings GInstallSettings;
+}; inline FInstallSettings GInstallSettings;
 
 
 struct FInstallFolder

@@ -24,13 +24,13 @@ namespace XiaoProtocol
 
 	// TCP 数据缓冲区默认大小
 	constexpr int32 SDefaultBufferSize = 64 * 1024;
-	static int32 SSendBufferSize = SDefaultBufferSize;
-	static int32 SReceiveBufferSize = SDefaultBufferSize;
+	inline int32 SSendBufferSize = SDefaultBufferSize;
+	inline int32 SReceiveBufferSize = SDefaultBufferSize;
 
 	// 特别的Protobuf
-	static FXiaoMsg STryConnectMsg;
-	static FXiaoMsg SDisconnectMsg;
-	static FXiaoMsg SKeepaliveMsg;
+	inline FXiaoMsg STryConnectMsg;
+	inline FXiaoMsg SDisconnectMsg;
+	inline FXiaoMsg SKeepaliveMsg;
 
 	class FXiaoTaskBase
 	{

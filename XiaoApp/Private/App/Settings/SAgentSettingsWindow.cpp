@@ -26,7 +26,7 @@
 #include "XiaoShareRedis.h"
 #include "XiaoAgent.h"
 #include "XiaoAppBase.h"
-#include "Protobuf/agent.pb.h"
+#include "agent.pb.h"
 #include "ShareDefine.h"
 
 

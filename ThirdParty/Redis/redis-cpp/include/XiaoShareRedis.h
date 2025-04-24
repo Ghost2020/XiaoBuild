@@ -65,7 +65,7 @@ public:
 private:
 	std::vector<std::function<void(uint8)>> Listeners;
 };
-static FRedisEvent GOnRedisChanged;
+inline FRedisEvent GOnRedisChanged;
 
 #define JSON_MCI_VALUE(var) JSON_SERIALIZE(#var, var)
 
@@ -244,15 +244,15 @@ struct FRedisEventDesc : FJsonSerializable
 };
 #undef JSON_MCI_VALUE
 
-static FSystemSettings GOriginalSystemSettings;
-static FSystemSettings GModifySystemSettings;
+inline FSystemSettings GOriginalSystemSettings;
+inline FSystemSettings GModifySystemSettings;
 
-static sw::redis::ConnectionOptions GMasterConnection;
-static const FString SRedisClusterFile = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/XiaoBuild/%s.json"), *FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir()), TEXT("CacheCluster")));
-static FRedisCluster GCluster;
-static float GSleepUpdate = 5.0f;
-static ERedisStatus SRedisStatus = ERedisStatus::Redis_Ok;
-static std::string SRedisMessage;
+inline sw::redis::ConnectionOptions GMasterConnection;
+inline const FString SRedisClusterFile = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/XiaoBuild/%s.json"), *FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir()), TEXT("CacheCluster")));
+inline FRedisCluster GCluster;
+inline float GSleepUpdate = 5.0f;
+inline ERedisStatus SRedisStatus = ERedisStatus::Redis_Ok;
+inline std::string SRedisMessage;
 
 #define CATCH_REDIS_EXCEPTRION() \
     catch (const ClosedError& Ex) \
@@ -365,7 +365,7 @@ namespace XiaoRedis
 		static const std::string SProcessException("exception");
 	}
 	
-	static std::shared_ptr<sw::redis::Redis> SRedisClient = nullptr;
+	inline std::shared_ptr<sw::redis::Redis> SRedisClient = nullptr;
 
 	static void SetDefaultParams(FSystemSettings& OutSettings)
 	{

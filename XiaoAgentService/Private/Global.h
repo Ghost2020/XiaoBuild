@@ -4,9 +4,9 @@
  */
 #pragma once
 
-#include "Protobuf/xiao_msg.pb.h"
+#include "xiao_msg.pb.h"
 
 #define SIZEOF_ARRAY(X) ((int)(sizeof(X)/sizeof(X[0])))
 
 // 核心状态的锁
-static FCriticalSection SCriticalSection;
+inline FCriticalSection SCriticalSection;
