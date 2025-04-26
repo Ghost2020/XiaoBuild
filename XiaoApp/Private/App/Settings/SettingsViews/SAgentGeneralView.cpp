@@ -9,9 +9,7 @@
 #include "Widgets/Layout/SExpandableArea.h"
 #include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Text/STextBlock.h"
-#include "Widgets/Input/SNumericEntryBox.h"
 #include "Widgets/Input/SButton.h"
-#include "Widgets/Input/STextComboBox.h"
 #include "Widgets/Input/SComboBox.h"
 
 #include "Dialogs/SProgressWindow.h"
@@ -19,6 +17,7 @@
 #include "XiaoAgent.h"
 #include "XiaoStyle.h"
 #include "XiaoShareField.h"
+#include "App/Installer/InstallerViews/SInstallationFolderView.h"
 
 #define LOCTEXT_NAMESPACE "AgentGeneral"
 
@@ -30,7 +29,7 @@ namespace
 	static const FName SIDUBTFlag("UBTFlag");
 	static const FName SIDPluginFlag("PluginFlag");
 
-	static const FText SUnrealEditorRuning = LOCTEXT("DetectUnrealEditor_Text", "检测到有Unreal编辑器正在运行，操作前请先关闭");
+	static const FText SUnrealEditorRunning = LOCTEXT("DetectUnrealEditor_Text", "检测到有Unreal编辑器正在运行，操作前请先关闭");
 
 	static int SIndex = 0;
 }
@@ -199,7 +198,7 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 							{
 								if (IsUnrealEditorRuning())
 								{
-									FXiaoStyle::DoModel(SUnrealEditorRuning, true);
+									FXiaoStyle::DoModel(SUnrealEditorRunning, true);
 									return;
 								}
 								if (FXiaoStyle::DoModel(LOCTEXT("ToggleUbac_Text", "是否取消UBAC系统的使用?")))
@@ -561,7 +560,7 @@ FReply SAgentGeneralView::OnCommit()
 {
 	if (IsUnrealEditorRuning())
 	{
-		FXiaoStyle::DoModel(SUnrealEditorRuning, true);
+		FXiaoStyle::DoModel(SUnrealEditorRunning, true);
 		return FReply::Handled();
 	}
 	if (FXiaoStyle::DoModel())
@@ -575,8 +574,7 @@ FReply SAgentGeneralView::OnCommit()
 			static FText UpdateComponentText = LOCTEXT("UpdateComponent_Text", "更新组件");
 			auto Window = SNew(SProgressWindow).AllAmount(Diffs.Num()).TiTile(UpdateComponentText);
 			FSlateApplication::Get().AddWindow(Window, true);
-
-			int Index = 0;
+			
 			for (const auto& Desc : Diffs)
 			{
 				Window->EnterProgressFrame(1.0f, FText::FromString(UpdateComponentText.ToString()));

@@ -2,7 +2,6 @@
 
 #include "SLicenseValidationFailed.h"
 #include "SlateOptMacros.h"
-#include "SSimpleButton.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SHyperlink.h"
 #include "Widgets/Text/STextBlock.h"

@@ -344,7 +344,7 @@ namespace Xiao
 
 	bool FTraceReader::StartReadClient(FTraceView& out, FNetworkTrace& client)
 	{
-		const uint32 traceMemSize = 128 * 1024 * 1024;
+		constexpr uint32 traceMemSize = 128 * 1024 * 1024;
 		const FGuid Guid = FGuid::NewGuid();
 		m_sharedMemeoryRegion.Reset(FPlatformMemory::MapNamedSharedMemoryRegion(Guid.ToString(EGuidFormats::DigitsWithHyphensInBraces), true, (FPlatformMemory::ESharedMemoryAccess::Read | FPlatformMemory::ESharedMemoryAccess::Write), traceMemSize));
 		if (!m_sharedMemeoryRegion)
@@ -816,7 +816,7 @@ namespace Xiao
 					const auto type = (ELogEntryType)reader.ReadByte();
 					if (type == 255)
 						break;
-					process.logLines.Add(FPocessLogLine(reader.ReadString(), type));
+					process.logLines.Add(FProcessLogLine(reader.ReadString(), type));
 				}
 			}
 			else if (out.version >= 20)
@@ -828,7 +828,7 @@ namespace Xiao
 				while (logLineCount--)
 				{
 					const auto type = (ELogEntryType)reader.ReadByte();
-					process.logLines.Add(FPocessLogLine(reader.ReadString(), type));
+					process.logLines.Add(FProcessLogLine(reader.ReadString(), type));
 				}
 			}
 

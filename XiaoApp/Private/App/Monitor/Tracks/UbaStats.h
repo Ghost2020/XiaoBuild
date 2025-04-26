@@ -1,6 +1,5 @@
 #pragma once
 
-#include "UbaCommon.h"
 #include "UbaTraceReader.h"
 #include "Insights/ViewModels/TooltipDrawState.h"
 

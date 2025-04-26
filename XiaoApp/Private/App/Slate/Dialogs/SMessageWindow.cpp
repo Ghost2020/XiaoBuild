@@ -5,11 +5,7 @@
 
 #include "SMessageWindow.h"
 #include "SlateOptMacros.h"
-#include "SSimpleButton.h"
 #include "Widgets/Text/STextBlock.h"
-#include "Widgets/Notifications/SProgressBar.h"
-#include "XiaoStyle.h"
-#include "XiaoShare.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SMessageWindow::Construct(const FArguments& InArgs)

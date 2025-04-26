@@ -11,8 +11,6 @@
 #include "Widgets/Input/SCheckBox.h"
 #include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Text/STextBlock.h"
-#include "Widgets/Input/STextComboBox.h"
-#include "Widgets/Input/SNumericDropDown.h"
 #include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Input/SSpinBox.h"
 #include "../../Slate/Widgets/SWarningBox.h"

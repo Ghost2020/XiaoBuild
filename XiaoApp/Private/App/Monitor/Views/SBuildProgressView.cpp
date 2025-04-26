@@ -10,7 +10,6 @@
 #include "SlateOptMacros.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "InsightsCore/Common/PaintUtils.h"
-#include "InsightsCore/Common/TimeUtils.h"
 #include "Insights/ViewModels/TimingEventSearch.h"
 
 #include "Widgets/SOverlay.h"
@@ -26,7 +25,6 @@
 
 #include "XiaoShare.h"
 #include "XiaoStyle.h"
-#include "XiaoShareField.h"
 #include "ShareDefine.h"
 
 #include "../Tracks/UbaTraceReader.h"
@@ -147,7 +145,7 @@ void SBuildProgressView::Construct(const FArguments& InArgs)
 		}
 		
 	});
-	OnSeriesVisibilityChanged.BindLambda([this](FXiaoTimingGraphTrack* InTrack, const FXiaoTimingGraphSeries* InSeries)
+	OnSeriesVisibilityChanged.BindLambda([this](const FXiaoTimingGraphTrack* InTrack, const FXiaoTimingGraphSeries* InSeries)
 	{
 		static double SLastTrigger = 0.0f;
 		if (InSeries)

@@ -59,7 +59,7 @@ TSharedRef<SWidget> SNetworkListRow::GenerateWidgetForColumn(const FName& InColu
 				{
 					if (NetworkDesc.IsValid())
 					{
-						return NetworkDesc.Pin()->Connectivety == ETestConnectivity::Test_Progress ? false : true;
+						return NetworkDesc.Pin()->Connectivety != ETestConnectivity::Test_Progress;
 					}
 					return false;
 				});

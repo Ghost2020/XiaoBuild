@@ -329,7 +329,7 @@ TWeakPtr<SWizardView> SInstallationFolderView::GetNext()
 		}
 		return SSLSettingsView;
 	}
-	else if (GInstallSettings.InstallType & EComponentTye::CT_Agent)
+	if (GInstallSettings.InstallType & EComponentTye::CT_Agent)
 	{
 		if (!InStallView.IsValid())
 		{

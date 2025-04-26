@@ -41,17 +41,17 @@ namespace Xiao
 		LogEntryType_Debug = 4,
 	};
 
-	struct FPocessLogLine
+	struct FProcessLogLine
 	{
-		FPocessLogLine()
+		FProcessLogLine()
 		{}
 
-		FPocessLogLine(FString inText, ELogEntryType inType)
+		FProcessLogLine(const FString& inText, const ELogEntryType inType)
 			: text(inText)
 			, type(inType)
 		{}
 
-		FPocessLogLine& operator=(const FPocessLogLine& Other)
+		FProcessLogLine& operator=(const FProcessLogLine& Other)
 		{
 			if (this != &Other)
 			{

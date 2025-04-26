@@ -40,10 +40,10 @@ public:
 	void OnViewProcessorTrack();
 	bool IsShowingProcessorTrack() const;
 
-	void ShowTraceView();
-	bool IsTraceViewClosed();
-	void ShowOutputView();
-	bool IsOutputViewClosed();
+	void ShowTraceView() const;
+	bool IsTraceViewClosed() const;
+	void ShowOutputView() const;
+	bool IsOutputViewClosed() const;
 
 private:
 	void ConstructWidgets();

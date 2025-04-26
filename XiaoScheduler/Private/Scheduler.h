@@ -10,7 +10,6 @@
 #include "Serialization/MemoryReader.h"
 #include "UbaScheduler.h"
 #include "UbaLogger.h"
-#include "UbaVersion.h"
 #include "UbaSessionServer.h"
 #include "UbaNetworkServer.h"
 #include "UbaStorageServer.h"
@@ -75,7 +74,7 @@ namespace uba
 		{
 		}
 
-		FSchedulerInfo(const FString& InYmlFilePath, NetworkBackend* InBackend, const uint8* InCrypto, bool InbDynamic, const FString& InTraceName, const uint32 InPPID)
+		FSchedulerInfo(const FString& InYmlFilePath, NetworkBackend* InBackend, const uint8* InCrypto, const bool InbDynamic, const FString& InTraceName, const uint32 InPPID)
 			: YmlFilePath(InYmlFilePath)
 			, Backend(InBackend)
 			, Crypto(InCrypto)
@@ -143,16 +142,16 @@ namespace uba
 		void RemoteActionFailedCrash(const ProcessHandle& InProcessHandle, const FString& InError);
 
 		void TryConnectAgents();
-		void ReleaseAgent(const uint32 InClientId, uba::SessionServer::ClientSession* InSession = nullptr);
+		void ReleaseAgent(const uint32 InClientId, const uba::SessionServer::ClientSession* InSession = nullptr);
 		void TryReleaseAgents();
 
 		bool HandleTask(FMemoryReader& InReader);
 		void HandleResponse(const ProcessHandle& InPh, const u32 InTaskId);
 
-		void UpdateSystemSettings(uint32& OutCurInitAvaNum);
+		void UpdateSystemSettings(uint32& OutCurInitAvaNum) const;
 		void UpdateAgents(const int InLocalStatus, const int InAgentStatus, const bool bImmediate);
 		void UpdateProgress(const int InStatus, const float InProgress, const bool bImmediate = false);
-		void UpdateBuildStats();
+		static void UpdateBuildStats();
 
 		SessionServer::ClientSession* GetClientSession(const std::string& InAgentId);
 

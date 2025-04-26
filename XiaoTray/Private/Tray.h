@@ -34,7 +34,7 @@ protected:
 private:
 	void OnPullMessage(QSystemTrayIcon* InTrayIcon);
 	bool OnCheckUpdate() const;
-	void OnUpdateLocalization(const FString& InLocalizaiton);
+	void OnUpdateLocalization(const FString& InLocalization);
 	static void OnDeleteFolderFiles(const FString& InFolder);
 	static void OnCleanTempFolder();
 

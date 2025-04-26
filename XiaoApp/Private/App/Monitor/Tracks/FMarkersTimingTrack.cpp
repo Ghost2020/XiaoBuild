@@ -5,8 +5,6 @@
 #include "FMarkersTimingTrack.h"
 #include "DesktopPlatformModule.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "IImageWrapper.h"
-#include "IImageWrapperModule.h"
 #include "Framework/Application/SlateApplication.h"
 
 #include "Misc/FileHelper.h"
@@ -18,10 +16,8 @@
 #include "TraceServices/Model/Screenshot.h"
 
 #include "InsightsCore/Common/PaintUtils.h"
-#include "Insights/ViewModels/TimingViewLayout.h"
 #include "Insights/ViewModels/TimingEvent.h"
 #include "Insights/ViewModels/TimingTrackViewport.h"
-#include "Insights/ViewModels/TooltipDrawState.h"
 #include "Fonts/FontMeasure.h"
 
 #define LOCTEXT_NAMESPACE "MarkersTimingTrack"
@@ -457,6 +453,13 @@ namespace Xiao
 		, FontMeasureService(FSlateApplication::Get().GetRenderer()->GetFontMeasureService())
 		, Font(FAppStyle::Get().GetFontStyle("SmallFont"))
 		, FontScale(InFontScale)
+		, LogProviderPtr(nullptr)
+		, LastX1(0)
+		, LastX2(0)
+		, LastLogIndex(0)
+		, LastVerbosity()
+		, LastCategory(nullptr)
+		, LastMessage(nullptr)
 	{
 		Track.ResetCache();
 		Track.NumLogMessages = 0;

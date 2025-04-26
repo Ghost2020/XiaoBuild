@@ -9,7 +9,6 @@
 #include "HAL/PlatformTime.h"
 #include "XiaoAgent.h"
 #include "Database/Users.h"
-#include "XiaoInstall.h"
 #include "App/Monitor/Tracks/UbaTraceReader.h"
 #include "HAL/PlatformFileManager.h"
 

@@ -4,11 +4,9 @@
  */
 #include "SLoginWindow.h"
 #include "SlateOptMacros.h"
-#include "HAL/PlatformApplicationMisc.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SHyperlink.h"
-#include "Widgets/Notifications/SErrorHint.h"
 #include "Dialogs/SForgetDialog.h"
 #include "XiaoShareField.h"
 #include "XiaoInterprocess.h"

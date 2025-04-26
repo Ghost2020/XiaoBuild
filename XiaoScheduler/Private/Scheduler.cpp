@@ -91,7 +91,7 @@ namespace uba
 				if (FolderStat.bIsValid && FolderStat.bIsDirectory)
 				{
 					const double OverSeconds = (FDateTime::Now() - FolderStat.CreationTime).GetTotalSeconds();
-					static const double OneWeekSeconds = 3600.0f * 24.0f * 7.0f;
+					static constexpr double OneWeekSeconds = 3600.0f * 24.0f * 7.0f;
 					if (OverSeconds > OneWeekSeconds)
 					{
 						FileManager.DeleteDirectory(*HistoryFolder, true, true);
@@ -213,7 +213,7 @@ namespace uba
 		CleanHistory(UbaScheduler.Dir);
 
 		const tchar* dbgStr = TC("");
-		Logger->Info(TC("XiaoScheduler v%s%s (Rootdir: \"%s\", StoreCapacity: %uGb)\n"), Version, dbgStr, *UbaScheduler.Dir, UbaScheduler.Capacity);
+		Logger->Info(TC("XiaoScheduler v%s%s (RootDir: \"%s\", StoreCapacity: %uGb)\n"), Version, dbgStr, *UbaScheduler.Dir, UbaScheduler.Capacity);
 
 		const u64 storageCapacity = u64(UbaScheduler.Capacity) * 1000 * 1000 * 1000;
 
@@ -416,14 +416,14 @@ namespace uba
 			}
 			catch (interprocess_exception& Ex)
 			{
-				logger.Warning(TC("Interprocee Object Create Exception::%s!"), Ex.what());
+				logger.Warning(TC("Interprocess Object Create Exception::%s!"), Ex.what());
 				return false;
 			}
 
 			// 更新进度信息
 			
-			const FString ScheluerMessage = TEXT("Initiating ") + Info.TraceName;
-			if (!UpdateAgent(GAgentUID, EAgentStatus::Status_Initiating, TCHAR_TO_UTF8(*ScheluerMessage), UbaScheduler.Port))
+			const FString SchedulerMessage = TEXT("Initiating ") + Info.TraceName;
+			if (!UpdateAgent(GAgentUID, EAgentStatus::Status_Initiating, TCHAR_TO_UTF8(*SchedulerMessage), UbaScheduler.Port))
 			{
 				return true;
 			}
@@ -431,7 +431,7 @@ namespace uba
 
 		if (UbaScheduler.bStandalone)
 		{
-			logger.Info(TC("Runing in Standalone mode!"));
+			logger.Info(TC("Running in Standalone mode!"));
 			return true;
 		}
 
@@ -475,7 +475,7 @@ namespace uba
 
 		if (!InitiatorProto.benableinitator())
 		{
-			logger.Info(TC("Not Allow to be as initiator, Runing in Standalone mode!"));
+			logger.Info(TC("Not Allow to be as initiator, Running in Standalone mode!"));
 			return true;
 		}
 
@@ -501,11 +501,11 @@ namespace uba
 	bool FDynamicScheduler::Run()
 	{
 #if PLATFORM_WINDOWS
-		const int32 HighPriority = REALTIME_PRIORITY_CLASS;
+		constexpr int32 HighPriority = REALTIME_PRIORITY_CLASS;
 		SetCurrentProcessPriority(HighPriority);
 #endif
 		logger.Info(TC("---------------------------------------XiaoBuild Start---------------------------------------"));
-		logger.Info(TC("Buid ID: {%s}"), *GBuildStats.BuildId);
+		logger.Info(TC("Build ID: {%s}"), *GBuildStats.BuildId);
 
 		Event.Create(true);
 
@@ -632,22 +632,22 @@ namespace uba
 						RemoteActionFailedCrash(InPh, TEXT(""));
 						return;
 					}
-					else if (ExitCode == 0xC0000005)
+					if (ExitCode == 0xC0000005)
 					{
 						RemoteActionFailedCrash(InPh, TEXT("Access violation"));
 						return;
 					}
-					else if (ExitCode == 0xC0000409)
+					if (ExitCode == 0xC0000409)
 					{
 						RemoteActionFailedCrash(InPh, TEXT("Stack buffer overflow"));
 						return;
 					}
-					else if (ExitCode > UBAExitCodeStart && ExitCode < 10000)
+					if (ExitCode > UBAExitCodeStart && ExitCode < 10000)
 					{
 						RemoteActionFailedCrash(InPh, TEXT("UBA error"));
 						return;
 					}
-					else if (std::any_of(Logs.begin(), Logs.end(), [](const ProcessLogLine& InLogLine) { return InLogLine.text.find(TC(" C1001: ")) > 0; }))
+					if (std::any_of(Logs.begin(), Logs.end(), [](const ProcessLogLine& InLogLine) { return InLogLine.text.find(TC(" C1001: ")) > 0; }))
 					{
 						RemoteActionFailedCrash(InPh, TEXT("C1001"));
 						return;
@@ -704,7 +704,7 @@ namespace uba
 						{
 							++GBuildStats.WarningNum;
 						}
-						logger.Log(Line.type, Text, u32(Line.text.size()));
+						logger.Log(Line.type, Text, static_cast<u32>(Line.text.size()));
 					}
 				}
 			}
@@ -809,7 +809,7 @@ namespace uba
 	{
 		if (Info.PPID == 0)
 		{
-			logger.Info(TC("Commnd line should contain -ppid for Parent Process Id"));
+			logger.Info(TC("Command line should contain -ppid for Parent Process Id"));
 			return false;
 		}
 
@@ -839,7 +839,7 @@ namespace uba
 
 			try
 			{
-				static const uint32 BufferSize = 8192 * 16;
+				static constexpr uint32 BufferSize = 8192 * 16;
 				TArray<uint8> Buffer;
 				std::size_t ReceiveSize = 0;
 				uint32 Priority = 0;
@@ -875,14 +875,14 @@ namespace uba
 			Disconnect();
 		});
 
-		static const std::string OuputQueueName = XiaoIPC::SOutputQueueName + "-" + std::to_string(Info.PPID);
+		static const std::string OutputQueueName = XiaoIPC::SOutputQueueName + "-" + std::to_string(Info.PPID);
 		try
 		{
-			OutputMq = MakeUnique<message_queue>(open_only, OuputQueueName.c_str());
+			OutputMq = MakeUnique<message_queue>(open_only, OutputQueueName.c_str());
 		}
 		catch (interprocess_exception& Ex)
 		{
-			logger.Info(TC("Error::Create Output Message queue \"%s\" failed::\"%s\""), UTF8_TO_TCHAR(OuputQueueName.c_str()), UTF8_TO_TCHAR(Ex.what()));
+			logger.Info(TC("Error::Create Output Message queue \"%s\" failed::\"%s\""), UTF8_TO_TCHAR(OutputQueueName.c_str()), UTF8_TO_TCHAR(Ex.what()));
 			return false;
 		}
 		logger.Info(TC("OutputMq Created"));
@@ -890,7 +890,7 @@ namespace uba
 		{
 			logger.Info(TC("WriteOutThread Begin"));
 
-			static const uint32 OutputMessegeSize = sizeof(FTaskResponse);
+			static constexpr uint32 OutputMessageSize = sizeof(FTaskResponse);
 
 			try
 			{
@@ -899,7 +899,7 @@ namespace uba
 					FTaskResponse TaskResponse;
 					if (PendingOutput.Dequeue(TaskResponse))
 					{
-						OutputMq->try_send(&TaskResponse, OutputMessegeSize, 0);
+						OutputMq->try_send(&TaskResponse, OutputMessageSize, 0);
 					}
 					else if(PendingOutput.IsEmpty())
 					{
@@ -909,7 +909,7 @@ namespace uba
 			}
 			catch (interprocess_exception& Ex)
 			{
-				logger.Info(TC("Error::Message queue \"%s\" Exception::\"%s\""), UTF8_TO_TCHAR(OuputQueueName.c_str()), UTF8_TO_TCHAR(Ex.what()));
+				logger.Info(TC("Error::Message queue \"%s\" Exception::\"%s\""), UTF8_TO_TCHAR(OutputQueueName.c_str()), UTF8_TO_TCHAR(Ex.what()));
 			}
 
 			logger.Info(TC("WriteOutThread Finish"));
@@ -967,7 +967,7 @@ namespace uba
 		}
 	}
 
-	void FDynamicScheduler::UpdateSystemSettings(uint32& OutCurInitAvaNum)
+	void FDynamicScheduler::UpdateSystemSettings(uint32& OutCurInitAvaNum) const
 	{
 		OutCurInitAvaNum = 0;
 
@@ -976,7 +976,6 @@ namespace uba
 			return;
 		}
 
-		uint32 CurInitiatorNum = 0;
 		std::unordered_map<std::string, std::string> AgentStats;
 		bool Rtn = false;
 
@@ -999,6 +998,7 @@ namespace uba
 
 		if (Rtn)
 		{
+			uint32 CurInitiatorNum = 0;
 			for (const auto& Iter : AgentStats)
 			{
 				const std::string AgentId = Iter.first;
@@ -1045,7 +1045,7 @@ namespace uba
 		std::string LocalMessage = "";
 		if (!bImmediate)
 		{
-			LocalMessage = TCHAR_TO_UTF8(*FString::Printf(TEXT("Runing [%u/%u/%u]"), Session.GetActiveProcessCount(), SFinishProcess, GBuildStats.TotalJobNum));
+			LocalMessage = TCHAR_TO_UTF8(*FString::Printf(TEXT("Running [%u/%u/%u]"), Session.GetActiveProcessCount(), SFinishProcess, GBuildStats.TotalJobNum));
 		}
 		
 		if (!UpdateAgent(GAgentUID, InLocalStatus, LocalMessage))
@@ -1058,15 +1058,12 @@ namespace uba
 		const auto& ClientSessions = SessionServer.GetClientSessions();*/
 		for (const auto& Iter : Ip2Id)
 		{
-			std::string AgentMessage = "";
-			if (!bImmediate)
-			{
+			std::string AgentMessage = "Helping " + GLocalMachineDesc;
+			
 				/*if (const auto Client = GetClientSession(Iter.Value))
 				{
 					AgentMessage = std::format("Helping \"{}\" with {}/{} core(s)", GLocalMachineDesc.c_str(), Client->usedSlotCount, Client->processSlotCount);
 				}*/
-				AgentMessage = "Helping " + GLocalMachineDesc;
-			}
 			if (!UpdateAgent(Iter.Value, InAgentStatus, AgentMessage))
 			{
 				return;
@@ -1155,7 +1152,7 @@ namespace uba
 			}			
 
 			// 根据相关约束条件选择对满足条件的代理机器请求协助
-			uint32 ConnetecAgentCount = 0;
+			uint32 ConnectedAgentCount = 0;
 			FString LocalGroup = SDefaultStr;
 			if (!InitiatorProto.group().empty())
 			{
@@ -1226,7 +1223,7 @@ namespace uba
 				}
 				if (LocalGroup != AgentGroup)
 				{
-					logger.Info(TC("Agent %s group:[%s] defferent group:[%s] with us!"), *AgentDesc, *LocalGroup, *AgentGroup);
+					logger.Info(TC("Agent %s group:[%s] different group:[%s] with us!"), *AgentDesc, *LocalGroup, *AgentGroup);
 					continue;
 				}
 
@@ -1236,7 +1233,7 @@ namespace uba
 					// 是否超过最大能够启动的最大Processor
 					if (MaxCoreAvailable >= MaxProcessorCount)
 					{
-						logger.Info(TC("Aready over %d max processors!"), MaxProcessorCount);
+						logger.Info(TC("Already over %d max processors!"), MaxProcessorCount);
 						return;
 					}
 
@@ -1245,7 +1242,7 @@ namespace uba
 					{
 						if (MaxCoreAvailable >= (GBuildStats.RemainJobNum - InitiatorProto.localmaxcpu()))
 						{
-							logger.Info(TC("Aready enough %u agent(s)! no need more agent(s)"), MaxAgentConCount);
+							logger.Info(TC("Already enough %u agent(s)! no need more agent(s)"), MaxAgentConCount);
 							return;
 						}
 					}
@@ -1256,11 +1253,11 @@ namespace uba
 				}
 
 				// 判断最大连接代理数量,避免占用不必要的计算资源
-				if (ConnetecAgentCount < MaxAgentConCount)
+				if (ConnectedAgentCount < MaxAgentConCount)
 				{
 					// 是否是同一个网络中
 					FString MappedAddress;
-					uint16 HelpPort = static_cast<uint16>(Proto.helperport());
+					const uint16 HelpPort = static_cast<uint16>(Proto.helperport());
 					/*if (TryGetAddressAndPort(Proto, MappedAddress, HelpPort))
 					{
 						if (MappedAddress != GMappedAddress)
@@ -1276,7 +1273,7 @@ namespace uba
 					if (session.GetServer().AddClient(*Info.Backend, TCHAR_TO_UBASTRING(*Ip), HelpPort, Info.Crypto))
 					{
 						Id2CId.insert_or_assign(NewAgentId, AgentIndex++);
-						++ConnetecAgentCount;
+						++ConnectedAgentCount;
 						MaxCoreAvailable += Proto.helpercore();
 						UpdateAgent(Id, EAgentStatus::Status_Helping, Message);
 						Ip2Id.Add(MakeTuple(Ip, Id));
@@ -1290,7 +1287,7 @@ namespace uba
 				}
 				else
 				{
-					logger.Info(TC("Aready connected %u Agents, over allow max %u agents!"), ConnetecAgentCount, MaxAgentConCount);
+					logger.Info(TC("Already connected %u Agents, over allow max %u agents!"), ConnectedAgentCount, MaxAgentConCount);
 					return;
 				}
 			}
@@ -1298,7 +1295,7 @@ namespace uba
 		CATCH_REDIS_EXCEPTRION()
 	}
 
-	void FDynamicScheduler::ReleaseAgent(const uint32 InClientId, uba::SessionServer::ClientSession* InSession)
+	void FDynamicScheduler::ReleaseAgent(const uint32 InClientId, const uba::SessionServer::ClientSession* InSession)
 	{
 		if (AreadyDisconnecedSet.Contains(InClientId))
 		{
@@ -1307,7 +1304,7 @@ namespace uba
 
 		logger.Info(TC("Disconnect with client::%d for release resource."), InClientId);
 		const auto& Sessions = GetSession().GetClientSessions();
-		uba::SessionServer::ClientSession* Session = InSession;
+		const uba::SessionServer::ClientSession* Session = InSession;
 		if (!Session)
 		{
 			for (int Index = Sessions.size() - 1; Index >= 0; --Index)
@@ -1398,7 +1395,7 @@ namespace uba
 		// 尝试释放代理
 		for (int Index = Sessions.size() - 1; Index >= 0; --Index)
 		{
-			auto Client = Sessions[Index];
+			const auto Client = Sessions[Index];
 			if (!Client)
 			{
 				continue;
@@ -1440,14 +1437,14 @@ namespace uba
 		uint32 JobId;
 		InReader << JobId;
 
-		FString Applicaiton;
-		InReader << Applicaiton;
-		if (Applicaiton.IsEmpty())
+		FString Application;
+		InReader << Application;
+		if (Application.IsEmpty())
 		{
 			logger.Error(TC("JobId::%u Application::Is empty!"), JobId);
 			return false;
 		}
-		ProcessInfo.application = TCHAR_TO_UBASTRING(*Applicaiton);
+		ProcessInfo.application = TCHAR_TO_UBASTRING(*Application);
 
 		FString Arguments;
 		InReader << Arguments;
@@ -1488,7 +1485,7 @@ namespace uba
 			FDynamicScheduler* Scheduler = nullptr;
 		};
 
-		auto ExitInfo = new FExitedInfo;
+		const auto ExitInfo = new FExitedInfo;
 		ExitInfo->jobId = JobId;
 		ExitInfo->Scheduler = this;
 
@@ -1514,19 +1511,19 @@ namespace uba
 
 				if (userData)
 				{
-					if (auto ExitInfo = (FExitedInfo*)userData)
+					if (const auto InnerExitInfo = static_cast<FExitedInfo*>(userData))
 					{
-						if (ExitInfo->Scheduler)
+						if (InnerExitInfo->Scheduler)
 						{
-							if (ph.GetExitCode() == 0 && FPaths::FileExists(ExitInfo->InputFile))
+							if (ph.GetExitCode() == 0 && FPaths::FileExists(InnerExitInfo->InputFile))
 							{
-								IFileManager::Get().Delete(*ExitInfo->InputFile, true , true, true);
+								IFileManager::Get().Delete(*InnerExitInfo->InputFile, true , true, true);
 							}
-							ExitInfo->Scheduler->session.RegisterDeleteFile(TCHAR_TO_UBASTRING(*ExitInfo->InputFile));
-							ExitInfo->Scheduler->HandleResponse(ph, ExitInfo->jobId);
-							ExitInfo->Scheduler->session.GetStorage().DeleteCasForFile(TCHAR_TO_UBASTRING(*ExitInfo->InputFile));
+							InnerExitInfo->Scheduler->session.RegisterDeleteFile(TCHAR_TO_UBASTRING(*InnerExitInfo->InputFile));
+							InnerExitInfo->Scheduler->HandleResponse(ph, InnerExitInfo->jobId);
+							InnerExitInfo->Scheduler->session.GetStorage().DeleteCasForFile(TCHAR_TO_UBASTRING(*InnerExitInfo->InputFile));
 						}
-						delete ExitInfo;
+						delete InnerExitInfo;
 					}
 				}
 			};

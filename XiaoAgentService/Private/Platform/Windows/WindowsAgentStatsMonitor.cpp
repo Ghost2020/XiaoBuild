@@ -3,7 +3,7 @@
 #include "HAL/PlatformTime.h"
 #include "XiaoLog.h"
 
-static float const SMegabyteNum = 1024 * 1024;
+static constexpr float SMegabyteNum = 1024 * 1024;
 
 FWindowsAgentStatsMonitor::FWindowsAgentStatsMonitor()
 {

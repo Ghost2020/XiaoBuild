@@ -213,7 +213,7 @@ void SManageBuildGroups::Construct(const FArguments& InArgs)
 				// .ItemHeight(20)
 				.SelectionMode(ESelectionMode::Single)
 				.ClearSelectionOnClick(false)
-				.OnSelectionChanged_Lambda([] (TSharedPtr<FBuildGroup> InGroup, ESelectInfo::Type InType)
+				.OnSelectionChanged_Lambda([] (const TSharedPtr<FBuildGroup>& InGroup, ESelectInfo::Type InType)
 				{
 					if(const auto Row = FindRowByGroup(InGroup.Get()))
 					{

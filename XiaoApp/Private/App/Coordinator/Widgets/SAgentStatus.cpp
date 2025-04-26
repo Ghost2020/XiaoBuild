@@ -3,14 +3,12 @@
   * @date 11:02 PM
  */
 #include "SAgentStatus.h"
-#include "SConstrainBox.h"
 #include "SlateOptMacros.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Layout/SSpacer.h"
 #include "Widgets/Text/STextBlock.h"
-#include "XiaoStyle.h"
 #include "ShareDefine.h"
 
 #define LOCTEXT_NAMESPACE "SAgentStatus"

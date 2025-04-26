@@ -42,18 +42,18 @@ protected:
 	void OnGenerateTable() const;
 	EColumnSortMode::Type GetSortModeForColumn(FName InColumnId) const;
 	void OnTableSort(EColumnSortPriority::Type InSortPriority, const FName& InName, EColumnSortMode::Type InSortMode) const;
-	FReply OnTableSave();
+	FReply OnTableSave() const;
 
 	int32 GetSelectedAgentsVal(const int32 InDeffIndex, TFunction<int32(const TSharedPtr<FAgentProto>&)> InGetter) const;
-	ECheckBoxState GetSelectedAgentsCheck(TFunction<bool(const TSharedPtr<FAgentProto>&)> InGetter) const;
-	void SetSeletecedAgentsParams(TFunction<void(const TSharedPtr<FAgentProto>&)> InSetter) const;
+	ECheckBoxState GetSelectedAgentsCheck(const TFunction<bool(const TSharedPtr<FAgentProto>&)>& InGetter) const;
+	void SetSeletecedAgentsParams(const TFunction<void(const TSharedPtr<FAgentProto>&)>& InSetter) const;
 
 private:
 	void OnAgentChange(const TWeakPtr<FAgentProto>& InAgent) const;
 	void OnAgentsChange(const TArray<TSharedPtr<FAgentProto>>& InAgents) const;
 	void OnSearchChange(const FText& InFiler, ETextCommit::Type InCommitType);
 	void DeleteAgents(const TSet<FString>& InAgentIds, const bool bRebuild) const;
-	void PostStopBuild(const TSharedPtr<FAgentProto> InProto) const;
+	void PostStopBuild(const TSharedPtr<FAgentProto>& InProto) const;
 
 private:
 	TSharedPtr<FJsonObject> AgentConfigJson = nullptr;

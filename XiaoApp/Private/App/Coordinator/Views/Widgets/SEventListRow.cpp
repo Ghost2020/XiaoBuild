@@ -8,9 +8,6 @@
 #include "Widgets/Text/SMultiLineEditableText.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SComboBox.h"
-#include "Widgets/Input/SNumericEntryBox.h"
-#include "SPrimaryButton.h"
-#include "Dialog/SMessageDialog.h"
 
 #include "XiaoShare.h"
 #include "XiaoStyle.h"

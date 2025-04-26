@@ -89,7 +89,7 @@ void SCustomInstallView::Construct(const FArguments& InArgs)
 					]
 					+SHorizontalBox::Slot().AutoWidth()
 					[
-						SNew(STextBlock).Text(LOCTEXT("IncredibuildCoordinator_Text", "Xiaobuild 调度器"))
+						SNew(STextBlock).Text(LOCTEXT("IncredibuildCoordinator_Text", "XiaoBuild 调度器"))
 					]
 				]
 				+SVerticalBox::Slot().L_PADDING(20.0f)
@@ -125,7 +125,7 @@ void SCustomInstallView::Construct(const FArguments& InArgs)
 					]
 					+SHorizontalBox::Slot().AutoWidth()
 					[
-						SNew(STextBlock).Text(LOCTEXT("IncredibuildMonitor_Text", "Xiaobuild 构建查看器"))
+						SNew(STextBlock).Text(LOCTEXT("IncredibuildMonitor_Text", "XiaoBuild 构建查看器"))
 					]
 				]
 				+SVerticalBox::Slot().L_PADDING(20.0f)
@@ -161,7 +161,7 @@ void SCustomInstallView::Construct(const FArguments& InArgs)
 					]
 					+SHorizontalBox::Slot().AutoWidth()
 					[
-						SNew(STextBlock).Text(LOCTEXT("BackupCoordinator_Text", "Xiaobuild 备份调度器"))
+						SNew(STextBlock).Text(LOCTEXT("BackupCoordinator_Text", "XiaoBuild 备份调度器"))
 					]
 				]
 				+SVerticalBox::Slot().L_PADDING(20.0f)

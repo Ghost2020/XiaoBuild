@@ -8,7 +8,6 @@
 #include "Widgets/Layout/SGridPanel.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Input/SButton.h"
-#include "Widgets/Layout/SWidgetSwitcher.h"
 #include "Widgets/Input/SHyperlink.h"
 #include "Widgets/Input/SNumericEntryBox.h"
 #include "Widgets/Input/SSpinBox.h"
@@ -625,7 +624,7 @@ void SSettingsView::Construct(const FArguments& InArgs)
 							// .ItemHeight(50.0f)
 							.AllowOverscroll(EAllowOverscroll::Yes)
 							.OnGenerateRow_Raw(this, &SSettingsView::OnGenerateBackRow)
-							.OnContextMenuOpening_Raw(this, &SSettingsView::OnContexMenuOpening)
+							.OnContextMenuOpening_Raw(this, &SSettingsView::OnContextMenuOpening)
 							.HeaderRow(
 								SNew(SHeaderRow)
 
@@ -943,8 +942,8 @@ void SSettingsView::OnQueryBackup() const
 			}
 
 			ExistIps.Add(TempDesc.Host);
-			bool bAreayExist = Ip2Redis.Contains(TempDesc.Host);
-			if (!bAreayExist)
+			bool bAlreadyExist = Ip2Redis.Contains(TempDesc.Host);
+			if (!bAlreadyExist)
 			{
 				auto Backup = MakeShared<FRedisServerDesc>();
 
@@ -955,7 +954,7 @@ void SSettingsView::OnQueryBackup() const
 
 			*Ip2Redis[TempDesc.Host].Pin() = TempDesc;
 
-			if (bAreayExist)
+			if (bAlreadyExist)
 			{
 				auto Row = StaticCastSharedPtr<SBackupRow>(BackupListView->WidgetFromItem(Ip2Redis[TempDesc.Host].Pin()));
 				if (Row.IsValid())
@@ -1023,7 +1022,7 @@ void SSettingsView::OnDiscardModify()
 
 void SSettingsView::OnCommitModify()
 {
-	if (auto Window = StaticCastSharedPtr<SCoordinatorWindow>(FXiaoAppBase::GApp->GetMainWindow().Pin()))
+	if (const auto Window = StaticCastSharedPtr<SCoordinatorWindow>(FXiaoAppBase::GApp->GetMainWindow().Pin()))
 	{
 		Window->SetLockedState(true);
 		FXiaoAppBase::GApp->AddNextTickTask(FSimpleDelegate::CreateLambda([this]()
@@ -1072,7 +1071,7 @@ TSharedRef<ITableRow> SSettingsView::OnGenerateBackRow(const TSharedPtr<FRedisSe
 		.OnBackupDelete_Raw(this, &SSettingsView::OnDeleteBackup);
 }
 
-TSharedPtr<SWidget> SSettingsView::OnContexMenuOpening()
+TSharedPtr<SWidget> SSettingsView::OnContextMenuOpening()
 {
 	const auto Items = this->BackupListView->GetSelectedItems();
 	if (Items.Num() > 0)

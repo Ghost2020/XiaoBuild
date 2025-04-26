@@ -4,15 +4,11 @@
  */
 #include "SLocalHistoryView.h"
 
-#include "HAL/PlatformApplicationMisc.h"
-#include "Widgets/Notifications/SProgressBar.h"
 #include "SlateOptMacros.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Input/SComboBox.h"
-#include "Widgets/Input/SSearchBox.h"
 #include "Widgets/Layout/SScrollBox.h"
-#include "Misc/ScopedSlowTask.h"
 #include "XiaoStyle.h"
 #include "XiaoShareField.h"
 #include "XiaoCompressor.h"

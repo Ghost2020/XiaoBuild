@@ -10,7 +10,6 @@
 #include "SInstallationFolderView.h"
 #include "Widgets/Notifications/SErrorText.h"
 #include "XiaoShareNetwork.h"
-#include "ShareDefine.h"
 
 
 #define LOCTEXT_NAMESPACE "SCoordinatorSettingsView"

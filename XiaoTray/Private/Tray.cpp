@@ -7,12 +7,10 @@
 #include "RequiredProgramMainCPPInclude.h"
 #include "XiaoShare.h"
 #include "XiaoShareField.h"
-#include "XiaoCode.h"
 #include "XiaoInterprocess.h"
 #include "XiaoAgent.h"
 #include "XiaoShareRedis.h"
 #include "XiaoCompressor.h"
-#include "agent.pb.h"
 #include "Misc/CommandLine.h"
 
 #ifdef verify
@@ -75,8 +73,8 @@ static const QString SAgentCache_T("As the agent service runs, a lot of cache da
 static const QString SSchedulerCache("Scheduler cache");
 static const QString SSchedulerCache_T("As the scheduler runs, a lot of cache data is generated");
 
-static const QString SBuilHistory("Build History");
-static const QString SBuilHistory_T("View recent build history");
+static const QString SBuildHistory("Build History");
+static const QString SBuildHistory_T("View recent build history");
 
 static const QString SNetworkTest("Network Connecti.");
 static const QString SNetworkTest_T("Open the network test panel to view the test network status");
@@ -93,10 +91,10 @@ static const QString SExit_T("Want Exit tray?");
 static const QString SConfirm("Comfirm");
 static const QString SNotShutdownSystem("Do you want to exit the tray program? (Exiting this program will not stop the joint compilation service)");
 
-static const QString SAgentNotworking("The agent service program is not running, please open the agent settings to set");
+static const QString SAgentNetworking("The agent service program is not running, please open the agent settings to set");
 static const QString SAgentDisable("Currently disabled");
 
-static const std::map<QString, std::map<QString, QString>> SLocalizaitonMap =
+static const std::map<QString, std::map<QString, QString>> SLocalizationMap =
 {
 	{
 		SEnglish,
@@ -134,8 +132,8 @@ static const std::map<QString, std::map<QString, QString>> SLocalizaitonMap =
 			{ SSchedulerCache, "清理调度器Cas" },
 			{ SSchedulerCache_T, "随着调度器的运行，会产生许多缓存数据" },
 
-			{ SBuilHistory, "构建历史" },
-			{ SBuilHistory_T, "查看最近的构建历史" },
+			{ SBuildHistory, "构建历史" },
+			{ SBuildHistory_T, "查看最近的构建历史" },
 
 			{ SNetworkTest, "网络测试" },
 			{ SNetworkTest_T, "打开网络测试面板，查看测试网络状况" },
@@ -152,7 +150,7 @@ static const std::map<QString, std::map<QString, QString>> SLocalizaitonMap =
 			{ SConfirm, "确认" },
 			{ SNotShutdownSystem, "是否退出托盘程序？(退出此程序并不会停止联合编译服务)" },
 
-			{ SAgentNotworking, "代理服务程序未运行，请打开代理设置进行设置"},
+			{ SAgentNetworking, "代理服务程序未运行，请打开代理设置进行设置"},
 			{ SAgentDisable, "当前处于禁用状态中"}
 		}
 	}
@@ -185,7 +183,7 @@ bool FXiaoTray::InitApp()
 #if !PLATFORM_MAC
 	if (!CheckSingleton(TEXT("XiaoTray")))
 	{
-		qWarning("Check Sington failed !");
+		qWarning("Check Singleton failed !");
 		return false;
 	}
 
@@ -267,7 +265,7 @@ void FXiaoTray::RunApp()
 	DetectAction->setVisible(false);
 	QObject::connect(DetectAction, &QAction::triggered, [this]()
 		{
-			OnCheckUpdate();
+			(void)OnCheckUpdate();
 		}
 	);
 	TrayMenu.addAction(DetectAction);
@@ -381,7 +379,7 @@ void FXiaoTray::RunApp()
 	ExitAction->setIcon(QIcon(IconDir + "/exit.png"));
 	QObject::connect(ExitAction, &QAction::triggered, [&, this]()
 		{
-			const auto& Map = SLocalizaitonMap.at(QString(*Localization));
+			const auto& Map = SLocalizationMap.at(QString(*Localization));
 			const QString ComfirmStr = Map.contains(SConfirm) ? Map.at(SConfirm) : SConfirm;
 			const QString ComfirmMessageStr = Map.contains(SNotShutdownSystem) ? Map.at(SNotShutdownSystem) : SNotShutdownSystem;
 			auto Reply = QMessageBox::question(&TrayMenu, ComfirmStr, ComfirmMessageStr);
@@ -435,13 +433,13 @@ void FXiaoTray::RunApp()
 void FXiaoTray::OnChangeState(const int State, const float Progress, QSystemTrayIcon* InTrayIcon) const
 {
 	QString ToolTipMessage = "XiaoBuildTray-ready";
-	const auto& Map = SLocalizaitonMap.at(QString(*Localization));
+	const auto& Map = SLocalizationMap.at(QString(*Localization));
 	const QString IconDir = GetIconDir();
 	QString IconPath;
 	if (!bAgentServiceState)
 	{
 		IconPath = IconDir + "/Status/NotWorking.png";
-		ToolTipMessage = Map.contains(SAgentNotworking) ? Map.at(SAgentNotworking) : SAgentNotworking;
+		ToolTipMessage = Map.contains(SAgentNetworking) ? Map.at(SAgentNetworking) : SAgentNetworking;
 	}
 	else
 	{
@@ -464,7 +462,7 @@ void FXiaoTray::OnChangeState(const int State, const float Progress, QSystemTray
 		else
 		{
 			IconPath = IconDir + "/Status/Disable.png";
-			ToolTipMessage = Map.contains(SAgentDisable) ? Map.at(SAgentDisable) : SAgentNotworking;
+			ToolTipMessage = Map.contains(SAgentDisable) ? Map.at(SAgentDisable) : SAgentNetworking;
 		}
 	}
 
@@ -517,7 +515,7 @@ void FXiaoTray::OnUpdate(QSystemTrayIcon* InTrayIcon)
 				}
 
 				// 检查是否有更新
-				OnCheckUpdate();
+				(void)OnCheckUpdate();
 			}
 			CATCH_REDIS_EXCEPTRION();
 		}
@@ -553,12 +551,12 @@ bool FXiaoTray::OnCheckUpdate() const
 	return bCanSyncUpdate;
 }
 
-void FXiaoTray::OnUpdateLocalization(const FString& InLocalizaiton)
+void FXiaoTray::OnUpdateLocalization(const FString& InLocalization)
 {
 	static bool bFirst = true;
-	if (InLocalizaiton != Localization || bFirst)
+	if (InLocalization != Localization || bFirst)
 	{
-		const auto& Map = SLocalizaitonMap.at(QString(*InLocalizaiton));
+		const auto& Map = SLocalizationMap.at(QString(*InLocalization));
 
 		SyncAction->setText(Map.contains(SSyncUpdate) ? Map.at(SSyncUpdate) : SSyncUpdate);
 
@@ -583,8 +581,8 @@ void FXiaoTray::OnUpdateLocalization(const FString& InLocalizaiton)
 		ClearSchedulerAction->setText(Map.contains(SSchedulerCache) ? Map.at(SSchedulerCache) : SSchedulerCache);
 		ClearSchedulerAction->setToolTip(Map.contains(SSchedulerCache_T) ? Map.at(SSchedulerCache_T) : SSchedulerCache_T);
 
-		HistoryAction->setText(Map.contains(SBuilHistory) ? Map.at(SBuilHistory) : SBuilHistory);
-		HistoryAction->setToolTip(Map.contains(SBuilHistory_T) ? Map.at(SBuilHistory_T) : SBuilHistory_T);
+		HistoryAction->setText(Map.contains(SBuildHistory) ? Map.at(SBuildHistory) : SBuildHistory);
+		HistoryAction->setToolTip(Map.contains(SBuildHistory_T) ? Map.at(SBuildHistory_T) : SBuildHistory_T);
 
 		NetworkTestAction->setText(Map.contains(SNetworkTest) ? Map.at(SNetworkTest) : SNetworkTest);
 		NetworkTestAction->setToolTip(Map.contains(SNetworkTest_T) ? Map.at(SNetworkTest_T) : SNetworkTest_T);
@@ -598,7 +596,7 @@ void FXiaoTray::OnUpdateLocalization(const FString& InLocalizaiton)
 		ExitAction->setText(Map.contains(SExit) ? Map.at(SExit) : SExit);
 		ExitAction->setToolTip(Map.contains(SExit_T) ? Map.at(SExit_T) : SExit_T);
 
-		Localization = InLocalizaiton;
+		Localization = InLocalization;
 	}
 
 	bFirst = false;

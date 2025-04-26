@@ -16,4 +16,4 @@
 #define XB_ORIGINAL_FILENAME "XiaoInstallConsole.exe"
 #define XB_PRODUCT_IDENTIFIER 2 
 
-static const TCHAR* ProductName = TEXT("XiaoInstalleConsole");
+static const TCHAR* ProductName = TEXT("XiaoInstallConsole");

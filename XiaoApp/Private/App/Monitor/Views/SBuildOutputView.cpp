@@ -12,7 +12,6 @@
 #include "MessageLogModule.h"
 
 #include "SlateOptMacros.h"
-#include "Widgets/Images/SThrobber.h"
 #include "ShareDefine.h"
 
 
@@ -173,8 +172,8 @@ void SBuildOutputView::AddSummaryLog(const Xiao::FTraceView& InTraceView) const
 	{
 		for (const auto& Summary : Session.summary)
 		{
-			const TSharedRef<FTokenizedMessage> SummayMessage = FTokenizedMessage::Create(EMessageSeverity::Type::Info, FText::FromString(Summary));
-			MessageLog.AddMessage(SummayMessage);
+			const TSharedRef<FTokenizedMessage> SummaryMessage = FTokenizedMessage::Create(EMessageSeverity::Type::Info, FText::FromString(Summary));
+			MessageLog.AddMessage(SummaryMessage);
 		}	
 	}
 }

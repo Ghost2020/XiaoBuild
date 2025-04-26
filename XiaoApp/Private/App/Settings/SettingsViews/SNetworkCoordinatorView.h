@@ -24,7 +24,7 @@ public:
 
 	/** Constructs this widget with InArgs */
 	void Construct(const FArguments& InArgs, FNetworkCoordinate* InSettings);
-	void Redraw();
+	void Redraw() const;
 	void SetStatus(const int32 bInStatus) const;
 
 private:

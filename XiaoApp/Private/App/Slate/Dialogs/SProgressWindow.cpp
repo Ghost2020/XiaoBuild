@@ -5,7 +5,6 @@
 
 #include "SProgressWindow.h"
 #include "SlateOptMacros.h"
-#include "SSimpleButton.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Notifications/SProgressBar.h"
 #include "XiaoStyle.h"

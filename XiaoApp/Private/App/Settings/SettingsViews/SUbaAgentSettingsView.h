@@ -7,7 +7,6 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
-#include "Widgets/Input/SNumericDropDown.h"
 
 class STextComboBox;
 class SCheckBox;

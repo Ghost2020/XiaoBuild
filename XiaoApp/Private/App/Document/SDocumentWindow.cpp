@@ -4,7 +4,6 @@
  */
 #include "SDocumentWindow.h"
 
-#include "HAL/PlatformApplicationMisc.h"
 #include "Misc/FileHelper.h"
 #include "SlateOptMacros.h"
 #include "Widgets/Layout/SScrollBox.h"
@@ -16,7 +15,6 @@
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
 #include "Widgets/Text/SMultiLineEditableText.h"
 #include "Widgets/Text/SRichTextBlock.h"
-#include "XiaoStyle.h"
 #include "XiaoShare.h"
 
 

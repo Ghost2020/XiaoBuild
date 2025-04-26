@@ -6,10 +6,8 @@
 
 #include <ranges>
 
-#include "HAL/PlatformApplicationMisc.h"
 #include "Misc/MessageDialog.h"
 #include "../Widgets/SNetworkListRow.h"
-#include "Widgets/Notifications/SProgressBar.h"
 #include "SlateOptMacros.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Layout/SScrollBox.h"

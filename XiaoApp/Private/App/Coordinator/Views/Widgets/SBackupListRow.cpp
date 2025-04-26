@@ -8,13 +8,10 @@
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Input/SNumericEntryBox.h"
-#include "SPrimaryButton.h"
-#include "Dialog/SMessageDialog.h"
 
 #include "XiaoShare.h"
 #include "XiaoStyle.h"
 #include "XiaoAppBase.h"
-#include "ShareDefine.h"
 
 
 #define LOCTEXT_NAMESPACE "SBackupListRow"
@@ -95,7 +92,7 @@ TSharedRef<SWidget> SBackupRow::GenerateWidgetForColumn(const FName& InColumnNam
 				{
 					if (BackupDesc.IsValid())
 					{
-						return BackupDesc.Pin()->Role ? false : true;
+						return !(BackupDesc.Pin()->Role);
 					}
 					return false;
 				})
@@ -149,7 +146,7 @@ TSharedRef<SWidget> SBackupRow::GenerateWidgetForColumn(const FName& InColumnNam
 				{
 					if (BackupDesc.IsValid())
 					{
-						return BackupDesc.Pin()->Role ? false : true;
+						return !(BackupDesc.Pin()->Role);
 					}
 					return false;
 				})

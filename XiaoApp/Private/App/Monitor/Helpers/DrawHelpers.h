@@ -70,7 +70,7 @@ namespace Xiao
 								  const float Y,
 								  const float H,
 								  const float TextY,
-								  const FString Text,
+								  const FString& Text,
 								  const FSlateBrush* Brush,
 								  const FSlateFontInfo& Font);
 	};

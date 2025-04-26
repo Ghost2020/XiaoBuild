@@ -4,13 +4,11 @@
  */
 #include "SInstallerWindow.h"
 
-#include "HAL/PlatformApplicationMisc.h"
 #include "SlateOptMacros.h"
 #include "SPrimaryButton.h"
 #include "Widgets/Layout/SWidgetSwitcher.h"
 #include "XiaoStyle.h"
 #include "XiaoShare.h"
-#include "XiaoShareField.h"
 
 #include "InstallerViews/SWelcomeView.h"
 #include "InstallerViews/SSyncUpdateView.h"

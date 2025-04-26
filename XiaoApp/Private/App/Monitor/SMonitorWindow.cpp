@@ -11,7 +11,6 @@
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Async/TaskGraphInterfaces.h"
-#include "HAL/PlatformApplicationMisc.h"
 
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Layout/SWidgetSwitcher.h"

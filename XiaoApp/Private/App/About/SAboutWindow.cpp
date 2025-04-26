@@ -3,15 +3,12 @@
   * @date 11:02 PM
  */
 #include "SAboutWindow.h"
-#include "RHI.h"
-#include "HAL/PlatformApplicationMisc.h"
 #include "SlateOptMacros.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Text/SMultiLineEditableText.h"
 #include "Widgets/Layout/SBox.h"
-#include "XiaoStyle.h"
 #include "XiaoShare.h"
 #include "XiaoLog.h"
 #include "../Slate/Const/WeChatQR.h"

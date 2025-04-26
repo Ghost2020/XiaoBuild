@@ -13,7 +13,6 @@
 #include "Views/SUsersView.h"
 #include "Views/SLogsView.h"
 #include "Views/SSettingsView.h"
-#include "Views/SCertificateView.h"
 #include "Widgets/SNavButton.h"
 #include "XiaoShareRedis.h"
 #include "XiaoAppBase.h"
@@ -246,7 +245,7 @@ void SCoordinatorWindow::Construct(const FArguments& Args)
 				]
 				+SHorizontalBox::Slot().HAlign(HAlign_Center).VAlign(VAlign_Top)
 				[
-					SAssignNew(NotificaitonList, SNotificationList)
+					SAssignNew(NotificationList, SNotificationList)
 				]
 				+ SHorizontalBox::Slot().HAlign(EHorizontalAlignment::HAlign_Fill)
 				[
@@ -322,7 +321,7 @@ void SCoordinatorWindow::Tick(const FGeometry& InAllottedGeometry, const double 
 		static double LastLoginTime = FPlatformTime::Seconds();
 		const double PassTime = FPlatformTime::Seconds() - LastLoginTime;
 		// 需要再次登录 锁定切到登录页面
-		static const double SCheckTime = 3600.0f * 6;
+		static constexpr double SCheckTime = 3600.0f * 6;
 		if (PassTime > SCheckTime)
 		{
 			SetCanTick(false);
@@ -525,7 +524,7 @@ void SCoordinatorWindow::OnQueueNotification(const int8 InStatus, const FText& I
 	Info.ExpireDuration = InStatus == 0 ? 1.0f : (InStatus == -1 ? 3.0f : 2.0f);
 	Info.bFireAndForget = true;
 	Info.ForWindow = FSlateApplication::Get().FindWidgetWindow(SharedThis(this));
-	NotificaitonList->AddNotification(Info);
+	NotificationList->AddNotification(Info);
 }
 
 #undef REDIS_INFO_WIDGET

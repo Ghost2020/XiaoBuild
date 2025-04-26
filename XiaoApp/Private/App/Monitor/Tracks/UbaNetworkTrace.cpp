@@ -179,15 +179,15 @@ namespace Xiao
 				{
 					if (BytesRead < Xiao::SValidSize)
 					{
-						XIAO_LOG(Error, TEXT("Receive Buffer not equqal %d!"), BytesRead);
+						XIAO_LOG(Error, TEXT("Receive Buffer not equal %d!"), BytesRead);
 						continue;
 					}
 					if (BytesRead > Xiao::SValidSize)
 					{
 						if (Buffer[0] != uint8(0))
 						{
-							XIAO_LOG(Error, TEXT("Receive Resonse Message Size::%d!"), BytesRead);
-							XIAO_LOG(Error, TEXT("Receive Initial Resonse::%d!"), Buffer[0]);
+							XIAO_LOG(Error, TEXT("Receive Response Message Size::%d!"), BytesRead);
+							XIAO_LOG(Error, TEXT("Receive Initial Response::%d!"), Buffer[0]);
 							continue;
 						}
 					}
@@ -236,7 +236,7 @@ namespace Xiao
 			// MessageID
 			Data[1] = ++MessageId >> 8;
 			// DataLength
-			const uint32 DataLength = (4 + 0 | 0 << 24);
+			constexpr uint32 DataLength = (4 + 0 | 0 << 24);
 			FMemory::Memcpy(Data + 2, &DataLength, 4);
 			int32 BytesSent = 0;
 			if (!Socket->Send(Buffer.GetData(), Buffer.Num(), BytesSent))

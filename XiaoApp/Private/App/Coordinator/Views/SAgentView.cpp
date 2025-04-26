@@ -12,8 +12,6 @@
 #include "Widgets/Input/SSearchBox.h"
 #include "Widgets/Input/SNumericEntryBox.h"
 #include "SSimpleButton.h"
-#include "Widgets/Input/SSuggestionTextBox.h"
-#include "../Widgets/SAgentFilter.h"
 #include "../Widgets/AgentListRow.h"
 #include "../Widgets/SConstrainBox.h"
 #include "../Dialogs/SManageBuildGroups.h"
@@ -678,11 +676,11 @@ TSharedPtr<SWidget> SAgentView::OnGenerateContextMenu() const
 				SNew(SComboBox<TSharedPtr<FString>>)
 				.IsEnabled_Raw(this, &SAgentView::IsEnableEdit)
 				.OptionsSource(&GGroupArray)
-				.OnGenerateWidget_Lambda([](const TSharedPtr<FString> InText)
+				.OnGenerateWidget_Lambda([](const TSharedPtr<FString>& InText)
 				{
 					return SNew(STextBlock).Text(InText.IsValid() ? FText::FromString(*InText) : FText::GetEmpty());
 				})
-				.OnSelectionChanged_Lambda([this](const TSharedPtr<FString> InText, ESelectInfo::Type)
+				.OnSelectionChanged_Lambda([this](const TSharedPtr<FString>& InText, ESelectInfo::Type)
 				{
 					if (InText->IsEmpty())
 					{
@@ -970,7 +968,7 @@ void SAgentView::OnTableSort(const EColumnSortPriority::Type InSortPriority, con
 	}
 }
 
-FReply SAgentView::OnTableSave()
+FReply SAgentView::OnTableSave() const
 {
 	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
 	if (!DesktopPlatform)
@@ -1062,7 +1060,7 @@ int32 SAgentView::GetSelectedAgentsVal(const int32 InDeffIndex, TFunction<int32(
 	return Val;
 }
 
-ECheckBoxState SAgentView::GetSelectedAgentsCheck(TFunction<bool(const TSharedPtr<FAgentProto>&)> InGetter) const
+ECheckBoxState SAgentView::GetSelectedAgentsCheck(const TFunction<bool(const TSharedPtr<FAgentProto>&)>& InGetter) const
 {
 	const auto _Items = this->AgentsListView->GetSelectedItems();
 	if (_Items.Num() == 1 || !_Items[0].IsValid())
@@ -1085,7 +1083,7 @@ ECheckBoxState SAgentView::GetSelectedAgentsCheck(TFunction<bool(const TSharedPt
 	return bCheck ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 }
 
-void SAgentView::SetSeletecedAgentsParams(TFunction<void(const TSharedPtr<FAgentProto>&)> InSetter) const
+void SAgentView::SetSeletecedAgentsParams(const TFunction<void(const TSharedPtr<FAgentProto>&)>& InSetter) const
 {
 	const auto _Items = this->AgentsListView->GetSelectedItems();
 	for (auto& Item : _Items)
@@ -1192,7 +1190,7 @@ void SAgentView::DeleteAgents(const TSet<FString>& InAgentIds, const bool bRebui
 	}
 }
 
-void SAgentView::PostStopBuild(const TSharedPtr<FAgentProto> InProto) const
+void SAgentView::PostStopBuild(const TSharedPtr<FAgentProto>& InProto) const
 {
 	if (InProto.IsValid())
 	{
@@ -1248,8 +1246,8 @@ void SAgentView::OnUpdate(const bool bRebuild) const
 				continue;
 			}
 
-			const bool bAreayExist = Id2Agent.Contains(UniqueId);
-			if (!bAreayExist)
+			const bool bAlreadyExist = Id2Agent.Contains(UniqueId);
+			if (!bAlreadyExist)
 			{
 				auto AgentProto = MakeShared<FAgentProto>();
 				Id2Agent.Add({UniqueId, AgentProto});
@@ -1313,7 +1311,7 @@ void SAgentView::OnUpdate(const bool bRebuild) const
 				GGroupArray.Add(MakeShared<FString>(GroupStr));
 			}
 
-			if (bAreayExist)
+			if (bAlreadyExist)
 			{
 				auto Row = StaticCastSharedPtr<SAgentListRow>(AgentsListView->WidgetFromItem(Item));
 				if (Row.IsValid())

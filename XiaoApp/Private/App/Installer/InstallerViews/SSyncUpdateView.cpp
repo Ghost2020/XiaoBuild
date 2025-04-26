@@ -4,9 +4,7 @@
  */
 #include "SSyncUpdateView.h"
 #include "ShareWidget.h"
-#include "XiaoAgent.h"
 #include "XiaoShareRedis.h"
-#include "XiaoCompressor.h"
 
 #define LOCTEXT_NAMESPACE "SSyncUpdateView"
 

@@ -10,7 +10,6 @@
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Views/SListView.h"
 #include "../Widgets/SHistoryListRow.h"
-#include "XiaoShare.h"
 
 class SLocalHistoryView final : public SCompoundWidget
 {

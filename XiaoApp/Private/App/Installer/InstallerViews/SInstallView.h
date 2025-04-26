@@ -13,7 +13,7 @@ struct FInstallDesc
 	FText Name;
 	const FSlateBrush* Thumbnail;
 
-	explicit FInstallDesc(const int InType, const FText InName, const FSlateBrush* InThumbnail)
+	explicit FInstallDesc(const int InType, const FText& InName, const FSlateBrush* InThumbnail)
 		: Type(InType)
 		, Name(InName)
 		, Thumbnail(InThumbnail)

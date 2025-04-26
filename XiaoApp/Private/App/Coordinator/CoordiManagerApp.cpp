@@ -8,7 +8,6 @@
 #include "Dialogs/SLicenseLockedDialog.h"
 #include "XiaoShare.h"
 #include "XiaoShareNetwork.h"
-// #include "XiaoHttpRequest.h"
 #include "XiaoShareRedis.h"
 #include "ShareDefine.h"
 #include "Database/Users.h"
@@ -139,7 +138,7 @@ void FCoordiManagerApp::ShowMainWindow()
 	}
 
 #if PLATFORM_WINDOWS
-	const int32 HighPriority = REALTIME_PRIORITY_CLASS;
+	constexpr int32 HighPriority = REALTIME_PRIORITY_CLASS;
 	SetCurrentProcessPriority(HighPriority);
 #endif
 }
@@ -164,7 +163,7 @@ void FCoordiManagerApp::ShowLoginWindow()
 	}
 
 #if PLATFORM_WINDOWS
-	const int32 HighPriority = NORMAL_PRIORITY_CLASS;
+	constexpr int32 HighPriority = NORMAL_PRIORITY_CLASS;
 	SetCurrentProcessPriority(HighPriority);
 #endif
 }

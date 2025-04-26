@@ -1,7 +1,5 @@
 #include "DrawHelpers.h"
 
-#include "DrawHelpers.h"
-
 #include "Fonts/FontMeasure.h"
 #include "Fonts/SlateFontInfo.h"
 
@@ -187,7 +185,7 @@ namespace Xiao
 		const float Y,
 		const float H,
 		const float TextY,
-		const FString Text,
+		const FString& Text,
 		const FSlateBrush* Brush,
 		const FSlateFontInfo& Font)
 	{

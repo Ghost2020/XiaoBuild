@@ -1,7 +1,5 @@
 #include "SAgentSettingsWindow.h"
 
-#include "HAL/PlatformApplicationMisc.h"
-#include "Widgets/Notifications/SProgressBar.h"
 #include "XiaoStyle.h"
 #include "SlateOptMacros.h"
 #include "Widgets/Input/SButton.h"
@@ -27,14 +25,13 @@
 #include "XiaoAgent.h"
 #include "XiaoAppBase.h"
 #include "agent.pb.h"
-#include "ShareDefine.h"
 
 
 #define LOCTEXT_NAMESPACE "SAgentSettingsWindow"
 
 
 static FAgentProto SAgentProto;
-static std::string SAgentUniqeId = TCHAR_TO_UTF8(*GetUniqueDeviceID());
+static std::string SAgentUniqueId = TCHAR_TO_UTF8(*GetUniqueDeviceID());
 
 
 SAgentSettingsWindow::SAgentSettingsWindow()
@@ -303,7 +300,7 @@ FReply SAgentSettingsWindow::OnCommit()
 	{
 		try
 		{
-			if (const auto AgentOption = XiaoRedis::SRedisClient->hget(XiaoRedis::Hash::SAgentStats, SAgentUniqeId))
+			if (const auto AgentOption = XiaoRedis::SRedisClient->hget(XiaoRedis::Hash::SAgentStats, SAgentUniqueId))
 			{
 				const std::string Value = AgentOption.value();
 				if (Value.size() > 0 && SAgentProto.ParseFromString(Value))
@@ -320,7 +317,7 @@ FReply SAgentSettingsWindow::OnCommit()
 					std::string Str;
 					if (SAgentProto.SerializeToString(&Str) && Str.size() > 0)
 					{
-						XiaoRedis::SRedisClient->hset(XiaoRedis::Hash::SAgentStats, SAgentUniqeId, Str);
+						XiaoRedis::SRedisClient->hset(XiaoRedis::Hash::SAgentStats, SAgentUniqueId, Str);
 					}
 				}
 			}
@@ -431,7 +428,7 @@ void SAgentSettingsWindow::AsyncNetworkTest()
 				{
 					ChangeStatus(false);
 
-					if (const auto AgentOption = XiaoRedis::SRedisClient->hget(XiaoRedis::Hash::SAgentStats, SAgentUniqeId))
+					if (const auto AgentOption = XiaoRedis::SRedisClient->hget(XiaoRedis::Hash::SAgentStats, SAgentUniqueId))
 					{
 						const std::string Value = AgentOption.value();
 						if (Value.size() > 0 && SAgentProto.ParseFromString(Value))

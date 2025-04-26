@@ -36,7 +36,7 @@ protected:
 	TSharedRef<ITableRow> OnGenerateEventRow(const TSharedPtr<FRedisEventDesc> InDesc, const TSharedRef<STableViewBase>& InTableView) const;
 
 	TSharedRef<ITableRow> OnGenerateBackRow(const TSharedPtr<FRedisServerDesc> InDesc, const TSharedRef<STableViewBase>& InTableView) const;
-	TSharedPtr<SWidget> OnContexMenuOpening();
+	TSharedPtr<SWidget> OnContextMenuOpening();
 	void OnTableSort(const EColumnSortPriority::Type InSortPriority, const FName& InName, EColumnSortMode::Type InSortMode) const;
 	EColumnSortMode::Type GetSortModeForColumn(const FName InColumnId) const;
 

@@ -15,11 +15,11 @@
 using namespace XiaoNetwork;
 using namespace XiaoRedis;
 
-static const double SOneHourSeconds = 3600.0f;
-static const double SOneDaySeconds = SOneHourSeconds * 24.0f;
-static const double SOneWeekSeconeds = SOneDaySeconds * 7.0f;
-static const double SOneMonthSeconds = SOneWeekSeconeds * 4.0f;
-static double SCleanTraceSeconds = SOneWeekSeconeds;
+static constexpr double SOneHourSeconds = 3600.0f;
+static constexpr double SOneDaySeconds = SOneHourSeconds * 24.0f;
+static constexpr double SOneWeekSeconds = SOneDaySeconds * 7.0f;
+static constexpr double SOneMonthSeconds = SOneWeekSeconds * 4.0f;
+static double SCleanTraceSeconds = SOneWeekSeconds;
 static double SCleanLoginSeconds = SOneDaySeconds;
 static double SNetworkPerforSeconds = 600.0f;
 
@@ -421,7 +421,7 @@ void FCoordiService::UpdateAgentStatus()
 				const EAgentStatus Status = static_cast<EAgentStatus>(Proto.status());
 				if (Status == EAgentStatus::Status_Initiating)
 				{
-					const std::string Initiator = (Proto.desc().empty() ? Proto.loginuser() : Proto.desc()) + "\"";
+					const std::string Initiator = (Proto.desc().empty() ? Proto.loginuser() : Proto.desc());
 					Initiators.insert(Initiator);
 				}
 
@@ -565,7 +565,7 @@ void FCoordiService::UpdateAgentStatus()
 				{
 					return true;
 				}
-				else if (ArchCompare < 0)
+				if (ArchCompare < 0)
 				{
 					return false;
 				}
@@ -576,7 +576,7 @@ void FCoordiService::UpdateAgentStatus()
 				{
 					return true;
 				}
-				else if (IsCompare < 0)
+				if (IsCompare < 0)
 				{
 					return false;
 				}
@@ -680,7 +680,7 @@ static void CleanCache()
 				// 写入时间
 				const uint64 WriteCycles = FCString::Strtoui64(*Parts[0], nullptr, Parts[0].Len());
 				const double PastSeconds = FPlatformTime::ToSeconds64(FPlatformTime::Cycles64() - WriteCycles);
-				if (PastSeconds > SOneWeekSeconeds)
+				if (PastSeconds > SOneWeekSeconds)
 				{
 					SRedisClient->hdel(Hash::STraceLog, Key);
 					XIAO_LOG(Log, TEXT("Delete the agent log with key::%s"), UTF8_TO_TCHAR(Key.c_str()));
@@ -767,9 +767,9 @@ void FCoordiService::TryBecomeMaster()
 					SRedisClient->command("SLAVEOF", "NO", "ONE");
 
 					// 将原有Master状态设置为false
-					auto& Node = std::get<1>(SRedisMasterNode);
-					Node.Status = false;
-					const std::string JsonContent = TCHAR_TO_UTF8(*Node.ToJson());
+					auto& MasterNode = std::get<1>(SRedisMasterNode);
+					MasterNode.Status = false;
+					const std::string JsonContent = TCHAR_TO_UTF8(*MasterNode.ToJson());
 					if (!JsonContent.empty())
 					{
 						SRedisClient->hset(Hash::SCacheList, std::get<0>(SRedisMasterNode), JsonContent);

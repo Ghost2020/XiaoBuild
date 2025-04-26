@@ -43,7 +43,7 @@ private:
 
 	TSharedPtr<FTabManager> TabManager = nullptr;
 
-	TSharedPtr<class SNotificationList> NotificaitonList = nullptr;
+	TSharedPtr<class SNotificationList> NotificationList = nullptr;
 
 	TSharedPtr<class SBorder> MaskBorder = nullptr;
 

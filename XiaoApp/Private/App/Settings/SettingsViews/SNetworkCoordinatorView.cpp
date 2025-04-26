@@ -151,7 +151,7 @@ void SNetworkCoordinatorView::Construct(const FArguments& InArgs, FNetworkCoordi
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
-void SNetworkCoordinatorView::Redraw()
+void SNetworkCoordinatorView::Redraw() const
 {
 	IPBox->SetText(FText::FromString(this->Settings->IP));
 	PortSpinBox->SetValue(this->Settings->Port);

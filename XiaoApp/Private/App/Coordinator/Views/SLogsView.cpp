@@ -4,7 +4,6 @@
  */
 #include "SLogsView.h"
 #include "../Widgets/SAgentExceptionRow.h"
-#include "SSimpleButton.h"
 #include "XiaoLog.h"
 #include "XiaoShareRedis.h"
 #include "exception.pb.h"

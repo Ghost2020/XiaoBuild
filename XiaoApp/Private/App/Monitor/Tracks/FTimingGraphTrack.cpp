@@ -3,14 +3,10 @@
   * @date 3:12 PM
  */
 #include "FTimingGraphTrack.h"
-#include "Algo/MaxElement.h"
 #include "Algo/ForEach.h"
-#include "InsightsCore/Common/TimeUtils.h"
 #include "Insights/ViewModels/GraphTrackBuilder.h"
 #include "Insights/ViewModels/TimingTrackViewport.h"
-#include "TraceServices/Model/AnalysisSession.h"
 #include "../Helpers/TimingViewDrawHelper.h"
-#include "XiaoLog.h"
 #include "ShareDefine.h"
 
 

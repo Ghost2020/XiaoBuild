@@ -7,8 +7,6 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
-#include <map>
-#include "system_settings.pb.h"
 
 class SBaseView : public SCompoundWidget
 {

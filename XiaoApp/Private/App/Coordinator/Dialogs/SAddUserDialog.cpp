@@ -4,7 +4,6 @@
  */
 
 #include "SAddUserDialog.h"
-#include "SSimpleButton.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Layout/SGridPanel.h"
@@ -63,11 +62,11 @@ void SAddUserDialog::Construct(const FArguments& InArgs)
 				SAssignNew(RoleComboBox, SComboBox<TSharedPtr<FText>>)
 				.OptionsSource(&GRoleArray)
 				.InitiallySelectedItem(GRoleArray[0])
-				.OnGenerateWidget_Lambda([](const TSharedPtr<FText> InText)
+				.OnGenerateWidget_Lambda([](const TSharedPtr<FText>& InText)
 				{
 					return SNew(STextBlock).Text(*InText);
 				})
-				.OnSelectionChanged_Lambda([this](const TSharedPtr<FText> InText, ESelectInfo::Type InType)
+				.OnSelectionChanged_Lambda([this](const TSharedPtr<FText>& InText, ESelectInfo::Type InType)
 				{
 					this->RoleComboBox->SetSelectedItem(InText);
 					UserDesc.Role = GRoleArray.Find(InText);

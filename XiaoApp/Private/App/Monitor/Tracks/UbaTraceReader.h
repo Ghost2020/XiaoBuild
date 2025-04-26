@@ -20,11 +20,11 @@ namespace Xiao
 	{
 		if (bytes < 1000)
 			return FString::Printf(TEXT("%ub"), uint64(bytes));
-		else if (bytes < 1000 * 1000)
+		if (bytes < 1000 * 1000)
 			return FString::Printf(TEXT("%.1fkb"), double(bytes) / 1000ull);
-		else if (bytes < 1000ull * 1000 * 1000)
+		if (bytes < 1000ull * 1000 * 1000)
 			return FString::Printf(TEXT("%.1fmb"), double(bytes) / (1000ull * 1000));
-		else if (bytes < 1000ull * 1000 * 1000 * 1000)
+		if (bytes < 1000ull * 1000 * 1000 * 1000)
 			return FString::Printf(TEXT("%.1fgb"), double(bytes) / (1000ull * 1000 * 1000));
 		else
 			return FString::Printf(TEXT("%.1ftb"), double(bytes) / (1000ull * 1000 * 1000 * 1000));
@@ -49,7 +49,7 @@ namespace Xiao
 			uint64 createFilesTime = 0;
 			uint64 writeFilesTime = 0;
 			TArray<uint8> stats;
-			TArray<FPocessLogLine> logLines;
+			TArray<FProcessLogLine> logLines;
 
 			FProcess& operator=(const FProcess& Other)
 			{

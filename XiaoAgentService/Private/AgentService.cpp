@@ -23,7 +23,7 @@ using namespace XiaoNetwork;
 using namespace sw::redis;
 using namespace XiaoRedis;
 
-static const double SOneDaySeconds = 3600.0f * 24.0f;
+static constexpr double SOneDaySeconds = 3600.0f * 24.0f;
 
 static ConnectionOptions SRedisConOptions;
 static FAgentProto SAgentProto;
@@ -58,7 +58,7 @@ struct FAgentCoreParams
 		, AgentSetting(InAgentSettings)
 	{}
 
-	bool operator==(const FAgentCoreParams& InAnother)
+	bool operator==(const FAgentCoreParams& InAnother) const
 	{
 		return this->MaxCon == InAnother.MaxCon && this->MaxCpu == InAnother.MaxCpu && this->LogLevel == InAnother.LogLevel && AgentSetting.IsEqual(InAnother.AgentSetting);
 	}
@@ -142,7 +142,7 @@ bool FAgentService::OnInitialize(const FString& InParams)
 		return false;
 	}
 
-	GOnRedisChanged.Bind([](uint8 InStatus)
+	GOnRedisChanged.Bind([](const uint8 InStatus)
 	{
 		if (!SRedisMessage.empty() && InStatus != ERedisStatus::Redis_Ok)
 		{

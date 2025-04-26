@@ -5,6 +5,7 @@
 #include "InsightsCore/Common/PaintUtils.h"
 #include "../Tracks/FTimingGraphTrack.h"
 #include "../Tracks/FSessionDetailsTrack.h"
+#include "Insights/ViewModels/TimingTrackViewport.h"
 
 namespace Xiao
 {
@@ -20,6 +21,7 @@ namespace Xiao
 		, InvalidAreaColor(0.1f, 0.07f, 0.07f, 1.0f)
 		, EdgeColor(0.05f, 0.05f, 0.05f, 1.0f)
 		, EventFont(FAppStyle::Get().GetFontStyle("SmallFont"))
+		, ReservedLayerId(0)
 		, ValidAreaX(0.0f)
 		, ValidAreaW(0.0f)
 		, NumEvents(0)
@@ -82,7 +84,7 @@ namespace Xiao
 			{
 				// Draw overlay for idle areas.
 				const FSlateBrush* IdleBrush = WhiteBrush;
-				const FLinearColor IdleColor(0.0f, 0.0f, 0.0f, 0.3f);
+				constexpr FLinearColor IdleColor(0.0f, 0.0f, 0.0f, 0.3f);
 				const int32 Count1 = DrawState.Boxes.Num();
 				const int32 Count2 = DrawState.Borders.Num();
 				int32 Index1 = 0;

@@ -7,7 +7,6 @@
 #include "Insights/ViewModels/ITimingEvent.h"
 #include "Insights/ViewModels/ITimingViewDrawHelper.h"
 #include "Insights/ViewModels/TimingEventsTrack.h"
-#include "Insights/ViewModels/TimingTrackViewport.h"
 
 struct FDrawContext;
 

@@ -4,7 +4,6 @@
  */
 #include "BuildMonitorApp.h"
 #include "SMonitorWindow.h"
-#include "XiaoLog.h"
 #include "ISourceCodeAccessModule.h"
 
 FBuildMonitorApp::FBuildMonitorApp(FAppParam& InParam)

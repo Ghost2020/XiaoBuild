@@ -7,7 +7,6 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/SWindow.h"
-// #include "Interfaces/IHttpRequest.h"
 #include "Database/Users.h"
 
 
@@ -35,7 +34,7 @@ protected:
 	bool CheckPassword(const FString& InPassword) const;
 
 private:
-	bool bEnbaleProxy = true;
+	bool bEnableProxy = true;
 	mutable bool bShowProxy = false;
 	mutable FAuthUser Auth;
 	TSharedPtr<SImage> CloseImage = nullptr;

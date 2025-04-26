@@ -4,7 +4,6 @@
 #include "XiaoShareField.h"
 #include "Database/LicenseDatabase.h"
 #include "Platform/Firewall.h"
-#include "XmlFile.h"
 #include "XiaoShareRedis.h"
 #include "XiaoCompressor.h"
 #include "agent.pb.h"
@@ -676,7 +675,7 @@ static void TerminateAllApp(const FString& InAppName, const uint32 InIgnorePid)
 	UpdateMessage(0.1f, TEXT("Terminate all XiaoApp Finish!"));
 }
 
-static bool Before(bool bInCheck)
+static bool Before(const bool bInCheck)
 {
 	// 加载配置文件
 	bool bRtn = LoadAgentSettings(SOriginalAgentSettings);
@@ -696,9 +695,9 @@ static bool Before(bool bInCheck)
 	return true;
 }
 
-static bool OverriteFiles()
+static bool OverrideFiles()
 {
-	XIAO_LOG(Log, TEXT("Overrite files begin!"));
+	XIAO_LOG(Log, TEXT("Override files begin!"));
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 	STempFolder = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::UserTempDir(), FString::Printf(TEXT("%s/TEMP"), *SXiaoBuild)));
 	if (FPaths::DirectoryExists(STempFolder))
@@ -727,12 +726,12 @@ static bool OverriteFiles()
 		return false;
 	}
 
-	TArray<uint8> CompressdBuffer;
-	CompressdBuffer.SetNum(Data.size());
-	FMemory::Memcpy(CompressdBuffer.GetData(), Data.data(), Data.size());
+	TArray<uint8> CompressedBuffer;
+	CompressedBuffer.SetNum(Data.size());
+	FMemory::Memcpy(CompressedBuffer.GetData(), Data.data(), Data.size());
 
 	const FString TempFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(STempFolder, TEXT("TEMP.xb")));
-	if (!FFileHelper::SaveArrayToFile(CompressdBuffer, *TempFile))
+	if (!FFileHelper::SaveArrayToFile(CompressedBuffer, *TempFile))
 	{
 		XIAO_LOG(Error, TEXT("Cant save data to file::%s"), *TempFile);
 		return false;
@@ -807,7 +806,7 @@ bool OnUpdate()
 	}
 
 	// 然后覆盖数据
-	if (!OverriteFiles())
+	if (!OverrideFiles())
 	{
 		return false;
 	}

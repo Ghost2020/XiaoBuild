@@ -9,16 +9,12 @@
 #include "XiaoShare.h"
 #include "XiaoShareField.h"
 #include "XiaoStyle.h"
-#include "XiaoCompressor.h"
-#include "XiaoInterprocess.h"
 #include "XiaoLog.h"
 
 #include "Framework/Docking/TabManager.h"
 #include "Misc/MessageDialog.h"
 #include "Misc/CommandLine.h"
-#include "Dialog/SMessageDialog.h"
 #include "Widgets/Notifications/SProgressBar.h"
-#include "DesktopPlatformModule.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "SlateOptMacros.h"
 #include "Widgets/Docking/SDockTab.h"
@@ -147,6 +143,7 @@ void SBuildView::Construct(const FArguments& InArgs)
  				]
  			]
  		]
+#pragma endregion
 	];
 
 	XIAO_LOG(Log, TEXT("SBuildView::Construct Finish!"));
@@ -367,12 +364,12 @@ bool SBuildView::IsShowingProcessorTrack() const
 	return false;
 }
 
-void SBuildView::ShowTraceView()
+void SBuildView::ShowTraceView() const
 {
 	TabManager->TryInvokeTab(SBuildProgressName);
 }
 
-bool SBuildView::IsTraceViewClosed()
+bool SBuildView::IsTraceViewClosed() const
 {
 	auto Tab = TabManager->FindExistingLiveTab(SBuildProgressName);
 	if (!Tab.IsValid())
@@ -382,12 +379,12 @@ bool SBuildView::IsTraceViewClosed()
 	return !(Tab->GetVisibility() == EVisibility::Visible);
 }
 
-void SBuildView::ShowOutputView()
+void SBuildView::ShowOutputView() const
 {
 	TabManager->TryInvokeTab(SBuildOutputName);
 }
 
-bool SBuildView::IsOutputViewClosed()
+bool SBuildView::IsOutputViewClosed() const
 {
 	auto Tab = TabManager->FindExistingLiveTab(SBuildOutputName);
 	if (!Tab.IsValid())
