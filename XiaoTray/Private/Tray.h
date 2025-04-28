@@ -43,26 +43,26 @@ private:
 	bool bAgentServiceState = false;
 	float TotalTime = 5.f;
 
-	TUniquePtr<shared_memory_object> ProgressShm = nullptr;
-	TUniquePtr<mapped_region> ProgressRegion = nullptr;
+	TUniquePtr<shared_memory_object> ProgressShm;
+	TUniquePtr<mapped_region> ProgressRegion;
 
 	bool bBuilding = false;
 	bool bEnableAsHelper = false;
 	bool bCanSyncUpdate = false;
 	FString Localization = TEXT("zh-CN");
 
-	QAction* SyncAction = nullptr;
-	QAction* DetectAction = nullptr;;
-	QAction* DocumentAction = nullptr;;
-	QAction* AboutAction = nullptr;;
-	QAction* LogAction = nullptr;;
-	QMenu* ClearMenu = nullptr;;
-	QAction* ClearTempAction = nullptr;;
-	QAction* ClearAgentAction = nullptr;;
-	QAction* ClearSchedulerAction = nullptr;;
-	QAction* HistoryAction = nullptr;;
-	QAction* NetworkTestAction = nullptr;;
-	QAction* CoordiManagerAction = nullptr;;
-	QAction* AgentSettingsAction = nullptr;;
-	QAction* ExitAction = nullptr;;
+	QAction* SyncAction;
+	QAction* DetectAction;
+	QAction* DocumentAction ;
+	QAction* AboutAction;
+	QAction* LogAction;
+	QMenu* ClearMenu;
+	QAction* ClearTempAction;
+	QAction* ClearAgentAction;
+	QAction* ClearSchedulerAction;
+	QAction* HistoryAction;
+	QAction* NetworkTestAction;
+	QAction* CoordiManagerAction;
+	QAction* AgentSettingsAction;
+	QAction* ExitAction;
 };
