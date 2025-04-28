@@ -8,34 +8,34 @@
 #include "CoreMinimal.h"
 #include "XiaoInstall.h"
 
-static FString GTaskFile;
+inline FString GTaskFile = TEXT("");
 
-extern bool GAgentAutoSelectPort = false;
-extern FString GAgentBuildGroup = TEXT("default");
-extern bool GAgentInstallAddsOn = false;
-extern EAgentType GAgentType = AT_Helper;
-extern EInitiatorType GInitiatorType = InitiatorType_Fixed;
-extern EHelperType GHelperType = ET_Fixed;
-extern uint32 GHelperCores = 0;
-extern FString GAgentDesc = TEXT("");
-extern bool GAgentBuildCache = false;
-extern FString GAgentDbDir = TEXT("");
-extern FString GAgentCacheDir = TEXT("");
-extern uint32 GAgentMaxFileCacheSize = 4096;
+inline bool GAgentAutoSelectPort = false;
+inline FString GAgentBuildGroup = TEXT("default");
+inline bool GAgentInstallAddsOn = false;
+inline EAgentType GAgentType = AT_Helper;
+inline EInitiatorType GInitiatorType = InitiatorType_Fixed;
+inline EHelperType GHelperType = ET_Fixed;
+inline uint32 GHelperCores = 0;
+inline FString GAgentDesc = TEXT("");
+inline bool GAgentBuildCache = false;
+inline FString GAgentDbDir = TEXT("");
+inline FString GAgentCacheDir = TEXT("");
+inline uint32 GAgentMaxFileCacheSize = 4096;
 
 // Coordinator
-extern FString GCoordiDatabaseDir = TEXT("");
+inline FString GCoordiDatabaseDir = TEXT("");
 
-extern bool GbWatchDogThread = false;
-extern bool GbNoUncSync = true;
-extern bool GbStopOnerror = false;
-extern bool GbOnlyFallLocally = false;
-extern bool GbShowCmd = false; 
-extern bool GbOpenMonitor = false; 
-extern bool GbUseIdeMonitor = false;
-extern bool GbEnableAgent = true;
-extern bool GbResetAgentCache = true;
-extern uint32 SPPID = 0;
+inline bool GbWatchDogThread = false;
+inline bool GbNoUncSync = true;
+inline bool GbStopOnerror = false;
+inline bool GbOnlyFallLocally = false;
+inline bool GbShowCmd = false; 
+inline bool GbOpenMonitor = false; 
+inline bool GbUseIdeMonitor = false;
+inline bool GbEnableAgent = true;
+inline bool GbResetAgentCache = true;
+inline uint32 SPPID = 0;
 
 
 bool OnInstall();
