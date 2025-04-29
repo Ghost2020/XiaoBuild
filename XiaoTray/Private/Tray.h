@@ -23,6 +23,7 @@ class FXiaoTray
 {
 public:
 	explicit FXiaoTray();
+	~FXiaoTray();
 
 	bool InitApp();
 	void RunApp();
@@ -43,8 +44,8 @@ private:
 	bool bAgentServiceState = false;
 	float TotalTime = 5.f;
 
-	TUniquePtr<shared_memory_object> ProgressShm;
-	TUniquePtr<mapped_region> ProgressRegion;
+	shared_memory_object* ProgressShm;
+	mapped_region* ProgressRegion;
 
 	bool bBuilding = false;
 	bool bEnableAsHelper = false;
@@ -53,7 +54,7 @@ private:
 
 	QAction* SyncAction;
 	QAction* DetectAction;
-	QAction* DocumentAction ;
+	QAction* DocumentAction;
 	QAction* AboutAction;
 	QAction* LogAction;
 	QMenu* ClearMenu;

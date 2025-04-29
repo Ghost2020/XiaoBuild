@@ -12,6 +12,7 @@
 #include "XiaoShareRedis.h"
 #include "XiaoCompressor.h"
 #include "Misc/CommandLine.h"
+#include "Version.h"
 
 #ifdef verify
 #pragma push_macro("verify")
@@ -33,10 +34,6 @@ THIRD_PARTY_INCLUDES_START
 THIRD_PARTY_INCLUDES_END
 
 #include <map>
-
-
-#define LOCTEXT_NAMESPACE "XiaoTray"
-
 
 using namespace XiaoIPC;
 
@@ -156,6 +153,8 @@ static const std::map<QString, std::map<QString, QString>> SLocalizationMap =
 	}
 };
 
+IMPLEMENT_APPLICATION(XiaoTray, XB_PRODUCT_NAME);
+
 #if !PLATFORM_MAC
 static void BeforeExit()
 {
@@ -174,6 +173,18 @@ static QString GetIconDir()
 FXiaoTray::FXiaoTray()
 {
 	Permissions.set_unrestricted();
+}
+
+FXiaoTray::~FXiaoTray()
+{
+	if (ProgressShm)
+	{
+		delete ProgressShm;
+	}
+	if (ProgressRegion)
+	{
+		delete ProgressRegion;
+	}
 }
 
 bool FXiaoTray::InitApp()
@@ -204,15 +215,15 @@ bool FXiaoTray::InitApp()
 
 	try
 	{
-		ProgressShm = MakeUnique<shared_memory_object>(open_or_create, SMonitorProgressMemoryName.c_str(), read_write, XiaoIPC::Permissions);
-		if (!ProgressShm.IsValid())
+		ProgressShm = new shared_memory_object(open_or_create, SMonitorProgressMemoryName.c_str(), read_write, XiaoIPC::Permissions);
+		if (!ProgressShm)
 		{
 			XIAO_LOG(Error, TEXT("Cant OpenExisting IPC Progress Memory!"));
 			return false;
 		}
 		ProgressShm->truncate(SMonitorProgressMemorySize);
-		ProgressRegion = MakeUnique<mapped_region>(*ProgressShm.Get(), read_only);
-		if (!ProgressRegion.IsValid())
+		ProgressRegion = new mapped_region(*ProgressShm, read_only);
+		if (!ProgressRegion)
 		{
 			XIAO_LOG(Error, TEXT("Cant Create Progress Map Region!"));
 			return false;
@@ -524,7 +535,7 @@ void FXiaoTray::OnUpdate(QSystemTrayIcon* InTrayIcon)
 
 void FXiaoTray::OnPullMessage(QSystemTrayIcon* InTrayIcon)
 {	
-	if (ProgressRegion.IsValid())
+	if (ProgressRegion)
 	{
 		const std::string Content(static_cast<char*>(ProgressRegion->get_address()));
 		if(!Content.empty() && ProgressStatus.ParseFromString(Content))
@@ -631,5 +642,3 @@ void FXiaoTray::OnCleanTempFolder()
 
 #pragma pop_macro("check")
 #pragma pop_macro("verify")
-
-#undef LOCTEXT_NAMESPACE

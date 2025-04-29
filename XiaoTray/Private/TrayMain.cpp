@@ -4,9 +4,6 @@
  */
 #include "TrayMain.h"
 #include "Tray.h"
-#include "Version.h"
-
-IMPLEMENT_APPLICATION(XiaoTray, XB_PRODUCT_NAME);
 
 int RunTrayApp(const TCHAR* Commandline)
 {
