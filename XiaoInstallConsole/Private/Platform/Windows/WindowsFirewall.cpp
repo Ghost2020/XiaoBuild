@@ -145,7 +145,7 @@ bool FWindowsFirewall::BuildFirewall()
 		// 入栈规则
 		AddFwRule(XiaoAppName::SUbaAgent + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SUbaAgent, MiddlePath));
 		AddFwRule(XiaoAppName::SXiaoScheduler + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SXiaoScheduler, MiddlePath));
-		AddFwRule(XiaoAppName::SBuildPerfService + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SIperfServer), false);
+		AddFwRule(XiaoAppName::SBuildPerfService + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SIperfServer));
 
 		// 出站规则
 		AddFwRule(XiaoAppName::SBuildApp + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SBuildApp), false);
