@@ -1223,7 +1223,8 @@ namespace uba
 				}
 				if (LocalGroup != AgentGroup)
 				{
-					logger.Info(TC("Agent %s group:[%s] different group:[%s] with us!"), *AgentDesc, *LocalGroup, *AgentGroup);
+					logger.Info(TC("Agent %s group:[%s] different group:[%s] with us!"), *AgentDesc, *AgentGroup, *LocalGroup);
+					CantConnectSet.insert(Id);
 					continue;
 				}
 
