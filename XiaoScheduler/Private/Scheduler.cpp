@@ -3,6 +3,7 @@
   * @datetime 2023 -9:32 PM
  */
 #include "Scheduler.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "Misc/CommandLine.h"
 #include "UbaEvent.h"
 #include "UbaProcessHandle.h"
@@ -367,7 +368,11 @@ namespace uba
 		Server.UnregisterService(uba::SessionServiceId);
 		Server.RegisterService(
 			uba::SessionServiceId,
-			[this](const ConnectionInfo& connectionInfo, uba::MessageInfo& messageInfo, uba::BinaryReader& reader, uba::BinaryWriter& writer)
+			[this](const ConnectionInfo& connectionInfo, 
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+				const WorkContext& workContext,
+#endif
+				uba::MessageInfo& messageInfo, uba::BinaryReader& reader, uba::BinaryWriter& writer)
 			{
 				if (messageInfo.type == STaskTypeExit)
 				{
@@ -375,18 +380,34 @@ namespace uba
 					Disconnect();
 					return true;
 				}
-				return session.HandleMessage(connectionInfo, messageInfo.type, reader, writer);
+
+				return session.HandleMessage(connectionInfo, 
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+					workContext, messageInfo,
+#else
+					messageInfo.type,
+#endif
+					reader, writer);
+
 			},
 			[](u8 type)
 			{
 				switch (type)
 				{
-#define UBA_SESSION_MESSAGE(x) case SessionMessageType_##x: return TC("")#x;
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+					#define UBA_SESSION_MESSAGE(x) case SessionMessageType_##x: return AsView(TC("")#x);
 					UBA_SESSION_MESSAGES
-#undef UBA_SESSION_MESSAGE
-				case STaskTypeExit: return TC("Exit");
+					#undef UBA_SESSION_MESSAGE
+				default:
+					return ToView(TC("Unknown"));
+#else
+					#define UBA_SESSION_MESSAGE(x) case SessionMessageType_##x: return TC("")#x;
+					UBA_SESSION_MESSAGES
+					#undef UBA_SESSION_MESSAGE
+					case STaskTypeExit: return TC("Exit");
 
-				default: return TC("Unknown");
+					default: return TC("Unknown");
+#endif
 				}
 			});
 
@@ -1053,17 +1074,16 @@ namespace uba
 			return;
 		}
 
-		// 是否有本地的在这里？？？
 		/*SessionServer& SessionServer = GetSession();
 		const auto& ClientSessions = SessionServer.GetClientSessions();*/
 		for (const auto& Iter : Ip2Id)
 		{
 			std::string AgentMessage = "Helping " + GLocalMachineDesc;
-			
-				/*if (const auto Client = GetClientSession(Iter.Value))
-				{
-					AgentMessage = std::format("Helping \"{}\" with {}/{} core(s)", GLocalMachineDesc.c_str(), Client->usedSlotCount, Client->processSlotCount);
-				}*/
+
+			/*if (const auto Client = GetClientSession(Iter.Value))
+			{
+				AgentMessage = std::format("Helping \"{}\" with {}/{} core(s)", GLocalMachineDesc.c_str(), Client->usedSlotCount, Client->processSlotCount);
+			}*/
 			if (!UpdateAgent(Iter.Value, InAgentStatus, AgentMessage))
 			{
 				return;
@@ -1124,7 +1144,13 @@ namespace uba
 		const auto& Sessions = SessionServer.GetClientSessions();
 		for (const auto& Client : Sessions)
 		{
-			if (Client && Client->id == ClientId)
+			if (Client && Client->
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+				clientId
+#else
+				id
+#endif
+				== ClientId)
 			{
 				return Client;
 			}
@@ -1316,7 +1342,13 @@ namespace uba
 					continue;
 				}
 
-				if (Session->id == InClientId)
+				if (Session->
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+					clientId
+#else
+					id
+#endif
+					== InClientId)
 				{
 					break;
 				}
@@ -1421,13 +1453,25 @@ namespace uba
 			}
 
 			// 或者已经断开
-			if (AreadyDisconnecedSet.Contains(Client->id) || !Client->enabled || Client->abort)
+			if (AreadyDisconnecedSet.Contains(Client->
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+				clientId
+#else
+				id
+#endif
+			) || !Client->enabled || Client->abort)
 			{
 				continue;
 			}
 
 			// 释放代理
-			ReleaseAgent(Client->id, Client);
+			ReleaseAgent(Client->
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+				clientId
+#else
+				id
+#endif
+				, Client);
 		}
 	}
 

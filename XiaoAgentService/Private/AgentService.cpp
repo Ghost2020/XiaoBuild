@@ -600,11 +600,10 @@ bool FAgentService::TryRunUbaAgent()
 	}
 
 	const FUbaAgentSetting& s = SOriginalAgentSettings.UbaAgent;
-	const FString Params = FString::Printf(TEXT("%s -listen=%u -maxcpu=%u -mulcpu=%u -maxcon=%u -maxworkers=%u -capacity=%u %s -stats=%u %s %s %s %s %s -sendsize=%u %s %s %s %s %s -maxidle=%u %s %s %s %s %s %s -memwait=%u -memkill=%u %s %s"),
+	const FString Params = FString::Printf(TEXT("%s -listen=%u -maxcpu=%u -mulcpu=%u -maxcon=%u -maxworkers=%u -capacity=%u %s %s %s %s %s %s -sendsize=%u %s %s %s %s %s -maxidle=%u %s %s %s %s %s %s -memwait=%u -memkill=%u %s %s"),
 		(s.Dir.IsEmpty() || !FPaths::DirectoryExists(s.Dir)) ? TEXT("") : *FString::Printf(TEXT("-dir=\"%s\""), *s.Dir),
 		OutPort, MaxCpu, s.Mulcpu, MaxCon, MaxCpu, s.Capacity,
 		(s.Config.IsEmpty() || !FPaths::FileExists(s.Config)) ? TEXT("") : *FString::Printf(TEXT("-config=\"%s\""), *s.Config),
-		s.Stats, 
 		s.bVerbose ? TEXT("-verbose") : TEXT(""),
 		s.bLog ? TEXT("-log") : TEXT(""),
 		s.bNoCustoMalloc ? TEXT("-nocustomalloc") : TEXT(""),
