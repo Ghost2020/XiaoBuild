@@ -4,6 +4,7 @@
  */
 
 #include "Misc/CommandLine.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "XiaoAgent.h"
 #include "XiaoShareRedis.h"
 #include "exception.pb.h"
@@ -58,7 +59,14 @@ namespace uba
 	{
 		StringBuffer<4096> assertInfo;
 		assertInfo.Appendf(TC("SEH EXCEPTION %u (0x%llx)"), InExceptionInfo->ExceptionRecord->ExceptionCode, InExceptionInfo->ExceptionRecord->ExceptionAddress);
-		WriteAssertInfo(assertInfo, nullptr, nullptr, 0, nullptr, 1);
+
+		WriteAssertInfo(assertInfo, nullptr, nullptr, 0, nullptr, 
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION <= 5)
+			1
+#else
+			nullptr
+#endif
+		);
 		WriteDump(InExceptionInfo);
 
 		FException Exception;
