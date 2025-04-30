@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "Templates/UnrealTemplate.h"
 #include "Async/TaskGraphInterfaces.h"
 #include "Misc/MessageDialog.h"
@@ -204,7 +205,9 @@ public:
 			DeltaTime = CurrentTime - LastTime;
 			LastTime = CurrentTime;
 
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION <= 5) && !UE_BUILD_SHIPPING
 			FStats::AdvanceFrame(false);
+#endif
 
 			FCoreDelegates::OnEndFrame.Broadcast();
 			GLog->FlushThreadedLogs();

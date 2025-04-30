@@ -6,6 +6,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "../Tracks/FMarkersTimingTrack.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Insights/ITimingViewSession.h"
@@ -90,6 +91,10 @@ public:
 	virtual bool RemoveTrack(TSharedPtr<FBaseTimingTrack> Track) override;
 
 	virtual TSharedPtr<FBaseTimingTrack> FindTrack(uint64 InTrackId) override;
+
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >=6)
+	virtual void EnumerateTracks(TFunctionRef<void(TSharedPtr<FBaseTimingTrack> Track)> Callback) override;
+#endif
 
 	virtual double GetTimeMarker() const override;
 	virtual void SetTimeMarker(double InTimeMarker) override;

@@ -7,6 +7,7 @@
 #include "Insights/ViewModels/ITimingEvent.h"
 #include "Insights/ViewModels/ITimingViewDrawHelper.h"
 #include "Insights/ViewModels/TimingEventsTrack.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 struct FDrawContext;
 
@@ -114,6 +115,10 @@ namespace Xiao
 		virtual int32 GetRelationLayerId() const override { return ReservedLayerId + ToInt32(EDrawLayer::Relation); };
 		virtual int32 GetFirstLayerId() const override { return ReservedLayerId; }
 		virtual int32 GetNumLayerIds() const override { return ToInt32(EDrawLayer::Count); }
+
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >=6)
+		virtual int32 GetTextLayerId() const override { return ReservedLayerId + ToInt32(EDrawLayer::EventText); };
+#endif
 
 		const FDrawContext& GetDrawContext() const { return DrawContext; }
 		const FTimingTrackViewport& GetViewport() const { return Viewport; }

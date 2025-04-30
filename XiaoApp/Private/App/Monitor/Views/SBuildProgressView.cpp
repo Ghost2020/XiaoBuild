@@ -1954,6 +1954,16 @@ TSharedPtr<FBaseTimingTrack> SBuildProgressView::FindTrack(const uint64 InTrackI
 	return TrackPtrPtr ? *TrackPtrPtr : nullptr;
 }
 
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >=6)
+void SBuildProgressView::EnumerateTracks(TFunctionRef<void(TSharedPtr<FBaseTimingTrack>Track)> Callback)
+{
+	for (auto& Entry : AllTracks)
+	{
+		Callback(Entry.Value);
+	}
+}
+#endif
+
 double SBuildProgressView::GetTimeMarker() const
 {
 	return SessionTime;
