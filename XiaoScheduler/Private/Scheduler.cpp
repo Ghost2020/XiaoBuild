@@ -250,6 +250,10 @@ namespace uba
 		ServerInfo.remoteLogEnabled = true;
 		ServerInfo.deleteSessionsOlderThanSeconds = 1;
 		ServerInfo.logToFile = UbaScheduler.bLog;
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+		// WARNING 如果设置为True dotnet.exe相关的程序会报错，阻塞进程的运行
+		ServerInfo.allowLocalDetour = false;
+#endif
 		SessionServer = std::make_unique<uba::SessionServer>(ServerInfo);
 
 		if (!StorageServer->LoadCasTable(true))
@@ -556,10 +560,12 @@ namespace uba
 			logger.EndScope();
 		}
 		
+		SetProcessFinishedCallback([](const ProcessHandle& InPh) {});
 		logger.Info(TC("Scheduler run took %s"), TimeToText(time).str);
 		logger.Info(TC("---------------------------------------XiaoBuild Finish with (%d)---------------------------------------"), GBuildStats.BuildStatus ? 0 : -1);
 		GBuildStats.End = FPlatformTime::Seconds();
 		UpdateBuildStats();
+		
 		return GBuildStats.BuildStatus;
 	}
 
@@ -663,6 +669,11 @@ namespace uba
 						RemoteActionFailedCrash(InPh, TEXT("Stack buffer overflow"));
 						return;
 					}
+					if (ExitCode == 0xC0000602)
+					{
+						RemoteActionFailedCrash(InPh, TEXT("Fail Fast Exception"));
+						return;
+					}
 					if (ExitCode > UBAExitCodeStart && ExitCode < 10000)
 					{
 						RemoteActionFailedCrash(InPh, TEXT("UBA error"));
@@ -673,6 +684,7 @@ namespace uba
 						RemoteActionFailedCrash(InPh, TEXT("C1001"));
 						return;
 					}
+					// # TODO 需要尝试本地再次运行
 					/*else if (SOriginalAgentSettings.UbaScheduler.Loop > 1)
 					{
 						RemoteActionFailedCrash(InPh, TEXT("Force local retry"));
@@ -1102,12 +1114,22 @@ namespace uba
 
 		if (ProgressRegion)
 		{
+			auto Address = ProgressRegion->get_address();
+			if (!Address)
+			{
+				static auto OnceCall = [this]() ->int {
+					logger.Warning(TC("WARNING::ProgressRegion address is null"));
+					return 0;
+				}();
+				
+				return;
+			}
 			BuildProgress.set_status(InStatus);
 			BuildProgress.set_progress(InProgress);
 			
 			try
 			{
-				BuildProgress.SerializePartialToArray(ProgressRegion->get_address(), BuildProgress.ByteSizeLong());
+				BuildProgress.SerializePartialToArray(Address, BuildProgress.ByteSizeLong());
 			}
 			catch (std::exception& Ex)
 			{

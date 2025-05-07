@@ -95,6 +95,10 @@ namespace Xiao
 		UBA_TRACE_TYPE(CacheEndWrite) \
 		UBA_TRACE_TYPE(ProgressUpdate) \
 		UBA_TRACE_TYPE(RemoteExecutionDisabled) \
+		UBA_TRACE_TYPE(FileFetchSize) \
+		UBA_TRACE_TYPE(ProcessBreadcrumbs) \
+		UBA_TRACE_TYPE(WorkHint) \
+		UBA_TRACE_TYPE(DriveUpdate) \
 
 	enum TraceType : uint8
 	{
@@ -178,6 +182,13 @@ namespace Xiao
 		AtomicU64 wallTime;
 		AtomicU64 cpuTime;
 
+		AtomicU64 detoursMemory;
+		AtomicU64 peakMemory;
+
+		AtomicU64 iopsRead;
+		AtomicU64 iopsWrite;
+		AtomicU64 iopsOther;
+
 		AtomicU64 usedMemory;
 
 		AtomicU64 hostTotalTime;
@@ -200,12 +211,31 @@ namespace Xiao
 				#undef UBA_PROCESS_STAT
 			}
 
-			startupTime = reader.ReadU64();
-			exitTime = reader.ReadU64();
-			wallTime = reader.ReadU64();
-			cpuTime = reader.ReadU64();
-			usedMemory = reader.ReadU32();
-			hostTotalTime = reader.ReadU64();
+			if (version >= 37)
+			{
+				startupTime = reader.Read7BitEncoded();
+				exitTime = reader.Read7BitEncoded();
+				wallTime = reader.Read7BitEncoded();
+				cpuTime = reader.Read7BitEncoded();
+				detoursMemory = reader.Read7BitEncoded();
+				peakMemory = reader.Read7BitEncoded();
+				if (version >= 39)
+				{
+					iopsRead = reader.Read7BitEncoded();
+					iopsWrite = reader.Read7BitEncoded();
+					iopsOther = reader.Read7BitEncoded();
+				}
+				hostTotalTime = reader.Read7BitEncoded();
+			}
+			else
+			{
+				startupTime = reader.ReadU64();
+				exitTime = reader.ReadU64();
+				wallTime = reader.ReadU64();
+				cpuTime = reader.ReadU64();
+				detoursMemory = reader.ReadU32();
+				hostTotalTime = reader.ReadU64();
+			}
 		}
 
 		uint64 GetTotalTime() const
@@ -271,6 +301,7 @@ namespace Xiao
 			UBA_SESSION_STAT(FTimer, createMmapFromFile, 12) \
 			UBA_SESSION_STAT(FTimer, waitMmapFromFile, 12) \
 			UBA_SESSION_STAT(FTimer, getLongNameMsg, 31) \
+			UBA_SESSION_STAT(FTimer, waitBottleneck, 40) \
 
 		#define UBA_SESSION_STAT(type, var, ver) type var;
 		UBA_SESSION_STATS
@@ -352,7 +383,7 @@ namespace Xiao
 				return;
 			}
 
-			const uint64 bits = reader.Read7BitEncoded();
+			uint64 bits = reader.Read7BitEncoded();
 			#define UBA_STORAGE_STAT(type, var, ver) if (bits & (1 << Bit_##var)) Xiao::Read(reader, var, version);
 			UBA_STORAGE_STATS
 			#undef UBA_STORAGE_STAT
@@ -429,6 +460,7 @@ namespace Xiao
 			UBA_KERNEL_STAT(FExtendedTimer, closeHandle, 0) \
 			UBA_KERNEL_STAT(FExtendedTimer, traverseDir, 27) \
 			UBA_KERNEL_STAT(FExtendedTimer, virtualAlloc, 30) \
+			UBA_KERNEL_STAT(FTimeAndBytes, memoryCompress, 41) \
 
 		#define UBA_KERNEL_STAT(type, var, ver) type var;
 		UBA_KERNEL_STATS
@@ -478,7 +510,6 @@ namespace Xiao
 			return true;
 		}
 	};
-
 
 	struct CacheStats
 	{

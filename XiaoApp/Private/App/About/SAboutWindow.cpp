@@ -3,6 +3,7 @@
   * @date 11:02 PM
  */
 #include "SAboutWindow.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "SlateOptMacros.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Input/SButton.h"
@@ -21,9 +22,18 @@ static constexpr int32 GAboutWindow_Height = 200;
 static FText GetEngineSupportInformation()
 {
 #if PLATFORM_WINDOWS
-	return LOCTEXT("CurrentSupport_Text", "\t\t\t\tUE4.26;UE4.27\nUE5.0;UE5.1;UE5.2;UE5.3;UE5.4;UE5.5");
+	return LOCTEXT("CurrentSupport_Text", "\t\t\t\t\tUE4.26;UE4.27\nUE5.0;UE5.1;UE5.2;UE5.3;UE5.4;UE5.5;UE5.6");
 #else
 	return LOCTEXT("OnlySupportSource_Text", "暂时只支持源码版本");
+#endif
+}
+
+static FText GetUbaSupportVersion()
+{
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+	return FText::FromString(TEXT("42"));
+#else
+	return FText::FromString(TEXT("33"));
 #endif
 }
 
@@ -73,6 +83,14 @@ void SAboutWindow::Construct(const FArguments& Args)
 			+SHorizontalBox::Slot().FillWidth(0.6f)
 			[
 				SNew(SVerticalBox)
+				+ SVerticalBox::Slot().VAlign(VAlign_Top).AutoHeight().Padding(5.0f, 5.0f)
+				[
+					SNew(STextBlock).Text(LOCTEXT("UbaSupportInfo_Text", "Uba当前版本"))
+				]
+				+ SVerticalBox::Slot().Padding(5.0f, 5.0f).HAlign(HAlign_Center).VAlign(VAlign_Center).AutoHeight()
+				[
+					SNew(SMultiLineEditableText).Text_Static(&GetUbaSupportVersion).AutoWrapText(true)
+				]
 				+SVerticalBox::Slot().VAlign(VAlign_Top).AutoHeight().Padding(5.0f, 5.0f)
 				[
 					SNew(STextBlock).Text(LOCTEXT("EngineSupportInfo_Text", "引擎支持版本"))

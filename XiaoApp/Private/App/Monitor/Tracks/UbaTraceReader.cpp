@@ -19,7 +19,7 @@
 
 namespace Xiao
 {
-	static constexpr uint32 TraceVersion = 34;
+	static constexpr uint32 TraceVersion = 42;//34;
 	static constexpr uint32 TraceReadCompatibilityVersion = 6;
 
     const FTraceView::FProcess& FTraceView::GetProcess(const FProcessLocation& loc)
@@ -46,11 +46,16 @@ namespace Xiao
 
 	void FTraceView::Clear()
 	{
+		version = 0;
 		sessions.Empty();
 		workTracks.Empty();
 		strings.Empty();
 		statusMap.Empty();
 		cacheWrites.Empty();
+
+		activeProcessCounts.Empty();
+		maxActiveProcessCount = 0;
+
 		startTime = 0;
 		totalProcessActiveCount = 0;
 		totalProcessExitedCount = 0;
@@ -323,13 +328,17 @@ namespace Xiao
 
 	bool FTraceReader::UpdateReadFile(FTraceView& out, const uint64 maxTime, bool& outChanged)
 	{
+		bool res = true;
 		FBinaryReader traceReader(m_memoryPos);
 		uint64 left = uint64(m_memoryEnd - m_memoryPos);
 		while (traceReader.GetPosition() < left)
 		{
 			uint64 pos = traceReader.GetPosition();
 			if (!ReadTrace(out, traceReader, maxTime))
-				return false;
+			{
+				res = false;
+				break;
+			}
 			if (pos == traceReader.GetPosition())
 			{
 				if (!traceReader.GetLeft())
@@ -339,11 +348,13 @@ namespace Xiao
 		}
 		outChanged = traceReader.GetPosition() != 0 || !m_activeProcesses.empty();
 		m_memoryPos += traceReader.GetPosition();
-		return true;
+		return res;
 	}
 
 	bool FTraceReader::StartReadClient(FTraceView& out, FNetworkTrace& client)
 	{
+		Reset(out);
+
 		constexpr uint32 traceMemSize = 128 * 1024 * 1024;
 		const FGuid Guid = FGuid::NewGuid();
 		m_sharedMemeoryRegion.Reset(FPlatformMemory::MapNamedSharedMemoryRegion(Guid.ToString(EGuidFormats::DigitsWithHyphensInBraces), true, (FPlatformMemory::ESharedMemoryAccess::Read | FPlatformMemory::ESharedMemoryAccess::Write), traceMemSize));
@@ -396,6 +407,12 @@ namespace Xiao
 				out.finished = true;
 				return false;
 			}
+
+			if (ReceiveBuffer.IsEmpty())
+			{
+				return false;
+			}
+
 			FBinaryReader reader(ReceiveBuffer.GetData(), 0, ReceiveBuffer.Num());
 			const uint32 remotePos = reader.ReadU32();
 			const uint32 left = uint32(reader.GetLeft());
@@ -477,7 +494,14 @@ namespace Xiao
 	bool FTraceReader::ReadMemory(FTraceView& out, bool trackHost, const uint64 maxTime)
 	{
 		if (m_memoryEnd == m_memoryPos)
+		{
 			return true;
+		}
+
+		if (out.version && out.version < TraceReadCompatibilityVersion || out.version > TraceVersion)
+		{
+			return true;
+		}
 
 		const uint64 toRead = m_memoryEnd - m_memoryPos;
 		FBinaryReader traceReader(m_memoryPos);
@@ -489,6 +513,7 @@ namespace Xiao
 
 			const uint32 traceSize = traceReader.ReadU32(); (void)traceSize;
 			const uint32 version = traceReader.ReadU32();
+			out.version = version;
 			
 			if (version < TraceReadCompatibilityVersion || version > TraceVersion)
 			{
@@ -504,6 +529,10 @@ namespace Xiao
 			if (trackHost && !replay)
 				m_hostProcess = FPlatformProcess::OpenProcess(hostProcessId);
 			uint64 traceSystemStartTimeUs = 0;
+			if (version < TraceReadCompatibilityVersion || version > TraceVersion)
+			{
+				return true;
+			}
 			if (version >= 18)
 				traceSystemStartTimeUs = traceReader.Read7BitEncoded();
 			if (version >= 18)
@@ -516,6 +545,7 @@ namespace Xiao
 			{
 				out.realStartTime = FPlatformTime::Cycles64() - UsToTime(GetSystemTimeUs() - traceSystemStartTimeUs);
 			}
+			out.traceSystemStartTimeUs = traceSystemStartTimeUs;
 
 			out.startTime = out.realStartTime;
 			if (replay)
@@ -528,7 +558,10 @@ namespace Xiao
 		while (lastPos != toRead)
 		{
 			if (!ReadTrace(out, traceReader, maxTime))
+			{
+				m_memoryPos += lastPos;
 				return false;
+			}
 			const uint64 pos = traceReader.GetPosition();
 			if (pos == lastPos)
 				break;
@@ -544,7 +577,7 @@ namespace Xiao
 		const uint64 readPos = reader.GetPosition();
 		const uint8 traceType = reader.ReadByte();
 		uint64 time = 0;
-		if (out.version >= 15 && traceType != TraceType_String)
+		if (out.version >= 15 && traceType != TraceType_String && traceType != TraceType_DriveUpdate)
 		{
 			time = ConvertTime(out, reader.Read7BitEncoded());
 			if (time > maxTime)
@@ -559,11 +592,41 @@ namespace Xiao
 		case TraceType_SessionAdded:
 		{
 			TStringBuilderWithBuffer<UBA_CHAR, 128> sessionName;
-			reader.ReadString(sessionName);
+			if (!reader.TryReadString(sessionName))
+			{
+				return false;
+			}
 			TStringBuilderWithBuffer<UBA_CHAR, 512> sessionInfo;
-			reader.ReadString(sessionInfo);
+			if (!reader.TryReadString(sessionInfo))
+			{
+				return false;
+			}
 			const Guid clientUid = ReadClientId(out, reader);
 			const uint32 sessionIndex = reader.ReadU32();
+
+			/*FString hyperlink;
+			FString SessionInfoStr = sessionInfo.ToString();
+			const TCHAR* hyperlinkPos = nullptr;
+			if (!SessionInfoStr.Contains(TEXT("http://")))
+			{
+				SessionInfoStr.Find(TEXT("https://"));
+			}
+			if (hyperlinkPos)
+			{
+				const TCHAR* hyperlinkEnd = sessionInfo.GetData() + sessionInfo.Len();
+				if (const TCHAR* space = TStrchr(hyperlinkPos, ' '))
+					hyperlinkEnd = space;
+
+				hyperlink.assign(hyperlinkPos, hyperlinkEnd);
+				if (*hyperlinkEnd == ' ')
+					++hyperlinkEnd;
+					while (hyperlinkPos[-1] == ' ')
+						--hyperlinkPos;
+				if (hyperlinkPos[-1] == ',')
+					--hyperlinkPos;
+					memmove(const_cast<TCHAR*>(hyperlinkPos), hyperlinkEnd, (sessionInfo.GetData() + sessionInfo.Len() - hyperlinkEnd) * sizeof(TCHAR));
+				sessionInfo.Reserve(sessionInfo.Len() - (hyperlinkEnd - hyperlinkPos));
+			}*/
 
 			TStringBuilderWithBuffer<UBA_CHAR, 512> fullName;
 			fullName.Append(sessionName.GetData()).Append(TEXT(" (")).Append(sessionInfo.GetData()).Append(TEXT(")"));
@@ -589,7 +652,6 @@ namespace Xiao
 				break;
 			}
 
-
 			if (out.sessions.Num() <= int32(virtualSessionIndex))
 			{
 				out.sessions.SetNum(virtualSessionIndex + 1);
@@ -603,6 +665,7 @@ namespace Xiao
 			FTraceView::FSession& session = GetSession(out, sessionIndex);
 			session.name = sessionName.GetData();
 			session.fullName = SessionFullName;
+			// session.hyperlink = hyperlink;
 			session.clientUid = clientUid;
 
 			++out.activeSessionCount;
@@ -665,7 +728,9 @@ namespace Xiao
 				session.prevRecv = 0;
 				session.memTotal = 0;
 				if (!session.updates.IsEmpty())
+				{
 					session.updates.Add({ time, 0, 0, lastPing, memAvail, cpuLoad, connectionCount });
+				}
 			}
 			else
 			{
@@ -676,15 +741,27 @@ namespace Xiao
 				session.prevUpdateTime = session.updates.Last().time;
 			}
 
-			//session.lastPing = lastPing;
-			//session.memAvail = memAvail;
 			session.memTotal = memTotal;
 			session.updates.Add({ time, totalSend, totalRecv, lastPing, memAvail, cpuLoad, connectionCount });
 
-			const uint64 send = totalSend - session.prevSend;
-			const uint64 recv = totalRecv - session.prevRecv;
-			session.highestSendPerS = FMath::Max(session.highestSendPerS, float(send) / TimeToS(time - session.prevUpdateTime));
-			session.highestRecvPerS = FMath::Max(session.highestRecvPerS, float(recv) / TimeToS(time - session.prevUpdateTime));
+			for (auto& pair : session.drives)
+			{
+				auto& drive = pair.Value;
+				const auto Num = session.updates.Num();
+				drive.busyPercent.Reserve(Num);
+				drive.readCount.Reserve(Num);
+				drive.writeCount.Reserve(Num);
+				drive.readBytes.Reserve(Num);
+				drive.writeBytes.Reserve(Num);
+			}
+
+			if (session.prevUpdateTime)
+			{
+				const uint64 send = totalSend - session.prevSend;
+				const uint64 recv = totalRecv - session.prevRecv;
+				session.highestSendPerS = FMath::Max(session.highestSendPerS, float(send) / TimeToS(time - session.prevUpdateTime));
+				session.highestRecvPerS = FMath::Max(session.highestRecvPerS, float(recv) / TimeToS(time - session.prevUpdateTime));
+			}
 			break;
 		}
 		case TraceType_SessionDisconnect:
@@ -741,6 +818,32 @@ namespace Xiao
 			TStringBuilderWithBuffer<UBA_CHAR, 512> desc;
 			reader.ReadString(desc);
 
+			FString breadcrumbs;
+			if (out.version >= 35)
+			{
+				if (out.version < 38)
+				{
+					breadcrumbs = reader.ReadString();
+				}
+				else if (out.version < 42)
+				{
+					if (reader.ReadBool())
+					{
+						breadcrumbs = reader.ReadString();
+					}
+					else
+					{
+						reader.Read7BitEncoded();
+						reader.Skip(reader.Read7BitEncoded());
+						breadcrumbs = TEXT("Uppgrade your XiaoApp");
+					}
+				}
+				else
+				{
+					breadcrumbs = reader.ReadLongString();
+				}
+			}
+
 			if (out.version < 15)
 			{
 				time = reader.Read7BitEncoded();
@@ -794,6 +897,10 @@ namespace Xiao
 			}
 			else if (out.version >= 30)
 			{
+				if (out.version >= 36)
+				{
+					sessionStats.Read(reader, out.version);
+				}
 				storageStats.Read(reader, out.version);
 				kernelStats.Read(reader, out.version);
 			}
@@ -801,7 +908,7 @@ namespace Xiao
 			process.stats.SetNum(dataEnd - dataStart);
 			memcpy(process.stats.GetData(), dataStart, dataEnd - dataStart);
 
-			if (out.version >= 34)
+			if (out.version >= 34 && out.version < 35)
 			{
 				process.breadcrumbs = reader.ReadString();
 			}
@@ -844,7 +951,7 @@ namespace Xiao
 			reader.ReadString(reason);
 			if (out.version < 15)
 				time = reader.Read7BitEncoded();
-			FTraceView::FProcessLocation active = findIt->second;
+			FTraceView::FProcessLocation& active = findIt->second;
 			auto& session = GetSession(out, active.sessionIndex);
 
 			auto& processes = session.processors[active.processorIndex].processes;
@@ -857,7 +964,10 @@ namespace Xiao
 			StorageStats storageStats;
 			KernelStats kernelStats;
 			processStats.Read(reader, out.version);
-			sessionStats.Read(reader, out.version);
+			if (process.isRemote || out.version < 35)
+			{
+				sessionStats.Read(reader, out.version);
+			}
 			storageStats.Read(reader, out.version);
 			kernelStats.Read(reader, out.version);
 
@@ -865,13 +975,44 @@ namespace Xiao
 			process.stats.SetNum(dataEnd - dataStart);
 			memcpy(process.stats.GetData(), dataStart, dataEnd - dataStart);
 
+			FString breadcrumbs;
+			if (out.version >= 35)
+			{
+				if (out.version < 38)
+				{
+					breadcrumbs = reader.ReadString();
+				}
+				else if (out.version < 42)
+				{
+					if (reader.ReadBool())
+					{
+						breadcrumbs = reader.ReadString();
+					}
+					else
+					{
+						reader.Read7BitEncoded();
+						reader.Skip(reader.Read7BitEncoded());
+						breadcrumbs = TEXT("Upgrade your visualizer");
+					}
+				}
+				else
+				{
+					breadcrumbs = reader.ReadLongString();
+				}
+			}
+
+			process.isReuse = true;
 			process.exitCode = 0u;
 			process.stop = time;
 			process.bitmapDirty = true;
+			process.createFilesTime = processStats.createFile.time;
+			process.writeFilesTime = FMath::Max(processStats.writeFiles.time.load(), processStats.sendFiles.time.load());
+
 			bool isRemote = process.isRemote;
 
 			processes.AddDefaulted();
 			auto& process2 = processes.Last();
+			active.processIndex = uint32(processes.Num() - 1);
 			m_activeProcesses[processId].processIndex = uint32(processes.Num() - 1);
 			process2.id = processId;
 			process2.description = reason.GetData();
@@ -923,7 +1064,13 @@ namespace Xiao
 		{
 			const Guid clientUid = ReadClientId(out, reader);
 			const FCasKey key = reader.ReadCasKey();
-			const uint64 size = reader.Read7BitEncoded();
+			uint64 size = reader.Read7BitEncoded();
+
+			if (out.version < 36)
+			{
+				size = reader.Read7BitEncoded();
+			}
+
 			TStringBuilderWithBuffer<UBA_CHAR, 512> temp;
 			const UBA_CHAR* hint;
 			if (out.version < 14)
@@ -932,7 +1079,9 @@ namespace Xiao
 				hint = temp.GetData();
 			}
 			else
+			{
 				hint = out.strings[reader.Read7BitEncoded()].GetCharArray().GetData();
+			}
 
 			if (out.version < 15)
 			{
@@ -946,6 +1095,7 @@ namespace Xiao
 
 			if (auto session = GetSession(out, clientUid))
 			{
+				// #TODO
 				session->fetchedFiles.Add({ key, size, hint, time, ~uint64(0) });
 				session->fetchedFilesBytes += size;
 			}
@@ -954,11 +1104,16 @@ namespace Xiao
 		case TraceType_FileFetchLight:
 		{
 			const Guid clientUid = ReadClientId(out, reader);
-			const uint64 fileSize = reader.Read7BitEncoded();
+			uint64 fileSize;
+			if (!reader.TryRead7BitEncoded(fileSize))
+			{
+				return false;
+			}
 			if (auto session = GetSession(out, clientUid))
 			{
 				session->fetchedFiles.Add({ CasKeyZero, fileSize, TEXT(""), time, time });
 				session->fetchedFilesBytes += fileSize;
+				++session->fetchedFilesCount;
 			}
 			break;
 		}
@@ -1004,6 +1159,22 @@ namespace Xiao
 				session->proxyName = proxyName.GetData();
 			break;
 		}
+		case TraceType_FileFetchSize:
+		{
+			const Guid clientUid = ReadClientId(out, reader);
+			const FCasKey key = reader.ReadCasKey();
+			const uint64 fileSize = reader.Read7BitEncoded();
+			if (auto session = GetSession(out, clientUid))
+			{
+				auto findIt = session->fetchedFilesActive.find(key);
+				if (findIt != session->fetchedFilesActive.end())
+				{
+					auto& file = session->fetchedFiles[findIt->second];
+					file.size = fileSize;
+				}
+			}
+			break;
+		}
 		case TraceType_FileEndFetch:
 		{
 			const Guid clientUid = ReadClientId(out, reader);
@@ -1021,13 +1192,14 @@ namespace Xiao
 
 			if (auto session = GetSession(out, clientUid))
 			{
-				// for (auto rit = session->fetchedFiles.rbegin(), rend = session->fetchedFiles.rend(); rit != rend; ++rit)
-				for(int i = session->fetchedFiles.Num() -1; i >= 0; --i)
+				auto findIt = session->fetchedFilesActive.find(key);
+				if (findIt != session->fetchedFilesActive.end())
 				{
-					auto& rit = session->fetchedFiles[i];
-					if (rit.key != key)
-						continue;
-					rit.stop = time;
+					auto& file = session->fetchedFiles[findIt->second];
+					file.stop = time;
+					session->fetchedFilesBytes += file.size;
+					++session->fetchedFilesCount;
+					session->fetchedFilesActive.erase(findIt);
 					break;
 				}
 			}
@@ -1059,8 +1231,10 @@ namespace Xiao
 
 			if (auto session = GetSession(out, clientUid))
 			{
+				session->storedFilesActive.try_emplace(key, uint32(session->storedFiles.Num()));
 				session->storedFiles.Add({ key, size, hint, time, ~uint64(0) });
 				session->storedFilesBytes += size;
+				++session->storedFilesCount;
 			}
 			break;
 		}
@@ -1072,6 +1246,7 @@ namespace Xiao
 			{
 				session->storedFiles.Add({ CasKeyZero, fileSize, TEXT(""), time, time });
 				session->storedFilesBytes += fileSize;
+				++session->storedFilesCount;
 			}
 			break;
 		}
@@ -1092,13 +1267,12 @@ namespace Xiao
 
 			if (auto session = GetSession(out, clientUid))
 			{
-				// for (auto rit = session->storedFiles.rbegin(), rend = session->storedFiles.rend(); rit != rend; ++rit)
-				for (int i = session->storedFiles.Num() - 1; i >= 0; --i)
+				auto findIt = session->storedFilesActive.find(key);
+				if (findIt != session->storedFilesActive.end())
 				{
-					auto& rit = session->storedFiles[i];
-					if (rit.key != key)
-						continue;
-					rit.stop = time;
+					auto & file = session->storedFiles[findIt->second];
+					file.stop = time;
+					session->storedFilesActive.erase(findIt);
 					break;
 				}
 			}
@@ -1150,6 +1324,11 @@ namespace Xiao
 			else
 				stringIndex = reader.Read7BitEncoded();
 
+			if (out.version >= 38)
+			{
+				record.color = reader.ReadU32();
+			}
+
 			record.description = out.strings[stringIndex].GetCharArray().GetData();
 			if (out.version < 15)
 				record.start = reader.Read7BitEncoded();
@@ -1166,17 +1345,22 @@ namespace Xiao
 			else
 				workIndex = uint32(reader.Read7BitEncoded());
 
+			uint64 stop;
+			if (out.version < 15)
+				stop = reader.Read7BitEncoded();
+			else
+				stop = time;
+
 			auto findIt = m_activeWorkRecords.find(workIndex);
 			if (findIt == m_activeWorkRecords.end())
-				return false;
+				return true;
+
 			FWorkRecordLocation active = findIt->second;
 			m_activeWorkRecords.erase(findIt);
 
 			FTraceView::FWorkRecord& record = out.workTracks[active.track].records[active.index];
-			if (out.version < 15)
-				record.stop = reader.Read7BitEncoded();
-			else
-				record.stop = time;
+			record.stop = stop;
+			record.bitmapDirty = true;
 			break;
 		}
 		case TraceType_ProgressUpdate:
@@ -1184,6 +1368,47 @@ namespace Xiao
 			out.progressProcessesTotal = uint32(reader.Read7BitEncoded());
 			out.progressProcessesDone = uint32(reader.Read7BitEncoded());
 			out.progressErrorCount = uint32(reader.Read7BitEncoded());
+			break;
+		}
+		case TraceType_DriveUpdate:
+		{
+			const uint8 driveLetter = reader.ReadByte();
+			const uint8 busyPercent = reader.ReadByte();
+			const uint32 readCount = uint32(reader.Read7BitEncoded());
+			const uint64 readBytes = reader.Read7BitEncoded();
+			const uint32 writeCount = uint32(reader.Read7BitEncoded());
+			const uint64 writeBytes = reader.Read7BitEncoded();
+
+			if (out.sessions.IsEmpty())
+				break;
+
+			auto & session = out.sessions[0];
+			if (session.drives.Contains(driveLetter))
+			{
+				auto& drive = session.drives[driveLetter];
+
+				if (drive.busyPercent.IsEmpty())
+				{
+					uint64 updatesCount = session.updates.Num(); // We get these before update
+					drive.busyPercent.Reserve(updatesCount);
+					drive.readCount.Reserve(updatesCount);
+					drive.writeCount.Reserve(updatesCount);
+					drive.readBytes.Reserve(updatesCount);
+					drive.writeBytes.Reserve(updatesCount);
+				}
+
+				drive.busyHighest = FMath::Max(drive.busyHighest, busyPercent);
+
+				drive.busyPercent.Add(busyPercent);
+				drive.totalReadCount += readCount;
+				drive.totalWriteCount += writeCount;
+				drive.totalReadBytes += readBytes;
+				drive.totalWriteBytes += writeBytes;
+				drive.readCount.Add(readCount);
+				drive.readBytes.Add(readBytes);
+				drive.writeCount.Add(writeCount);
+				drive.writeBytes.Add(writeBytes);
+			}
 			break;
 		}
 		case TraceType_StatusUpdate:
@@ -1212,9 +1437,59 @@ namespace Xiao
 
 			break;
 		}
+		case TraceType_ProcessBreadcrumbs:
+		{
+			const uint32 processId = reader.ReadU32();
+		
+			FString breadcrumbs;
+			if (out.version < 38)
+				breadcrumbs = reader.ReadString();
+			else
+				breadcrumbs = reader.ReadLongString();
+		
+			const bool deleteOld = reader.ReadBool();
+
+			auto writeBreadcrumb = [&](FTraceView::FProcess& process)
+			{
+				if (deleteOld)
+					process.breadcrumbs.Empty();
+				else if (!process.breadcrumbs.IsEmpty())
+					process.breadcrumbs += '\n';
+				process.breadcrumbs += breadcrumbs;
+			};
+
+			auto findIt = m_activeProcesses.find(processId);
+			if (findIt != m_activeProcesses.end())
+			{
+				auto& active = findIt->second;
+				writeBreadcrumb(GetSession(out, active.sessionIndex).processors[active.processorIndex].processes[active.processIndex]);
+				break;
+			}
+
+			// Process is not active anymore, search for it the slow way
+			for (auto& session : out.sessions)
+			{
+				for (auto& processor : session.processors)
+				{
+					for (auto& process : processor.processes)
+					{
+						if (process.id == processId)
+						{
+							writeBreadcrumb(process);
+							return true;
+						}
+					}
+				}
+			}
+			break;
+		}
 		case TraceType_RemoteExecutionDisabled:
 		{
 			out.remoteExecutionDisabled = true;
+			if (!out.sessions.IsEmpty())
+			{
+				out.sessions[0].notification = TEXT("(Remote scheduling finished)");
+			}
 			break;
 		}
 		case TraceType_String:
@@ -1269,6 +1544,59 @@ namespace Xiao
 			write.success = reader.ReadBool();
 			write.bytesSent = reader.Read7BitEncoded();
 			write.end = time;
+			break;
+		}
+		case TraceType_WorkHint:
+		{
+			const uint32 workIndex = uint32(reader.Read7BitEncoded());
+			const uint64 stringIndex = reader.Read7BitEncoded();
+			const uint64 startTime = ConvertTime(out, reader.Read7BitEncoded());
+			
+			auto findIt = m_activeWorkRecords.find(workIndex);
+			if (findIt == m_activeWorkRecords.end())
+				return false;
+			
+			const FString text = out.strings[stringIndex];
+			
+			FWorkRecordLocation active = findIt->second;
+			FTraceView::FWorkRecord& record = out.workTracks[active.track].records[active.index];
+			
+			bool handled = false;
+			// Collapse if already exists
+			if (startTime)
+			{
+				for (auto rit = record.entries.rbegin(), rend = record.entries.rend(); rit != rend; ++rit)
+				{
+					auto& entry = *rit;
+					if (!entry.startTime)
+						break;
+					if (entry.text != text)
+						continue;
+					++entry.count;
+					const uint64 entryTime = entry.time - entry.startTime;
+					const uint64 newTime = time - startTime;
+					if (newTime > entryTime)
+					{
+						entry.time = time;
+						entry.startTime = startTime;
+					}
+					handled = true;
+					break;
+				}
+			}
+
+			if (!handled)
+			{
+				Xiao::FTraceView::FWorkRecordLogEntry Entry;
+				Entry.time = time; Entry.startTime = startTime; Entry.text = text;
+				record.entries.Add(Entry);
+			}
+			
+			break;
+		}
+		default:
+		{
+			XIAO_LOG(Error, TEXT("Unknown trace type found in stream. UbaVisualizer too old?"));
 		}
 		}
 		return true;
@@ -1283,6 +1611,13 @@ namespace Xiao
 			process.exitCode = ~0u;
 			process.stop = stopTime;
 			process.bitmapDirty = true;
+		}
+
+		for (auto& pair : m_activeWorkRecords)
+		{
+			const FWorkRecordLocation& active = pair.second;
+			FTraceView::FWorkRecord& record = out.workTracks[active.track].records[active.index];
+			record.stop = stopTime;
 		}
 
 		m_activeProcesses.clear();
@@ -1320,6 +1655,20 @@ namespace Xiao
 		}
 
 		m_namedTrace.Empty();
+	}
+
+	bool FTraceReader::SaveAs(const FString& fileName) const
+	{
+		if (!m_memoryBegin)
+		{
+			XIAO_LOG(Warning, TEXT("Can only save traces that are opened using -listen/-name."));
+			return false;
+		}
+		
+		TArray<uint8> Buffer;
+		Buffer.Append(m_memoryBegin, m_memoryPos - m_memoryBegin);
+
+		return FFileHelper::SaveArrayToFile(Buffer, *fileName);
 	}
 
 	Guid FTraceReader::ReadClientId(FTraceView& out, FBinaryReader& reader)
@@ -1373,6 +1722,11 @@ namespace Xiao
 
 		m_activeProcesses.try_emplace(id, FTraceView::FProcessLocation{ sessionIndex, processorIndex, uint32(processor->processes.Num() - 1) });
 
+		const uint16 activeCount = uint16(m_activeProcesses.size());
+		FTraceView::FActiveProcessCount Count(time, activeCount);
+		out.activeProcessCounts.Add(Count);
+		out.maxActiveProcessCount = FMath::Max(out.maxActiveProcessCount, activeCount);
+
 		++session.processActiveCount;
 		++out.totalProcessActiveCount;
 
@@ -1401,6 +1755,8 @@ namespace Xiao
 		--out.totalProcessActiveCount;
 
 		FTraceView::FProcess& process = session.processors[active.processorIndex].processes[active.processIndex];
+		FTraceView::FActiveProcessCount Count(time, uint16(m_activeProcesses.size()));
+		out.activeProcessCounts.Add(Count);
 
 		process.stop = time;
 		process.bitmapDirty = true;

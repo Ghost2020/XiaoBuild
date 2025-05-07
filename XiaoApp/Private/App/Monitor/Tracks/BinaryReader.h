@@ -2,6 +2,8 @@
 
 #include "UbaCommon.h"
 #include "Misc/StringBuilder.h"
+#include "oodle2.h"
+#include <string>
 
 namespace Xiao
 {
@@ -71,6 +73,59 @@ namespace Xiao
 			m_pos += sizeof(uint64);
 			return value;
 		}
+
+		template<typename CharType>
+		FORCEINLINE bool TryReadString(TStringBuilderBase<CharType>& out)
+		{
+#if PLATFORM_WINDOWS
+			uint64 charLen;
+			if (!TryRead7BitEncoded(charLen))
+				return false;
+			TCHAR* it = out.GetData() + out.Len();
+			uint64 left = charLen;
+			while (left--)
+			{
+				if (m_pos >= m_end)
+					return false;
+				uint8 a = *m_pos++;
+				if (a <= 127)
+				{
+					*it++ = a;
+					continue;
+				}
+				if (m_pos >= m_end)
+					return false;
+				uint8 b = *m_pos++;
+				if (a >= 192 && a <= 223)
+				{
+					*it++ = (a - 192) * 64 + (b - 128);
+					continue;
+				}
+				if (m_pos >= m_end)
+					return false;
+				uint8 c = *m_pos++;
+				if (a >= 224 && a <= 239)
+				{
+					*it++ = (a - 224) * 4096 + (b - 128) * 64 + (c - 128);
+					continue;
+				}
+				return false;
+			}
+			*it = 0;
+			out.Reserve(uint32(it - out.GetData()));
+#else
+			uint64 charLen;
+			if (!TryRead7BitEncoded(charLen))
+				return false;
+			uint32 strCapacity = out.capacity - out.count;
+			if (charLen >= strCapacity)
+				return false;
+			ReadBytes(out.data + out.count, charLen);
+			out.count += charLen;
+			out.data[out.count] = 0;
+#endif
+			return true;
+		}
 		FORCEINLINE uint64 ReadString(TCHAR* str, const uint64 strCapacity)
 		{
 			const uint64 charLen = Read7BitEncoded();
@@ -90,6 +145,37 @@ namespace Xiao
 			Temp.Reserve(len);
 			InternalReadString(GetData(Temp), len, String);
 			return String;
+		}
+		FORCEINLINE FString ReadLongString()
+		{
+			uint8 s = ReadByte();
+			if (!s)
+				return ReadString();
+
+			const uint64 stringLength = Read7BitEncoded();
+			const uint64 uncompressedSize = stringLength * s;
+			const uint64 compressedSize = Read7BitEncoded();
+
+			const uint8* data = GetPositionData();
+			Skip(compressedSize);
+
+			if (s == sizeof(TCHAR))
+			{
+				FString str;
+				str.Reserve(stringLength);
+				OO_SINTa decompLen = OodleLZ_Decompress(data, (OO_SINTa)compressedSize, str.GetCharArray().GetData(), (OO_SINTa)uncompressedSize);
+				check(decompLen == (OO_SINTa)uncompressedSize); (void)decompLen;
+				return str;
+			}
+			else
+			{
+				check(s == 1);
+				std::string temp;
+				temp.resize(stringLength);
+				OO_SINTa decompLen = OodleLZ_Decompress(data, (OO_SINTa)compressedSize, temp.data(), (OO_SINTa)uncompressedSize);
+				check(decompLen == (OO_SINTa)uncompressedSize); (void)decompLen;
+				return UTF8_TO_TCHAR(temp.data());
+			}
 		}
 		FORCEINLINE void SkipString()
 		{
@@ -139,6 +225,25 @@ namespace Xiao
 				++byteIndex;
 			} while (hasMoreBytes);
 			return result;
+		}
+		FORCEINLINE bool TryRead7BitEncoded(uint64& outValue)
+		{
+			const uint8* pos = m_pos;
+			uint64 result = 0;
+			uint64 byteIndex = 0;
+			bool hasMoreBytes;
+			do
+			{
+				if (m_pos >= m_end)
+					return false;
+				uint8 value = *pos++;
+				hasMoreBytes = value & 0x80;
+				result |= uint64(value & 0x7f) << (byteIndex * 7);
+				++byteIndex;
+			} while (hasMoreBytes);
+			outValue = result;
+			m_pos = pos;
+			return true;
 		}
 		template<typename CharType> 
 		FORCEINLINE CharType ReadUtf8Char()

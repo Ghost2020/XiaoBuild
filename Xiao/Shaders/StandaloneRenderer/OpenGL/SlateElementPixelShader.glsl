@@ -18,6 +18,7 @@ precision highp float;
 #define ST_GrayscaleFont	2
 #define ST_ColorFont		3
 #define ST_Line				4
+#define ST_Custom			5
 #define ST_RoundedBox       7
 
 #define USE_LEGACY_DISABLED_EFFECT 0
@@ -58,13 +59,11 @@ vec3 powScalar(vec3 values, float power)
 
 vec3 LinearTo709Branchless(vec3 lin)
 {
-	lin = maxWithScalar(6.10352e-5, lin); // minimum positive non-denormal (fixes black problem on DX11 AMD and NV)
 	return min(lin * 4.5, powScalar(maxWithScalar(0.018, lin), 0.45) * 1.099 - 0.099);
 }
 
 vec3 LinearToSrgbBranchless(vec3 lin)
 {
-	lin = maxWithScalar(6.10352e-5, lin); // minimum positive non-denormal (fixes black problem on DX11 AMD and NV)
 	return min(lin * 12.92, powScalar(maxWithScalar(0.00313067, lin), 1.0/2.4) * 1.055 - 0.055);
 	// Possible that mobile GPUs might have native pow() function?
 	//return min(lin * 12.92, exp2(log2(max(lin, 0.00313067)) * (1.0/2.4) + log2(1.055)) - 0.055);
@@ -286,16 +285,60 @@ vec4 GetRoundedBoxElementColor()
 	return OutColor;
 }
 
+
+/**
+ * Computes 0-1 value that interpolates between dashes of length DashLength based on Distance with 1px of antialiasing between dashes and gaps
+ * 
+ * ie:
+ * 1 -----------------                     -----------------                     -----------------                     
+ *                    \                   /                 \                   /                 \                   /
+ * 0                   \_________________/                   \_________________/                   \_________________/ 
+ *
+ *   <  DashLength   >  <  DashLength   >  <  DashLength   >  <  DashLength   >  <  DashLength   >  <  DashLength   >
+ 
+ */
+float ModulateDashedLine(float Distance, float DashLength)
+{
+	// Add one for antialias pixel
+	DashLength += 1.0;
+
+	float HalfDash  = 0.50*DashLength;
+	float Period    = 2.00*DashLength;
+
+	// Offset the interpolation so that the dash starts at distance = 0;
+	float Interp = Distance - HalfDash + 0.50;
+	float Mod = Interp - Period*floor(Interp/Period); // mod(Interp, Period)
+
+	// Compute the dash alpha using a clamped triangle wave
+	float TriWave = 2.0 * abs(Mod - DashLength) - DashLength;
+	return clamp(TriWave, -1.0, 1.0)*0.5 + 0.5;
+}
+
+/**
+ * Generates an anti-aliased line segment pixel
+ * This is based on the fast prefiltered lines technique published in GPU Gems 2
+ *
+ * Instead of passing edge function coefficients as uniform parameters we use
+ * texture coordinates to define the line
+ *
+ * When rasterized, the submitted geometry must contain every pixel that
+ * could have coverage > 0. Failing to do so will create sharp, aliased edges
+ */
 vec4 GetLineSegmentElementColor()
 {
 	vec2 Gradient = TexCoords.xy;
+	vec2 DashParams = TexCoords.zw;
 
+	// Get coverage based on distance from segment sides and ends
 	vec2 OutsideFilterUV = vec2(1.0, 1.0);
 	vec2 InsideFilterUV = vec2(ShaderParams.x, 0.0);
 	vec2 LineCoverage = smoothstep(OutsideFilterUV, InsideFilterUV, abs(Gradient));
 
+	float DashLength = DashParams.y;
+	float DashAlpha = ModulateDashedLine(DashParams.x, DashParams.y);
+
 	vec4 OutColor = Color;
-	OutColor.a *= LineCoverage.x * LineCoverage.y;
+	OutColor.a *= LineCoverage.x * LineCoverage.y * DashAlpha;
 	return OutColor;
 }
 
@@ -303,7 +346,7 @@ void main()
 {
 	vec4 OutColor;
 
-	if( ShaderType == ST_Default )
+	if( ShaderType == ST_Default || ShaderType == ST_Custom )
 	{
 		OutColor = GetDefaultElementColor();
 	}

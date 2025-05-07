@@ -8,6 +8,7 @@
 #define ESlateShader::GrayscaleFont	2
 #define ESlateShader::ColorFont		3
 #define ESlateShader::LineSegment	4
+#define ESlateShader::Custom		5
 #define ESlateShader::RoundedBox    7
 
 #define USE_LEGACY_DISABLED_EFFECT 0
@@ -183,16 +184,59 @@ float4 GetRoundedBoxElementColor( VertexOut InVertex )
 	return OutColor;
 }
 
+/**
+ * Computes 0-1 value that interpolates between dashes of length DashLength based on Distance with 1px of antialiasing between dashes and gaps
+ * 
+ * ie:
+ * 1 -----------------                     -----------------                     -----------------                     
+ *                    \                   /                 \                   /                 \                   /
+ * 0                   \_________________/                   \_________________/                   \_________________/ 
+ *
+ *   <  DashLength   >  <  DashLength   >  <  DashLength   >  <  DashLength   >  <  DashLength   >  <  DashLength   >
+ 
+ */
+float ModulateDashedLine(float Distance, float DashLength)
+{
+	// Add one for antialias pixel
+	DashLength += 1.f;
+
+	const float HalfDash  = 0.5f*DashLength;
+	const float Period    = 2.0f*DashLength;
+
+	// Offset the interpolation so that the dash starts at distance = 0;
+	const float Interp = Distance - HalfDash + 0.5f;
+	const float Mod = Interp - Period*floor(Interp/Period); // mod(Interp, Period)
+
+	// Compute the dash alpha using a clamped triangle wave
+	const float TriWave = 2.0f * abs(Mod - DashLength) - DashLength;
+	return clamp(TriWave, -1.0f, 1.0f)*0.5f + 0.5f;
+}
+
+/**
+ * Generates an anti-aliased line segment pixel
+ * This is based on the fast prefiltered lines technique published in GPU Gems 2
+ *
+ * Instead of passing edge function coefficients as uniform parameters we use
+ * texture coordinates to define the line
+ *
+ * When rasterized, the submitted geometry must contain every pixel that
+ * could have coverage > 0. Failing to do so will create sharp, aliased edges
+ */
 float4 GetLineSegmentElementColor( VertexOut InVertex )
 {
 	const float2 Gradient = InVertex.TextureCoordinates;
+	const float2 DashParams = InVertex.TextureCoordinates.zw;
 
+	// Get coverage based on distance from segment sides and ends
 	const float2 OutsideFilterUV = float2(1.0f, 1.0f);
 	const float2 InsideFilterUV = float2(ShaderParams.x, 0.0f);
 	const float2 LineCoverage = smoothstep(OutsideFilterUV, InsideFilterUV, abs(Gradient));
 
+	const float DashLength = DashParams.y;
+	const float DashAlpha = ModulateDashedLine(DashParams.x, DashParams.y);
+
 	float4 Color = InVertex.Color;
-	Color.a *= LineCoverage.x * LineCoverage.y;
+	Color.a *= LineCoverage.x * LineCoverage.y * DashAlpha;
 	return Color;
 }
 
@@ -200,7 +244,7 @@ float4 Main( VertexOut InVertex ) : SV_Target
 {
 	float4 OutColor;
 
-	if( ShaderType == ESlateShader::Default )
+	if( ShaderType == ESlateShader::Default || ShaderType == ESlateShader::Custom )
 	{
 		OutColor = GetDefaultElementColor( InVertex );
 	}

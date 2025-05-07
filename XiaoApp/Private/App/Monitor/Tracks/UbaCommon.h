@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include <atomic>
+#include <type_traits>
 
 namespace Xiao
 {
@@ -79,3 +80,12 @@ namespace Xiao
 		}
 	};
 }
+
+template<>
+struct std::hash<Xiao::FCasKey>
+{
+	size_t operator()(const Xiao::FCasKey& g) const
+	{
+		return g.a;
+	}
+};

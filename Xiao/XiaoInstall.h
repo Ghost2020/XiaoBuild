@@ -529,7 +529,10 @@ static FString GetEnghineVersion(const FString& InEngineVersion)
 
 static bool IsSupportUBAC(const FString& InVersionStr)
 {
-	static const TSet<FString> InternalSupportEngineSet = { TEXT("4.26."), TEXT("4.27."), TEXT("5.0."), TEXT("5.1."), TEXT("5.2."), TEXT("5.3."), TEXT("5.4."), TEXT("5.5.")};
+	static const TSet<FString> InternalSupportEngineSet = { 
+		TEXT("4.26."), TEXT("4.27."), 
+		TEXT("5.0."), TEXT("5.1."), TEXT("5.2."), TEXT("5.3."), TEXT("5.4."), TEXT("5.5."), TEXT("5.6.") 
+	};
 	auto IsInSet = [](const TSet<FString>& InSet, const FString& InString) ->bool
 	{
 		for (const FString& InStr : InSet)
