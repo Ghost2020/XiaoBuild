@@ -766,6 +766,14 @@ namespace uba
 					Event.Set();
 				}
 			}
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+			static double LastTime = 0.0f;
+			if(FPlatformTime::Seconds() - LastTime > 3.0f)
+			{
+				// Save current snapshot of UBA trace in case this failure crashes
+				GetSession().SaveSnapshotOfTrace();
+			}
+#endif
 		});
 
 		session.RegisterGetNextProcess([this](Process& ProcessHandle, NextProcessInfo& OutNextProcess, u32 PrevExitCode) 
