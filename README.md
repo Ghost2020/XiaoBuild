@@ -77,8 +77,6 @@ Description of the software's runtime environment and hardware requirements:
 
 - **Operating System**：x64 Windows 10/11
   
-    ⚠️ Win11 system still has problems with supporting the distribution and compilation of materials
-  
 - **Hardware Requirements**：
 
   - CPU: i5
