@@ -8,7 +8,7 @@
 ## 2. Recommended IDEs
 | Operating System | Recommended IDE |
 |------------------|------------------|
-| Windows          | VS2022 (MSVC14.41.34120) Or Later|
+| Windows          | VS2022 (MSVC14.41.34120)|
 | MacOS            | Xcode            |
 | Linux            | VSCode           |
 
@@ -18,10 +18,13 @@
 
 > Although precompiled static libraries are provided in the project, it is still recommended to compile them yourself for better compatibility.
 
-### 3.1 redis-plus-plus
+### 3.1 hiredis
+- URL[https://github.com/redis/hiredis](https://github.com/redis/hiredis)
+
+### 3.2 redis-plus-plus
 - URL: [https://github.com/sewenew/redis-plus-plus](https://github.com/sewenew/redis-plus-plus)
 
-### 3.2 QtBase
+### 3.3 QtBase
 - URL: [https://github.com/qt/qtbase](https://github.com/qt/qtbase)
 
 ---
@@ -149,3 +152,11 @@ GenerateProjectFiles.bat (or GenerateProjectFiles.sh)
 ---
 
 > ✅ After completing the above steps, you are ready to build and develop your XiaoBuild project.
+
+## ⚠️ If you encounter the following error during compilation ##
+
+1. error LNK 2019: unresolved external symbol _Cnd_timewait_for  referenced in function "public: bool __cdecl std::condition_variable::wait_for
+![Unresolved](./documents/resource/CndTimedWait.png)
+
+    Resolution:The MSVC version can be aligned with 14.38.33130.
+![MSVCVersion](./documents/resource/MSVCVersion.png)
