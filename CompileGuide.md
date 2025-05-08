@@ -8,7 +8,7 @@
 ## 2. Recommended IDEs
 | Operating System | Recommended IDE |
 |------------------|------------------|
-| Windows          | VS2022           |
+| Windows          | VS2022 (MSVC14.41.34120) Or Later|
 | MacOS            | Xcode            |
 | Linux            | VSCode           |
 
