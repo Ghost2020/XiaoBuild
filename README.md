@@ -21,12 +21,12 @@ Release Date: ：2025-04-17
 |--------------------|--------------------|-----------------------|
 | 4_26    | ✔        | ✔       |
 | 4_27    | ✔        | ✔       |
-| 5_0     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1p9cieiEQc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_1     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1dCr3YqExS/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_2     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1k9cieiEdQ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_3     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1C9cieiEV8/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_4     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1p9cieiEsZ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_5     | ✔ [View BuildInsight](https://www.bilibili.com/video/BV1p9cieiEyc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_0     | ✔ [▶️](https://www.bilibili.com/video/BV1p9cieiEQc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_1     | ✔ [▶️](https://www.bilibili.com/video/BV1dCr3YqExS/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_2     | ✔ [▶️](https://www.bilibili.com/video/BV1k9cieiEdQ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_3     | ✔ [▶️](https://www.bilibili.com/video/BV1C9cieiEV8/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_4     | ✔ [▶️](https://www.bilibili.com/video/BV1p9cieiEsZ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_5     | ✔ [▶️](https://www.bilibili.com/video/BV1p9cieiEyc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
 
 ## Table of contents
 
