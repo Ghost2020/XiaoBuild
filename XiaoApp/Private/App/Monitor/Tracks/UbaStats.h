@@ -40,10 +40,10 @@ namespace Xiao
 	const TCHAR EmptyCharArray[31] = TEXT("                   ");
 	
 	template<typename T>
-	void LogStat(FTooltipDrawState& InToolTip, const char* name, const T&, uint64 frequency) 
+	void LogStat(FTooltipDrawState& InToolTip, const char* name, const T&, const uint64 frequency) 
 	{}
 
-	static void LogStat(FTooltipDrawState& InToolTip, const char* name, const FTimer& timer, uint64 frequency)
+	static void LogStat(FTooltipDrawState& InToolTip, const char* name, const FTimer& timer, const uint64 frequency)
 	{
 		if (!timer.count)
 			return;
@@ -51,12 +51,12 @@ namespace Xiao
 		InToolTip.AddTextLine(FString::Printf(TEXT("  %c%s %s %8u %9s"), FChar::ToUpper(NameStr[0]), *NameStr.Mid(1), EmptyCharArray + NameStr.Len() + 1, timer.count.load(), *FPlatformTime::PrettyTime(FPlatformTime::ToSeconds64(timer.time))), FLinearColor::White);
 	}
 
-	static void LogStat(FTooltipDrawState& InToolTip, const char* name, const FExtendedTimer& timer, uint64 frequency)
+	static void LogStat(FTooltipDrawState& InToolTip, const char* name, const FExtendedTimer& timer, const uint64 frequency)
 	{
 		LogStat(InToolTip, name, (const FTimer&)timer, frequency);
 	}
 
-	static void LogStat(FTooltipDrawState& InToolTip, const char* name, const FTimeAndBytes& timer, uint64 frequency)
+	static void LogStat(FTooltipDrawState& InToolTip, const char* name, const FTimeAndBytes& timer, const uint64 frequency)
 	{
 		if (!timer.count)
 			return;

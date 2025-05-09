@@ -206,7 +206,7 @@ void SBuildOutputView::AddProcessesOutput(const Xiao::FTraceView::FProcess& InPr
 	TArray<FString> Outputs;
 	for (const auto& Log : InProcess.logLines)
 	{
-		if (!Log.text.IsEmpty())
+		if (!Log.text.IsEmpty() && InProcess.description != Log.text)
 		{
 			Outputs.Add(Log.text);
 		}

@@ -203,6 +203,7 @@ FProcessTimingTrack::~FProcessTimingTrack()
 
 void FProcessTimingTrack::BuildDrawState(ITimingEventsTrackDrawStateBuilder& Builder, const ITimingTrackUpdateContext& Context)
 {
+	static const uint32 ErrorColor = 0xFF883333;
 	for (const auto& Process : Processes)
 	{
 		const bool done = Process.stop != ~uint64(0);
@@ -222,7 +223,7 @@ void FProcessTimingTrack::BuildDrawState(ITimingEventsTrackDrawStateBuilder& Bui
 		}
 		else if (Process.exitCode != 0)
 		{
-			EventColor = 0xFF883333;	//error
+			EventColor = ErrorColor;	//error
 		}
 
 		const uint64 Stop = done ? Process.stop : LastTime;
@@ -236,27 +237,29 @@ void FProcessTimingTrack::BuildDrawState(ITimingEventsTrackDrawStateBuilder& Bui
 				StatsMap.Add(MakeTuple(Process.id, MakeShared<FProcessStats>(Process, TraceView->version, TraceView->frequency)));
 			}
 
+			const auto& ProcessStat = StatsMap[Process.id];
+			const bool Error = Process.exitCode != 0;
 			if (Process.isRemote)
 			{
 				// 准备时间
-				const double ResponseTime = FPlatformTime::ToSeconds64(Process.start + StatsMap[Process.id]->processStats.waitOnResponse.time);
-				Builder.AddEvent(StartTime, ResponseTime, 0, TEXT(""), 0, 0xFF306630);
+				const double ResponseTime = FPlatformTime::ToSeconds64(Process.start + ProcessStat->processStats.waitOnResponse.time);
+				Builder.AddEvent(StartTime, ResponseTime, 0, TEXT(""), 0, Error ? ErrorColor : 0xFF306630);
 
 				// 发送时间
-				const double StorageStartTime = StopTime - FPlatformTime::ToSeconds64(StatsMap[Process.id]->processStats.sendFiles.time);
-				Builder.AddEvent(StorageStartTime, StopTime, 0, TEXT(""), 0, 0xFF4a9f4a);
+				const double StorageStartTime = StopTime - FPlatformTime::ToSeconds64(ProcessStat->processStats.sendFiles.time);
+				Builder.AddEvent(StorageStartTime, StopTime, 0, TEXT(""), 0, Error ? ErrorColor : 0xFF4a9f4a);
 
 				// 运算时间
 				StartTime = ResponseTime;
 				StopTime = StorageStartTime;
 			}
 
-			if (StatsMap[Process.id]->bHasWarning)
+			if (ProcessStat->bHasWarning)
 			{
 				EventColor = 0xFF338888;
-				if (Process.exitCode != 0)
+				if (Error)
 				{
-					EventColor = 0xFF883333;	//error
+					EventColor = ErrorColor;	//error
 				}
 			}
 		}

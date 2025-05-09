@@ -876,6 +876,11 @@ namespace Xiao
 
 			process.exitCode = exitCode;
 
+			if (process.exitCode != 0)
+			{
+				++out.progressErrorCount;
+			}
+
 			ProcessStats processStats;
 			SessionStats sessionStats;
 			StorageStats storageStats;
@@ -1367,7 +1372,11 @@ namespace Xiao
 		{
 			out.progressProcessesTotal = uint32(reader.Read7BitEncoded());
 			out.progressProcessesDone = uint32(reader.Read7BitEncoded());
-			out.progressErrorCount = uint32(reader.Read7BitEncoded());
+			const auto ErrorCount = uint32(reader.Read7BitEncoded());
+			if (out.progressErrorCount == 0)
+			{
+				out.progressErrorCount = ErrorCount;
+			}
 			break;
 		}
 		case TraceType_DriveUpdate:
@@ -1596,7 +1605,7 @@ namespace Xiao
 		}
 		default:
 		{
-			XIAO_LOG(Error, TEXT("Unknown trace type found in stream. UbaVisualizer too old?"));
+			XIAO_LOG(Error, TEXT("Unknown trace type found in stream. XiaoApp too old?"));
 		}
 		}
 		return true;

@@ -296,7 +296,7 @@ void SBuildView::UpdateProgress(const bool bFirst)
 	if (TraceView.finished)
 	{
 		OutputView->AddSummaryLog(TraceView);
-		if (TraceView.progressProcessesDone == TraceView.progressProcessesTotal)
+		if (TraceView.progressProcessesDone == TraceView.progressProcessesTotal && TraceView.progressErrorCount == 0)
 		{
 			ProgressBar->SetFillColorAndOpacity(FColor::Green);
 		}
@@ -399,7 +399,7 @@ void SBuildView::ConstructWidgets()
 	if (!ProgressView.IsValid())
 	{
 		ProgressView = SNew(SBuildProgressView)
-		.OnActionEventClicked_Lambda([this](const FName InTrackName)
+		.OnActionEventClicked_Lambda([this](const FName& InTrackName)
 		{
 			if (InTrackName.IsValid())
 			{

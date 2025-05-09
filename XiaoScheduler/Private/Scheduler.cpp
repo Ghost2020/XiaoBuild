@@ -251,8 +251,8 @@ namespace uba
 		ServerInfo.deleteSessionsOlderThanSeconds = 1;
 		ServerInfo.logToFile = UbaScheduler.bLog;
 #if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
-		// WARNING 如果设置为True dotnet.exe相关的程序会报错，阻塞进程的运行
-		ServerInfo.allowLocalDetour = false;
+		// ServerInfo.allowLocalDetour = false;
+		ServerInfo.readIntermediateFilesCompressed = true;
 #endif
 		SessionServer = std::make_unique<uba::SessionServer>(ServerInfo);
 
@@ -287,7 +287,11 @@ namespace uba
 		if (Scheduler)
 		{
 			auto& Session = Scheduler->GetSession();
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+			Session.SaveSnapshotOfTrace(true);
+#else
 			Session.StopTrace(TCHAR_TO_UBASTRING(*TraceFile));
+#endif
 		}
 		if (StorageServer)
 		{
@@ -559,6 +563,11 @@ namespace uba
 			KernelStats::GetGlobal().Print(logger, true);
 			logger.EndScope();
 		}
+
+		if (GBuildStats.RemainJobNum > 0)
+		{
+			GBuildStats.BuildStatus = false;
+		}
 		
 		SetProcessFinishedCallback([](const ProcessHandle& InPh) {});
 		logger.Info(TC("Scheduler run took %s"), TimeToText(time).str);
@@ -770,6 +779,7 @@ namespace uba
 			static double LastTime = 0.0f;
 			if(FPlatformTime::Seconds() - LastTime > 3.0f)
 			{
+				LastTime = FPlatformTime::Seconds();
 				// Save current snapshot of UBA trace in case this failure crashes
 				GetSession().SaveSnapshotOfTrace();
 			}

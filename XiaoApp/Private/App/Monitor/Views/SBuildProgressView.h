@@ -27,7 +27,7 @@ class FXiaoMarkersTimingTrack;
 class FXiaoTimingGraphTrack;
 class FJsonValue;
 
-DECLARE_DELEGATE_OneParam(FActionEventClicked, const FName)
+DECLARE_DELEGATE_OneParam(FActionEventClicked, const FName&)
 
 class SBuildProgressView final : public SCompoundWidget, public UE::Insights::Timing::ITimingViewSession
 {
