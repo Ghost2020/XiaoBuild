@@ -610,7 +610,7 @@ static void GetEngineStates(TArray<TSharedPtr<FInstallFolder>>& OutFolderArray)
 {
 	for (auto& Desc : OutFolderArray)
 	{
-		const FString UBTDll = FPaths::ConvertRelativePathToFull(FPaths::Combine(Desc->Folder, TEXT("Engine/Binaries/DotNET/UnrealBuildTool/UnrealBuildTool.backup")));
+		const FString UBTDll = FPaths::ConvertRelativePathToFull(FPaths::Combine(Desc->Folder, FString::Printf(TEXT("Engine/Binaries/DotNET/%sUnrealBuildTool.backup"), !Desc->EngineVersion.StartsWith(TEXT("4")) ? TEXT("UnrealBuildTool/") : TEXT(""))));
 		Desc->bInstall = FPaths::FileExists(UBTDll);
 		const FString UBACController = FPaths::ConvertRelativePathToFull(FPaths::Combine(Desc->Folder, TEXT("Engine/Plugins/Marketplace/UbaCompatibleController")));
 		Desc->bPluginInstall = FPaths::DirectoryExists(UBACController);
