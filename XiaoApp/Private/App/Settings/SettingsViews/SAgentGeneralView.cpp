@@ -422,45 +422,6 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 					]
 				]
 #pragma endregion
-
-				+ SVerticalBox::Slot().VAlign(VAlign_Bottom)
-				[
-					SNew(SHorizontalBox)
-					+ SHorizontalBox::Slot().HAlign(HAlign_Fill)
-					[
-						SNullWidget::NullWidget
-					]
-					+ SHorizontalBox::Slot().HAlign(HAlign_Right).AutoWidth()
-					[
-						SNew(SBorder)
-						.Visibility_Lambda([this]() { return OnCanCommit() ? EVisibility::Visible : EVisibility::Collapsed; })
-						.BorderImage(FXiaoStyle::Get().GetBrush("NoBorder"))
-						[
-							SNew(SButton).HAlign(HAlign_Center)
-							.Text(LOCTEXT("Confirm_Text", "确定"))
-							.ToolTipText(LOCTEXT("Confime_ToolTip", "提交当前的修改"))
-							.ButtonStyle(FXiaoStyle::Get(), "FlatButton.Warning")
-							.TextStyle(FXiaoStyle::Get(), "FlatButton.DefaultTextStyle")
-							.OnClicked_Raw(this, &SAgentGeneralView::OnCommit)
-						]
-					]
-
-					+ SHorizontalBox::Slot().HAlign(HAlign_Right).AutoWidth()
-					[
-						SNew(SBorder)
-						.Visibility_Lambda([this]() { return OnCanCommit() ? EVisibility::Visible : EVisibility::Collapsed; })
-						.BorderImage(FXiaoStyle::Get().GetBrush("NoBorder"))
-						.VAlign(VAlign_Bottom)
-						[
-							SNew(SButton).HAlign(HAlign_Center)
-							.Text(LOCTEXT("Cancel_Text", "取消"))
-							.ToolTipText(LOCTEXT("CancelToolTip_Text", "放弃当前的修改,退回到修改之前"))
-							.ButtonStyle(FXiaoStyle::Get(), "FlatButton.Primary")
-							.TextStyle(FXiaoStyle::Get(), "FlatButton.DefaultTextStyle")
-							.OnClicked_Raw(this, &SAgentGeneralView::OnRevert)
-						]
-					]
-				]
 			]
 		]
 	];

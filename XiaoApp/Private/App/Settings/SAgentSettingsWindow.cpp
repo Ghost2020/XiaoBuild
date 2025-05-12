@@ -212,6 +212,7 @@ void SAgentSettingsWindow::Construct(const FArguments& Args)
 						.OnClicked_Lambda([this] ()
 						{
 							SModifiedAgentSettings = SOriginalAgentSettings;
+							AgentGeneral->OnRevert();
 							AgentGeneral->ForceVolatile(true);
 							UbaAgentAdvanced->ForceVolatile(true);
 
