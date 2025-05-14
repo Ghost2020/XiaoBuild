@@ -138,6 +138,12 @@ size_t Scheduler::GetTotal()
 }
 ```
 
+### 5.5 Modify `UbaWinBinDependencyParser.h`
+Added dxcore.dll to known system files to make sure it is never transferred to remotes
+![image](https://github.com/user-attachments/assets/05406fb1-7a6e-4c8e-8105-46b839fbfad5)
+
+
+
 ---
 
 ## 6. Initialize the UE Project
