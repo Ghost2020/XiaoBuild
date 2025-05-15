@@ -100,8 +100,6 @@ static void RegistApp(const FString& InAppName)
 	RegSetValue(HKey, nullptr, REG_SZ, *KeyName, Len);
 	RegCloseKey(HKey);
 
-
-
 	const FString UnInstallKey = TEXT("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
 	Result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, *UnInstallKey, 0, KEY_READ | KEY_WRITE, &HKey);
 	if (Result != ERROR_SUCCESS)

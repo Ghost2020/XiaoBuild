@@ -10,6 +10,8 @@
 #include "HAL/PlatformFileManager.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "Misc/FileHelper.h"
+#include "Dom/JsonObject.h"
 
 #include "XiaoShareNetwork.h"
 #include "XiaoShare.h"
@@ -792,6 +794,106 @@ static void _EditPlugin(const FString& InPluginPath, const bool bInEnable)
 	}
 }
 
+static void EnumerateProjectsKnownByEngine(const FString& InEngineVerison, TSet<FString>& OutProjectFileNames)
+{
+#ifdef DESKTOPPLATFORM_API
+	// Find all the engine installations
+	TMap<FString, FString> EngineInstallations;
+	auto PlatformModule = FDesktopPlatformModule::Get();
+	PlatformModule->EnumerateEngineInstallations(EngineInstallations);
+
+	XIAO_LOG(Log, TEXT("Looking for projects..."));
+
+	// Add projects from every branch that we know about
+	for (const auto& Iter : EngineInstallations)
+	{
+		TArray<FString> ProjectFiles;
+
+		XIAO_LOG(Log, TEXT("Found Engine Installation \"%s\"(%s)"), *Iter.Key, *Iter.Value);
+
+		if (PlatformModule->EnumerateProjectsKnownByEngine(Iter.Key, false, ProjectFiles))
+		{
+			FEngineVersion EngineVersion;
+			if (PlatformModule->TryGetEngineVersion(Iter.Value, EngineVersion))
+			{
+				if (InEngineVerison == EngineVersion.ToString())
+				{
+					OutProjectFileNames.Append(MoveTemp(ProjectFiles));
+					return;
+				}
+			}
+		}
+	}
+#endif
+}
+
+static bool RemovePluginFromUProject(const FString& InProjectFilePath, const FString& InPluginNameToRemove)
+{
+	FString FileContent;
+	if (!FFileHelper::LoadFileToString(FileContent, *InProjectFilePath))
+	{
+		XIAO_LOG(Error, TEXT("Failed to load project file: %s"), *InProjectFilePath);
+		return false;
+	}
+
+	TSharedPtr<FJsonObject> RootObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(FileContent);
+
+	if (!FJsonSerializer::Deserialize(Reader, RootObject) || !RootObject.IsValid())
+	{
+		XIAO_LOG(Error, TEXT("Failed to parse JSON for \"%s\"."), *InProjectFilePath);
+		return false;
+	}
+
+	const TArray<TSharedPtr<FJsonValue>>* PluginsArray;
+	bool bFind = false;
+	if (RootObject->TryGetArrayField(TEXT("Plugins"), PluginsArray))
+	{
+		TArray<TSharedPtr<FJsonValue>> NewPluginsArray;
+
+		for (const TSharedPtr<FJsonValue>& PluginValue : *PluginsArray)
+		{
+			const TSharedPtr<FJsonObject>* PluginObjPtr = nullptr;
+			if (PluginValue->TryGetObject(PluginObjPtr) && PluginObjPtr)
+			{
+				FString Name;
+				if ((*PluginObjPtr)->TryGetStringField(TEXT("Name"), Name) && Name == InPluginNameToRemove)
+				{
+					XIAO_LOG(Log, TEXT("Removing plugin: %s"), *Name);
+					bFind = true;
+					continue; // Skip this plugin (i.e. delete it)
+				}
+
+				NewPluginsArray.Add(PluginValue); // Keep others
+			}
+		}
+
+		RootObject->SetArrayField("Plugins", NewPluginsArray);
+	}
+
+	if (!bFind)
+	{
+		XIAO_LOG(Log, TEXT("No Plugins array found in project file \"%s\"."), *InProjectFilePath);
+		return true;
+	}
+
+	FString OutputString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+	if (!FJsonSerializer::Serialize(RootObject.ToSharedRef(), Writer))
+	{
+		XIAO_LOG(Error, TEXT("Failed to serialize modified JSON."));
+		return false;
+	}
+
+	if (!FFileHelper::SaveStringToFile(OutputString, *InProjectFilePath))
+	{
+		XIAO_LOG(Error, TEXT("Failed to save modified project file for \"%s\"."), *InProjectFilePath);
+		return false;
+	}
+
+	return true;
+}
+
 static bool InstallComponent(const FInstallFolder& InDesc)
 {
 	static const FString SUBTStr = TEXT("UnrealBuildTool");
@@ -940,6 +1042,17 @@ static bool InstallComponent(const FInstallFolder& InDesc)
 				const FString SrcModulesFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(InDesc.Folder, TEXT("Engine/Plugins"), SXGEControllerPlugin, TEXT("Binaries"), SPlatformName, TEXT("UnrealEditor.modules")));
 				const FString DesModulesFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(DesXiaoControllerDir, TEXT("Binaries"), SPlatformName, TEXT("UnrealEditor.modules")));
 				_ModifyBuildID(DesModulesFile, SrcModulesFile);
+			}
+		}
+		
+		if (!InDesc.bInstall || !InDesc.bPluginInstall)
+		{
+			// 移除项目文件中的插件描述
+			TSet<FString> ProjectFilePaths;
+			EnumerateProjectsKnownByEngine(InDesc.EngineVersion, ProjectFilePaths);
+			for (const auto& ProjectPath : ProjectFilePaths)
+			{
+				RemovePluginFromUProject(ProjectPath, SUbaControllerPlugin);
 			}
 		}
 

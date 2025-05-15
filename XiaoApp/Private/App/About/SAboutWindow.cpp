@@ -31,7 +31,7 @@ static FText GetEngineSupportInformation()
 static FText GetUbaSupportVersion()
 {
 #if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
-	return FText::FromString(TEXT("42"));
+	return FText::FromString(TEXT("33"));
 #else
 	return FText::FromString(TEXT("33"));
 #endif

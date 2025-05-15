@@ -12,9 +12,9 @@ namespace Xiao
 	static constexpr uint32 SHeaderSize = 5;
 	static constexpr uint32 SValidSize = 17;
 	static constexpr uint32 SReceiveMaxSize = 128 * 1024 * 1024;
-	static constexpr uint8 SSessionMessageType_GetTraceInformation = 
+	static constexpr uint8 SSessionMessageType_GetTraceInformation =
 #if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
-		19
+		18
 #else
 		18
 #endif

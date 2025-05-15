@@ -81,11 +81,10 @@ public:
 								{
 									if (FolderDesc.IsValid())
 									{
-										FolderDesc.Pin()->bInstall = true ? InState == ECheckBoxState::Checked : false;
-										if (FolderDesc.Pin()->bInstall)
-										{
-											FolderDesc.Pin()->bPluginInstall = true;
-										}
+										auto Desc = FolderDesc.Pin();
+										Desc->bInstall = true ? InState == ECheckBoxState::Checked : false;
+										Desc->bPluginInstall = Desc->bInstall;
+										PluginCheck->SetIsChecked(InState);
 									}
 								})
 						];
@@ -95,7 +94,7 @@ public:
 					return SNew(SHorizontalBox)
 						+ SHorizontalBox::Slot().HAlign(HAlign_Center).VAlign(VAlign_Center)
 						[
-							SNew(SCheckBox)
+							SAssignNew(PluginCheck, SCheckBox)
 								.IsChecked(Folder->bPluginInstall ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
 								.IsEnabled_Lambda([this]() 
 								{
@@ -117,6 +116,7 @@ public:
 
 private:
 	TWeakPtr<FInstallFolder> FolderDesc = nullptr;
+	TSharedPtr<SCheckBox> PluginCheck = nullptr;
 };
 
 
@@ -366,6 +366,9 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 					+ SScrollBox::Slot()
 					[
 						SAssignNew(FolderListView, SListView<TSharedPtr<FInstallFolder>>)
+						.IsEnabled_Lambda([this]() {
+							return SModifiedAgentSettings.bEnableUbac;
+						})
 						.ListItemsSource(&ModiefyFolderArray)
 						.Orientation(Orient_Vertical)
 						.SelectionMode(ESelectionMode::Type::Multi)
