@@ -2,6 +2,7 @@
 
 #include "UbaCommon.h"
 #include "Misc/StringBuilder.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "oodle2.h"
 #include <string>
 
@@ -112,7 +113,16 @@ namespace Xiao
 				return false;
 			}
 			*it = 0;
-			out.Reserve(uint32(it - out.GetData()));
+			const auto NewCapacity = uint32(it - out.GetData());
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+			out.Reserve(NewCapacity);
+#else
+			const auto AdditinalCapacity = NewCapacity - out.Len();
+			if (AdditinalCapacity > 0)
+			{
+				out.AddUninitialized(AdditinalCapacity);
+			}
+#endif
 #else
 			uint64 charLen;
 			if (!TryRead7BitEncoded(charLen))
