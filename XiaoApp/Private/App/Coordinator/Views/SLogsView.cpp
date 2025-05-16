@@ -184,14 +184,15 @@ TSharedPtr<SWidget> SLogsView::OnContextMenuOpening()
 			FUIAction(
 				FExecuteAction::CreateLambda([this]() {
 					const auto _Items = this->ExceptionListView->GetSelectedItems();
-					IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-
 					try
 					{
 						for (int i = _Items.Num()-1; i >= 0; --i)
 						{
 							const std::string Key = _Items[i]->buildid();
-							SRedisClient->hdel(Hash::SExceptionDesc, Key);
+							if (!SRedisClient->hdel(Hash::SExceptionDesc, Key))
+							{
+								XIAO_LOG(Warning, TEXT("hdel key [%s]"), UTF8_TO_TCHAR(Key.c_str()));
+							}
 
 							ExceptionArray.Remove(_Items[i]);
 							Key2Exception.erase(Key);

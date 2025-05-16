@@ -1590,7 +1590,11 @@ namespace uba
 		}
 
 		ProcessInfo.userData = ExitInfo;
-		ProcessInfo.exitedFunc = [](void* userData, const ProcessHandle& ph)
+		ProcessInfo.exitedFunc = [](void* userData, const ProcessHandle& ph
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+			, ProcessExitedResponse& rp
+#endif
+			)
 			{
 				FScopeLock ScopedLock(GCriticalSection);
 

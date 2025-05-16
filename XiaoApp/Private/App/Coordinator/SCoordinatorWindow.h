@@ -40,6 +40,7 @@ protected:
 	
 private:
 	bool bFullScreen = false;
+	double LastLoginTime = 0.0f;
 
 	TSharedPtr<FTabManager> TabManager = nullptr;
 

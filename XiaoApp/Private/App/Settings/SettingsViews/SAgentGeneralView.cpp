@@ -553,6 +553,7 @@ FReply SAgentGeneralView::OnCommit()
 
 FReply SAgentGeneralView::OnRevert()
 {
+	SIndex = 0;
 	if (FolderListView.IsValid())
 	{
 		AssiganArray(OriginlFolderArray, ModiefyFolderArray);

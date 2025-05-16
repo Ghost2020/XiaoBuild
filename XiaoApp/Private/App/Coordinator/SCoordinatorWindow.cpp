@@ -308,6 +308,7 @@ void SCoordinatorWindow::Construct(const FArguments& Args)
 
 	XIAO_LOG(Log, TEXT("SCoordinatorWindow::Construct::Finish"));
 	GLog->Flush();
+	LastLoginTime = FPlatformTime::Seconds();
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -318,7 +319,6 @@ void SCoordinatorWindow::Tick(const FGeometry& InAllottedGeometry, const double 
 	// 非管理类型则有时间限制
 	if (FXiaoAppBase::GApp && GCurrentUser.Role != 2)
 	{
-		static double LastLoginTime = FPlatformTime::Seconds();
 		const double PassTime = FPlatformTime::Seconds() - LastLoginTime;
 		// 需要再次登录 锁定切到登录页面
 		static constexpr double SCheckTime = 3600.0f * 6;

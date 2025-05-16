@@ -578,12 +578,6 @@ static void StopService(const float InBeginProgress, const float InFinishProgres
 		ShutdownXiaoApp(Params);
 	}
 
-	/*if (IsAppRunning(SBuildLicenseService))
-	{
-		Params = FPaths::ConvertRelativePathToFull(FPaths::Combine(WorkingPath, SBuildLicenseService));
-		ShutdownXiaoApp(Params);
-	}*/
-
 	UpdateMessage(InFinishProgress, TEXT("Stop Service finish!"));
 }
 
@@ -642,7 +636,7 @@ static void UnRegistEnvirment()
 
 static void TerminateAllApp(const FString& InAppName, const uint32 InIgnorePid)
 {
-	UpdateMessage(0.05f, TEXT("Terminate all XiaoApp begin!"));
+	UpdateMessage(0.05f, FString::Printf(TEXT("Terminate all App [%s] begin!"), *InAppName));
 
 	TArray<uint32> NeedTerminateProcs;
 	FPlatformProcess::FProcEnumerator ProcIter;
@@ -687,6 +681,7 @@ static bool Before(const bool bInCheck)
 
 	// 先停止所有的app的运行
 	TerminateAllApp(XiaoAppName::SBuildApp, 0);
+	TerminateAllApp(XiaoAppName::SBuildTray, 0);
 
 	// 先停止所有的服务程序
 	StopService(0.15f, 0.2f);
