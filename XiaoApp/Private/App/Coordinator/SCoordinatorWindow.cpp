@@ -396,7 +396,14 @@ void SCoordinatorWindow::SetErrorText(const FText& InText)
 {	
 	if (NotificationText.IsValid())
 	{
-		NotificationText->SetError(InText);
+		// 要确保在主线程调用
+		if (FXiaoAppBase::GApp)
+		{
+			FXiaoAppBase::GApp->AddNextTickTask(FSimpleDelegate::CreateLambda([this, &InText]()
+			{
+				NotificationText->SetError(InText);
+			}));
+		}
 	}
 }
 

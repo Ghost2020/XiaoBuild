@@ -24,7 +24,8 @@ public class XiaoCommon : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Protobuf"
+				"Protobuf",
+				"Redis"
 			}
 		);
 

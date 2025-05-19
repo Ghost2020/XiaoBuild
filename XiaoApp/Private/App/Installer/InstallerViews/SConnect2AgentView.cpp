@@ -218,9 +218,9 @@ void SConnect2AgentView::AsyncNetworkTest()
 				return;
 			}
 		}
-		catch (const sw::redis::Error& Ex)
+		catch (const std::exception& Ex)
 		{
-			XIAO_LOG(Error, TEXT("sw::redis::Error::%s!"), UTF8_TO_TCHAR(Ex.what()));
+			XIAO_LOG(Error, TEXT("Exception::%s!"), UTF8_TO_TCHAR(Ex.what()));
 		}
 		bConnect = false;
 		bCanClickTestButton = true;

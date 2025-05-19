@@ -7,12 +7,6 @@
 
 #include "CoreMinimal.h"
 
-namespace sw::redis
-{
-	class ConnectionOptions;
-}
-using namespace sw::redis;
-
 struct FProcHandle;
 
 class FCoordiService final

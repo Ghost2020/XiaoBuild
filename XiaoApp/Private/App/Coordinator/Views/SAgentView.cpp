@@ -1224,7 +1224,7 @@ void SAgentView::OnUpdate(const bool bRebuild) const
 	try
 	{
 		// 更新频率
-		const OptionalString FreqOptional = XiaoRedis::SRedisClient->get(XiaoRedis::String::SAgentUpdateFreqStr);
+		const auto FreqOptional = XiaoRedis::SRedisClient->get(XiaoRedis::String::SAgentUpdateFreqStr);
 		if (FreqOptional.has_value())
 		{
 			GSleepUpdate = std::atof(FreqOptional.value().c_str());

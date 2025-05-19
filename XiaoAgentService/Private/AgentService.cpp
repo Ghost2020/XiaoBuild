@@ -20,7 +20,9 @@
 
 
 using namespace XiaoNetwork;
+#ifdef REDIS_CPLUS_CPLUS
 using namespace sw::redis;
+#endif
 using namespace XiaoRedis;
 
 static constexpr double SOneDaySeconds = 3600.0f * 24.0f;

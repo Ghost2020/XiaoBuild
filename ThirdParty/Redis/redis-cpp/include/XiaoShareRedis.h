@@ -11,15 +11,25 @@
 #include <set>
 #include <functional>
 #include <thread>
+#define REDIS_CPLUS_CPLUS
+#ifdef REDIS_CPLUS_CPLUS
 #include "sw/redis++/redis++.h"
 #include "sw/redis++/connection_pool.h"
+#else
+#include "XiaoRedis.h"
+#endif
 #include "system_settings.pb.h"
 #include "agent.pb.h"
 #include "XiaoShareNetwork.h"
 #include "Serialization/JsonSerializerMacros.h"
 
-
+#ifdef REDIS_CPLUS_CPLUS
 using namespace sw::redis;
+namespace _ = sw::redis;
+#else
+using namespace Xiao;
+namespace _ = Xiao;
+#endif
 
 enum ERedisStatus
 {
@@ -246,8 +256,11 @@ struct FRedisEventDesc : FJsonSerializable
 
 inline FSystemSettings GOriginalSystemSettings;
 inline FSystemSettings GModifySystemSettings;
-
+#ifdef REDIS_CPLUS_CPLUS
 inline sw::redis::ConnectionOptions GMasterConnection;
+#else
+inline Xiao::ConnectionOptions GMasterConnection;
+#endif
 inline const FString SRedisClusterFile = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/XiaoBuild/%s.json"), *FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir()), TEXT("CacheCluster")));
 inline FRedisCluster GCluster;
 inline float GSleepUpdate = 5.0f;
@@ -283,11 +296,11 @@ inline std::string SRedisMessage;
     	SRedisStatus = ERedisStatus::Redis_ProtoError; \
 		GOnRedisChanged.Trigger(static_cast<uint8>(SRedisStatus)); \
     } \
-    catch (const sw::redis::Error& Ex) \
+	catch(const _::Error& Ex) \
     { \
-    	SRedisMessage = std::string("Exception::") +  Ex.what(); \
-    	GSleepUpdate = 5.0f; \
-    	SRedisStatus = ERedisStatus::Redis_Error; \
+    	SRedisMessage = std::string("Error::") + Ex.what(); \
+		GSleepUpdate = 2.0f; \
+    	SRedisStatus = ERedisStatus::Redis_UndefinedError; \
 		GOnRedisChanged.Trigger(static_cast<uint8>(SRedisStatus)); \
     } \
 	catch(const std::exception& Ex) \
@@ -365,7 +378,11 @@ namespace XiaoRedis
 		static const std::string SProcessException("exception");
 	}
 	
+#ifdef REDIS_CPLUS_CPLUS
 	inline std::shared_ptr<sw::redis::Redis> SRedisClient = nullptr;
+#else
+	inline std::shared_ptr<Xiao::Redis> SRedisClient = nullptr;
+#endif
 
 	static void SetDefaultParams(FSystemSettings& OutSettings)
 	{
@@ -493,12 +510,16 @@ namespace XiaoRedis
 		SRedisStatus = ERedisStatus::Redis_Error;
 	}
 
-	static bool _ConnectRedis(const sw::redis::ConnectionOptions& InOptions)
+	static bool _ConnectRedis(const ConnectionOptions& InOptions)
 	{
 		try
 		{
 			TryDisconnectRedis();
+#ifdef REDIS_CPLUS_CPLUS
 			SRedisClient = std::make_shared<sw::redis::Redis>(InOptions);
+#else
+			SRedisClient = std::make_shared<Xiao::Redis>(InOptions);
+#endif
 			if (SRedisClient->ping() == Key::SPong)
 			{
 				SRedisStatus = ERedisStatus::Redis_Ok;

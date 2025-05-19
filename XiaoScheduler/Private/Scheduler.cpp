@@ -475,18 +475,21 @@ namespace uba
 		// 获取本机约束条件
 		MaxProcessorCount = UbaScheduler.MaxCpu;
 		MaxAgentConCount = UbaScheduler.MaxCon;
-		sw::redis::OptionalString StatsVal;
+		std::string Stats;
 		try
 		{
-			StatsVal = XiaoRedis::SRedisClient->hget(XiaoRedis::Hash::SAgentStats, GAgentUID);
+			const auto StatsVal = XiaoRedis::SRedisClient->hget(XiaoRedis::Hash::SAgentStats, GAgentUID);
+			if (StatsVal.has_value())
+			{
+				Stats = StatsVal.value();
+			}
 		}
 		CATCH_REDIS_EXCEPTRION();
-		if (!StatsVal.has_value())
+		if (Stats.empty())
 		{
 			return true;
 		}
 
-		const std::string Stats = StatsVal.value();
 		if (Stats.size() > 0 && InitiatorProto.ParseFromString(Stats))
 		{
 			if (InitiatorProto.maxcpu() >= 0)
