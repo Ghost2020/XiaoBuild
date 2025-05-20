@@ -459,10 +459,7 @@ void SAgentSettingsWindow::AsyncNetworkTest()
 			}
 #endif
 		}
-		catch (const std::exception& Ex)
-		{
-			XIAO_LOG(Error, TEXT("sw::redis::Error::%s!"), UTF8_TO_TCHAR(Ex.what()));
-		}
+		CATCH_REDIS_EXCEPTRION();
 		ChangeStatus(true);
 	});
 }

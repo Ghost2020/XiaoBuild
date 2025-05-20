@@ -26,21 +26,21 @@ namespace Xiao
 		static timeval connect_tv;
 		if (InOptions.connect_timeout.count() > 0)
 		{
-			connect_tv.tv_sec = static_cast<long>(std::chrono::duration_cast<std::chrono::seconds>(InOptions.connect_timeout / 1000).count());
+			connect_tv.tv_sec = static_cast<long>(std::chrono::duration_cast<std::chrono::seconds>(InOptions.connect_timeout).count());
 			Options.connect_timeout = &connect_tv;
 		}
-		
+
 		static timeval command_tv;
 		if (InOptions.socket_timeout.count() > 0)
 		{
-			command_tv.tv_sec = static_cast<long>(std::chrono::duration_cast<std::chrono::seconds>(InOptions.socket_timeout / 1000).count());
+			command_tv.tv_sec = static_cast<long>(std::chrono::duration_cast<std::chrono::seconds>(InOptions.socket_timeout).count());
 			Options.command_timeout = &command_tv;
 		}
 
 		Context = redisConnectWithOptions(&Options);
 		if (Context == nullptr || Context->err)
 		{
-			throw ClosedError("redisConnectWithOptions failed");
+			throw ClosedError(std::format("redisConnectWithOptions failed with {}", Context->errstr));
 			return;
 		}
 
