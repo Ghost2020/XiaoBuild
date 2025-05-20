@@ -327,18 +327,26 @@ void FCoordiService::UpdateAgentStatus()
 		try
 		{
 			// 更新频率
-			const std::string UpdateValueStr = SRedisClient->get(String::SAgentUpdateFreqency).value();
-			if (UpdateValueStr.length() > 0)
+			const auto UpdateOptional = SRedisClient->get(String::SAgentUpdateFreqency);
+			if (UpdateOptional.has_value())
 			{
-				SSleepTime = GSleepUpdate = std::stof(UpdateValueStr);
+				const std::string UpdateValueStr = UpdateOptional.value();
+				if (UpdateValueStr.length() > 0)
+				{
+					SSleepTime = GSleepUpdate = std::stof(UpdateValueStr);
+				}
 			}
 
-			const std::string SystemSettingsStr = SRedisClient->get(String::SSystemSettings).value();
-			if (SystemSettingsStr.length() > 0)
-			{
-				if (!GModifySystemSettings.ParseFromString(SystemSettingsStr))
+			const auto SettingsOptional = SRedisClient->get(String::SSystemSettings);
+			if(SettingsOptional.has_value())
+			{ 
+				const std::string SystemSettingsStr = SettingsOptional.value();
+				if (SystemSettingsStr.length() > 0)
 				{
-					XIAO_LOG(Error, TEXT("SystemSettings ParseFromString failed!"));
+					if (!GModifySystemSettings.ParseFromString(SystemSettingsStr))
+					{
+						XIAO_LOG(Error, TEXT("SystemSettings ParseFromString failed!"));
+					}
 				}
 			}
 

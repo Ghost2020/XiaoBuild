@@ -386,9 +386,12 @@ bool FAgentService::UpdateAgentStats(const bool bInit)
 		if (SRedisClient->hexists(Hash::SAgentStats, GAgentUID))
 		{
 			const auto Optional = SRedisClient->hget(Hash::SAgentStats, GAgentUID);
-			if (const std::string Value = Optional.value(); !(Value.size() > 0 && SAgentProto.ParseFromString(Value)))
+			if (Optional.has_value())
 			{
-				XIAO_LOG(Error, TEXT("Agent proto parse failed!"));
+				if (const std::string Value = Optional.value(); !(Value.size() > 0 && SAgentProto.ParseFromString(Value)))
+				{
+					XIAO_LOG(Error, TEXT("Agent proto parse failed!"));
+				}
 			}
 
 			if (SAgentCoreParams.Init && !SbNeedRestart)
@@ -429,10 +432,13 @@ bool FAgentService::UpdateAgentStats(const bool bInit)
 void FAgentService::UpdateAgentSettings()
 {
 	const auto UpdateFrequencyStr = SRedisClient->get(String::SSystemSettings);
-	const std::string SettingsStr = UpdateFrequencyStr.value();
-	if (SettingsStr.size() > 0 && SSystemSettings.ParseFromString(SettingsStr))
+	if (UpdateFrequencyStr.has_value())
 	{
-		GSleepUpdate = SSystemSettings.syncfreq();
+		const std::string SettingsStr = UpdateFrequencyStr.value();
+		if (SettingsStr.size() > 0 && SSystemSettings.ParseFromString(SettingsStr))
+		{
+			GSleepUpdate = SSystemSettings.syncfreq();
+		}
 	}
 }
 

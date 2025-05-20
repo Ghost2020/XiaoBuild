@@ -124,13 +124,12 @@ namespace Xiao
 		return Num;
 	}
 
-	bool Redis::set(const std::string& InKey, const std::string& InVal, const std::chrono::milliseconds& ttl)
+	bool Redis::set(const std::string& InKey, const std::string& InVal)
 	{
 		bool bRtn = false;
-		const std::string TTLStr = std::to_string(ttl.count() / 1000).c_str();
-		const char* argv[] = { "SET", InKey.c_str(), InVal.c_str(), "EX", TTLStr.c_str()};
-		size_t argvlen[] = { 3, InKey.size(), InVal.size(), 2, TTLStr.size()};
-		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 5, argv, argvlen));
+		const char* argv[] = { "SET", InKey.c_str(), InVal.c_str() };
+		size_t argvlen[] = { 3, InKey.size(), InVal.size() };
+		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 3, argv, argvlen));
 		if (!HandleReply(reply))
 		{
 			return bRtn;
@@ -172,11 +171,10 @@ namespace Xiao
 			std::string TempStr;
 			TempStr.resize(reply->len);
 			std::memcpy(&TempStr[0], reply->str, reply->len);
-			const auto Val = std::optional<std::string>(TempStr);
-			return Val;
+			return std::optional<std::string>(TempStr);
 		}
 		case REDIS_REPLY_NIL:
-			std::cout << "Key: " << InKey << " does not exist." << std::endl;
+			std::cerr << "Key: " << InKey << " does not exist." << std::endl;
 			break;
 		default:
 			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));

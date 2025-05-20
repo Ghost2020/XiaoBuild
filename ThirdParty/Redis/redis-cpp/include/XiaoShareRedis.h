@@ -11,7 +11,7 @@
 #include <set>
 #include <functional>
 #include <thread>
-#define REDIS_CPLUS_CPLUS
+// #define REDIS_CPLUS_CPLUS
 #ifdef REDIS_CPLUS_CPLUS
 #include "sw/redis++/redis++.h"
 #include "sw/redis++/connection_pool.h"

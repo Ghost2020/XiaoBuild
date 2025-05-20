@@ -17,7 +17,7 @@ public class Redis : ModuleRules
 		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "redis-cpp/include/sw/redis++/cxx17"));
 		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "redis-cpp/include/sw/redis++/tls"));
 
-		bool UseRedisCplusCplus = true;
+		bool UseRedisCplusCplus = false;
 
 		var libraryPath = Path.Combine(ModuleDirectory, "redis-cpp/lib");
 

@@ -1035,13 +1035,17 @@ namespace uba
 
 		try
 		{
-			const std::string SystemSettingsStr = SRedisClient->get(String::SSystemSettings).value();
-			if (SystemSettingsStr.length() > 0)
+			const auto Optional = SRedisClient->get(String::SSystemSettings);
+			if (Optional.has_value())
 			{
-				if (!GModifySystemSettings.ParseFromString(SystemSettingsStr))
+				const std::string SystemSettingsStr = Optional.value();
+				if (SystemSettingsStr.length() > 0)
 				{
-					logger.Error(TC("SystemSettings ParseFromString failed!"));
-					return;
+					if (!GModifySystemSettings.ParseFromString(SystemSettingsStr))
+					{
+						logger.Error(TC("SystemSettings ParseFromString failed!"));
+						return;
+					}
 				}
 			}
 

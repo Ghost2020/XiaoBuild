@@ -201,7 +201,7 @@ namespace Xiao
 
 		int64_t exists(const std::string& InKey);
 
-		bool set(const std::string& InKey, const std::string& InVal, const std::chrono::milliseconds& ttl = std::chrono::milliseconds(0));
+		bool set(const std::string& InKey, const std::string& InVal);
 		std::optional<std::string> get(const std::string& InKey);
 
 		int64_t llen(const std::string& InKey);
