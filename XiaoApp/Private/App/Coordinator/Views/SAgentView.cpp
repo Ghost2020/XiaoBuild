@@ -701,6 +701,10 @@ TSharedPtr<SWidget> SAgentView::OnGenerateContextMenu() const
 						static const FString DefaultGroup = TEXT("Default");
 						static const FString MultiGroup = TEXT("Multi");
 						const auto _Items = this->AgentsListView->GetSelectedItems();
+						if (_Items.IsEmpty())
+						{
+							return FText::FromString(TEXT("Unknown"));
+						}
 						if (_Items.Num() == 1 || !_Items[0].IsValid())
 						{
 							return FText::FromString(_Items[0].IsValid() ? UTF8_TO_TCHAR(_Items[0]->group().c_str()) : DefaultGroup);
@@ -1040,6 +1044,10 @@ FReply SAgentView::OnTableSave() const
 int32 SAgentView::GetSelectedAgentsVal(const int32 InDeffIndex, TFunction<int32(const TSharedPtr<FAgentProto>&)> InGetter) const
 {
 	const auto _Items = this->AgentsListView->GetSelectedItems();
+	if (_Items.IsEmpty())
+	{
+		return 0;
+	}
 	if (_Items.Num() == 1 || !_Items[0].IsValid())
 	{
 		return _Items[0].IsValid() ? InGetter(_Items[0]) : 1;
@@ -1063,6 +1071,10 @@ int32 SAgentView::GetSelectedAgentsVal(const int32 InDeffIndex, TFunction<int32(
 ECheckBoxState SAgentView::GetSelectedAgentsCheck(const TFunction<bool(const TSharedPtr<FAgentProto>&)>& InGetter) const
 {
 	const auto _Items = this->AgentsListView->GetSelectedItems();
+	if (_Items.IsEmpty())
+	{
+		return ECheckBoxState::Undetermined;
+	}
 	if (_Items.Num() == 1 || !_Items[0].IsValid())
 	{
 		return _Items[0].IsValid() ? (InGetter(_Items[0]) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked) : ECheckBoxState::Undetermined;

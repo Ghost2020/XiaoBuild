@@ -189,9 +189,6 @@ namespace Xiao
 		// tls::TlsOptions tls;
 
 		bool readonly = false;
-
-		// For internal use, and might be removed in the future. DO NOT use it in client code.
-		std::string _server_info() const;
 	};
 
 	class Redis
