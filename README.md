@@ -238,9 +238,9 @@ After the network service is installed and registered, choose a stable machine w
 
 Documenting software version updates:
 
-### v1.0.0
+### v1.0.9
 
-- Basic functionality equivalent to IncrediBuild, but material compilation may occasionally cause crashes, blocking packaging or material-dependent workflows.
+- Basic functionality equivalent to IncrediBuild
 
 ---
 
