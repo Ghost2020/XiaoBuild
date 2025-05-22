@@ -464,43 +464,40 @@ static void RunService()
 	AutoRun();
 	RegistMisc();
 
-	/*if (GInstallSettings.InstallType == CT_AgentCoordiVisulizer)
-	{
-		SetServiceState(SBuildLicenseService, true);
-		UpdateMessage(0.6f, FString::Printf(TEXT("startup \"%s\" service finish..."), *SBuildLicenseService));
-	}*/
-	if (GInstallSettings.InstallType & CT_Coordinator)
+	if ((GInstallSettings.InstallType & CT_Coordinator) || (GInstallSettings.InstallType & CT_BackCoordi))
 	{
 		SetServiceState(SBuildCoordiService, true);
 		UpdateMessage(0.65f, FString::Printf(TEXT("startup \"%s\" service finish..."), *SBuildCoordiService));
 
-		FPlatformProcess::Sleep(1.0f);
-
-		XiaoDB::FUserDetail User;
-		User.Username = GInstallSettings.Username;
-		User.Password = GInstallSettings.Password;
-
-		GMasterConnection.host = "127.0.0.1";
-		GMasterConnection.port = GInstallSettings.CoordiListenPort;
-		GMasterConnection.keep_alive = true;
-
-		if (XiaoRedis::TryConnectRedis())
+		if (GInstallSettings.InstallType & CT_Coordinator)
 		{
-			const std::string Key = TCHAR_TO_UTF8(*GInstallSettings.Username);
-			FString EncryptContent;
-			if (EncryptString(User.ToJson(), XiaoEncryptKey::SAuth, EncryptContent))
+			FPlatformProcess::Sleep(1.0f);
+			XiaoDB::FUserDetail User;
+			User.Username = GInstallSettings.Username;
+			User.Password = GInstallSettings.Password;
+
+			GMasterConnection.host = "127.0.0.1";
+			GMasterConnection.port = GInstallSettings.CoordiListenPort;
+			GMasterConnection.keep_alive = true;
+
+			if (XiaoRedis::TryConnectRedis())
 			{
-				const std::string Val = TCHAR_TO_UTF8(*EncryptContent);
-				XiaoRedis::SRedisClient->hset(XiaoRedis::Hash::SUserDetail, Key, Val);
+				const std::string Key = TCHAR_TO_UTF8(*GInstallSettings.Username);
+				FString EncryptContent;
+				if (EncryptString(User.ToJson(), XiaoEncryptKey::SAuth, EncryptContent))
+				{
+					const std::string Val = TCHAR_TO_UTF8(*EncryptContent);
+					XiaoRedis::SRedisClient->hset(XiaoRedis::Hash::SUserDetail, Key, Val);
+				}
+				else
+				{
+					UpdateError(TEXT("Can\'t EncryptString!"));
+				}
 			}
 			else
 			{
-				UpdateError(TEXT("Can\'t EncryptString!"));
+				UpdateError(TEXT("Can\'t connect to CacheServer!"));
 			}
-		}
-		else
-		{
-			UpdateError(TEXT("Can\'t connect to CacheServer!"));	
 		}
 	}
 	if (GInstallSettings.InstallType & CT_Agent)
