@@ -21,12 +21,12 @@ Release Date: ：2025-04-17
 |--------------------|--------------------|-----------------------|
 | 4_26    | ✔        | ✔       |
 | 4_27    | ✔        | ✔       |
-| 5_0     | ✔ [▶️](https://www.bilibili.com/video/BV1p9cieiEQc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_1     | ✔ [▶️](https://www.bilibili.com/video/BV1dCr3YqExS/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_2     | ✔ [▶️](https://www.bilibili.com/video/BV1k9cieiEdQ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_3     | ✔ [▶️](https://www.bilibili.com/video/BV1C9cieiEV8/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_4     | ✔ [▶️](https://www.bilibili.com/video/BV1p9cieiEsZ/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
-| 5_5     | ✔ [▶️](https://www.bilibili.com/video/BV1p9cieiEyc/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      | ✔       |
+| 5_0     | ✔ [▶️](https://youtu.be/H8qjjH1VbRo?si=YAnu5DE9qh3JFa5M&t=73)      | ✔       |
+| 5_1     | ✔ [▶️](https://youtu.be/Id_Khmcypw0?si=yDGeibHtfjDIBHyH&t=191)      | ✔       |
+| 5_2     | ✔ [▶️](https://youtu.be/gRwpNMGWrb4?si=EIRa0z3PNzHSqsWE&t=167)      | ✔       |
+| 5_3     | ✔ [▶️](https://youtu.be/6dNMNT_D8Ts?si=JITDGahkYgP6MSVj&t=56)      | ✔       |
+| 5_4     | ✔ [▶️](https://youtu.be/WxD754CTsPE?si=-EcJWkgddUdlma5j&t=95)      | ✔       |
+| 5_5     | ✔ [▶️](https://youtu.be/QL_PEHftOOs?si=-QcaSyq6IM7EdPRT&t=152)      | ✔       |
 
 ## Table of contents
 
