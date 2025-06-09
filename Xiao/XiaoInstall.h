@@ -1112,6 +1112,8 @@ static bool InstallUBT(const bool bInstallOrUninstall = true)
 	FString DesBuildConfigPath = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%sUnreal Engine/UnrealBuildTool/%s"),
 #if PLATFORM_WINDOWS
 		*GetWindowsKnownDir(FOLDERID_ProgramData), 
+#else
+		TEXT("/Users/Shared"),
 #endif
 		*SBuildConfigXml));
 	const FString UnrealBuildToolFolder = FPaths::GetPath(DesBuildConfigPath);
@@ -1131,29 +1133,24 @@ static bool InstallUBT(const bool bInstallOrUninstall = true)
 		XIAO_LOG(Error, TEXT("Copy BuildConfiguration.xml SrcFile::%s -> DesFile::%s With LastError::%d"), *SrcBuildConfigPath, *DesBuildConfigPath, FPlatformMisc::GetLastError());
 	}
 
+#if PLATFORM_WINDOWS
 	// AppData Local
 	DesBuildConfigPath = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%sUnreal Engine/UnrealBuildTool/%s"),
-#if PLATFORM_WINDOWS
 		*GetWindowsKnownDir(FOLDERID_LocalAppData), 
-#endif
 		*SBuildConfigXml));
 	EditConfigXml(DesBuildConfigPath, bInstallOrUninstall);
 
 	// Documents 
 	DesBuildConfigPath = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%sUnreal Engine/UnrealBuildTool/%s"),
-#if PLATFORM_WINDOWS
-		* GetWindowsKnownDir(FOLDERID_Documents),
-#endif
-		* SBuildConfigXml));
+		*GetWindowsKnownDir(FOLDERID_Documents),
+		*SBuildConfigXml));
 	EditConfigXml(DesBuildConfigPath, bInstallOrUninstall);
 
 	// AppData Roaming
 	DesBuildConfigPath = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%sUnreal Engine/UnrealBuildTool/%s"),
-#if PLATFORM_WINDOWS
 		*GetWindowsKnownDir(FOLDERID_RoamingAppData),
-#endif
-		* SBuildConfigXml));
+		*SBuildConfigXml));
 	EditConfigXml(DesBuildConfigPath, bInstallOrUninstall);
-
+#endif
 	return true;
 }

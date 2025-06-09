@@ -47,6 +47,8 @@ THIRD_PARTY_INCLUDES_START
 
 #if PLATFORM_MAC
 #include <sys/shm.h>
+#pragma push_macro("check")
+#undef check
 #endif
 
 #if PLATFORM_UNIX
@@ -61,6 +63,9 @@ THIRD_PARTY_INCLUDES_START
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/exceptions.hpp>
 
+#if PLATFORM_MAC
+#pragma pop_macro("check")
+#endif
 
 #if PLATFORM_WINDOWS
 #pragma pop_macro("check")

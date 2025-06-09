@@ -1,4 +1,5 @@
 #include "UbaTraceReader.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "BinaryReader.h"
 #include "HAL/PlatformFileManager.h"
 #include "HAL/PlatformMemory.h"
@@ -172,7 +173,13 @@ namespace Xiao
 			close(FileHandle);
 		}
 
-		virtual IMappedFileRegion* MapRegion(int64 Offset = 0, int64 BytesToMap = MAX_int64, bool bPreloadHint = false) override
+		virtual IMappedFileRegion* MapRegion(int64 Offset = 0, int64 BytesToMap = MAX_int64, 
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+			FFileMappingFlags Flags = EMappedFileFlags::ENone
+#else
+			bool bPreloadHint = false
+#endif
+		) override
 		{
 			LLM_PLATFORM_SCOPE(ELLMTag::PlatformMMIO);
 			check(Offset < GetFileSize()); // don't map zero bytes and don't map off the end of the file

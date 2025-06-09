@@ -78,10 +78,9 @@ namespace Xiao
 		template<typename CharType>
 		FORCEINLINE bool TryReadString(TStringBuilderBase<CharType>& out)
 		{
-#if PLATFORM_WINDOWS
 			uint64 charLen;
 			if (!TryRead7BitEncoded(charLen))
-				return false;
+				return false;	
 			TCHAR* it = out.GetData() + out.Len();
 			uint64 left = charLen;
 			while (left--)
@@ -122,17 +121,6 @@ namespace Xiao
 			{
 				out.AddUninitialized(AdditinalCapacity);
 			}
-#endif
-#else
-			uint64 charLen;
-			if (!TryRead7BitEncoded(charLen))
-				return false;
-			uint32 strCapacity = out.capacity - out.count;
-			if (charLen >= strCapacity)
-				return false;
-			ReadBytes(out.data + out.count, charLen);
-			out.count += charLen;
-			out.data[out.count] = 0;
 #endif
 			return true;
 		}

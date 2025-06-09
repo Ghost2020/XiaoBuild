@@ -9,6 +9,7 @@
 #include <optional>
 #include <chrono>
 #include <memory>
+#include <iterator>
 #include <exception>
 #include <unordered_map>
 #include "hiredis/hiredis.h"
