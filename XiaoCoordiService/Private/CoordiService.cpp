@@ -58,7 +58,7 @@ bool FCoordiService::OnInitialize(const FString& InParams)
 			XIAO_LOG(Error, TEXT("%s"), UTF8_TO_TCHAR(SRedisMessage.c_str()));
 		}
 
-		if (SRedisStatus == ERedisStatus::Redis_TimeoutError || SRedisStatus == ERedisStatus::Redis_IoError)
+		if (SRedisStatus == ERedisStatus::Redis_TimeoutError || SRedisStatus == ERedisStatus::Redis_IoError || SRedisStatus == ERedisStatus::Redis_CloseError)
 		{
 			TryBecomeMaster();
 		}
@@ -737,12 +737,6 @@ static void CleanCache()
 
 void FCoordiService::TryBecomeMaster()
 {
-	if (!IsConnected())
-	{
-		XIAO_LOG(Error, TEXT("TryBecomeMaster::Redis Client is not valid!"));
-		return;
-	}
-
 	try
 	{
 		// 当前的从服务器是否是具有第一顶替优先级
@@ -761,9 +755,8 @@ void FCoordiService::TryBecomeMaster()
 		});
 
 		// 如果是顺位第一位则选举为下一任Master
-		if (SlaveNodes.Num() > 0)
+		for (const auto& Node : SlaveNodes)
 		{
-			const auto& Node  = SlaveNodes[0];
 			if (Node.Host == SLocalIp)
 			{
 				GMasterConnection.host = TCHAR_TO_UTF8(*Node.Host);
@@ -772,7 +765,7 @@ void FCoordiService::TryBecomeMaster()
 				{
 					// 将当前的从服务器升格为主服务器
 					XIAO_LOG(Warning, TEXT("About to switch to master server"));
-					SRedisClient->command("SLAVEOF", "NO", "ONE");
+					SRedisClient->command("REPLICAOF", "NO", "ONE");
 
 					// 将原有Master状态设置为false
 					auto& MasterNode = std::get<1>(SRedisMasterNode);
@@ -786,6 +779,7 @@ void FCoordiService::TryBecomeMaster()
 					SRedisMasterNode = std::make_tuple(GAgentUID, SlaveNodes[0]);
 					SMaster = true;
 					XIAO_LOG(Warning, TEXT("New Master server::%s:%d."), *SLocalIp, SlaveNodes[0].Port);
+					return;
 				}
 			}
 		}
