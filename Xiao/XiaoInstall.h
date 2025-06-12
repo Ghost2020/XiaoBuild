@@ -997,7 +997,7 @@ static bool InstallComponent(const FInstallFolder& InDesc)
 			}
 		}
 
-		if (InDesc.bInstall)
+		if (InDesc.bInstall && InDesc.bPluginInstall)
 		{
 			if (!Platform.CopyDirectoryTree(*DesXiaoControllerDir, *SrcXiaoControllerDir, true))
 			{
