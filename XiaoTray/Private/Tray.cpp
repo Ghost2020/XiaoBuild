@@ -306,11 +306,13 @@ void FXiaoTray::RunApp()
 	LogAction->setIcon(QIcon(IconDir + "/log.png"));
 	QObject::connect(LogAction, &QAction::triggered, []()
 		{
-			const FString Dir = FPaths::Combine(FPlatformProcess::UserDir(),
+			const FString Dir = FPaths::Combine(
 #if PLATFORM_WINDOWS
-				TEXT("../AppData/Local/XiaoApp/Saved/Logs"));
-#else
-				TEXT("XiaoApp/Saved/Logs"));
+				FPlatformProcess::UserDir(), TEXT("../AppData/Local/XiaoApp/Saved/Logs"));
+#elif PLATFORM_MAC
+				FPlatformProcess::UserHomeDir(), TEXT("Library/Logs/Unreal Engine"));
+#elif PLATFORM_UNIX
+				FPlatformProcess::UserHomeDir(), TEXT(".log/"));
 #endif
 			FPlatformProcess::ExploreFolder(*Dir);
 		}
@@ -361,7 +363,13 @@ void FXiaoTray::RunApp()
 	NetworkTestAction->setIcon(QIcon(IconDir + "/network.png"));
 	QObject::connect(NetworkTestAction, &QAction::triggered, []()
 		{
-			RunXiaoApp(XiaoAppName::SBuildApp, FString::Printf(TEXT("-app=%s -network "), *XiaoAppName::SBuildMonitor), true, true, true, true, true);
+			RunXiaoApp(XiaoAppName::SBuildApp, FString::Printf(TEXT("-app=%s -network "), *XiaoAppName::SBuildMonitor), true, true,
+#if PLATFORM_WINDOWS
+				true,
+#else
+				false,
+#endif
+				true, true);
 		}
 	);
 	TrayMenu.addAction(NetworkTestAction);
@@ -379,7 +387,13 @@ void FXiaoTray::RunApp()
 	AgentSettingsAction->setIcon(QIcon(IconDir + "/settings.png"));
 	QObject::connect(AgentSettingsAction, &QAction::triggered, []()
 		{
-			RunXiaoApp(XiaoAppName::SBuildApp, FString::Printf(TEXT("-app=%s"), *XiaoAppName::SBuildAgentSettings), true, true, true, true, true);
+			RunXiaoApp(XiaoAppName::SBuildApp, FString::Printf(TEXT("-app=%s"), *XiaoAppName::SBuildAgentSettings), true, true,
+#if PLATFORM_WINDOWS
+				true,
+#else
+				false,
+#endif
+				true, true);
 		}
 	);
 	TrayMenu.addAction(AgentSettingsAction);
