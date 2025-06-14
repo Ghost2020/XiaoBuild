@@ -5,6 +5,8 @@
 #include "GenericAgentStatsMonitor.h"
 #include "HAL/PlatformProcess.h"
 #include "HAL/PlatformMemory.h"
+#include "HAL/PlatformFilemanager.h"
+#include "Misc/Paths.h"
 
 bool FGenericAgentStatsMonitor::GetAvailableMemory(TTuple<uint64, uint32>& OutAvailableMemory)
 {
@@ -16,6 +18,20 @@ bool FGenericAgentStatsMonitor::GetAvailableMemory(TTuple<uint64, uint32>& OutAv
 
 bool FGenericAgentStatsMonitor::GetAvailableSpace(TTuple<uint64, uint64>& OutDiskSpace, const FString& InTargetDrive)
 {
+	FText Text;
+	if (FPaths::ValidatePath(InTargetDrive, &Text) && !FPaths::DirectoryExists(InTargetDrive))
+	{
+		IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+		if (PlatformFile.CreateDirectoryTree(*InTargetDrive))
+		{
+			XIAO_LOG(Log, TEXT("Directory create success: %s"), *InTargetDrive);
+		}
+		else
+		{
+			XIAO_LOG(Error, TEXT("Directory create failed: %s"), *InTargetDrive);
+		}
+	}
+
 	uint64 TotalNumberOfBytes, NumberOfFreeBytes;
 	if (FPlatformMisc::GetDiskTotalAndFreeSpace(InTargetDrive, TotalNumberOfBytes, NumberOfFreeBytes))
 	{
