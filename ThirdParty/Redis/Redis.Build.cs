@@ -41,13 +41,13 @@ public class Redis : ModuleRules
 			{
 				libraryPath = Path.Combine(libraryPath, "Linux");
 			}
-			else if (Target.Platform == UnrealTargetPlatform.LinuxArm64)
+			else if(Target.Platform == UnrealTargetPlatform.LinuxArm64)
 			{
 				libraryPath = Path.Combine(libraryPath, "LinuxArm64");
 			}
 			else if(Target.Platform == UnrealTargetPlatform.Mac)
 			{
-				libraryPath = Path.Combine(libraryPath, Target.Architecture == UnrealArch.X64 ? "Mac" : "MacArm64");
+				libraryPath = Path.Combine(libraryPath, Target.Architectures.Contains(UnrealArch.X64) ? "Mac" : "MacArm64");
 				PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "libhiredis_ssl.a"));
 			}
 

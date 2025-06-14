@@ -357,9 +357,9 @@ static bool AutoRun()
 {
 	UpdateMessage(0.51f, TEXT("Register auto run..."));
 
+#if PLATFORM_WINDOWS
 	if (GInstallSettings.bEnableAutoTray)
 	{
-#if PLATFORM_WINDOWS
 		HKEY HKey;
 		const FString RunKey = TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
 		DWORD DwDisposition = REG_OPENED_EXISTING_KEY;
@@ -374,7 +374,6 @@ static bool AutoRun()
 			RegCloseKey(HKey);
 			UpdateMessage(0.51f, TEXT("RegSetValueEx success..."));
 		}
-#endif
 		else
 		{
 			const FString Message = FString::Printf(TEXT("Failed to create registry key for autorun! ErrorCode::%d"), Result);
@@ -382,6 +381,7 @@ static bool AutoRun()
 			return false;
 		}
 	}
+#endif
 
 	return true;
 }

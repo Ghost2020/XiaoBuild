@@ -42,6 +42,6 @@ private:
 	double LastRecvBytes = 0.0f;
 };
 
-typedef FMacAgentStatsMonitor FAgentStatsMonitor;
+// typedef FMacAgentStatsMonitor FAgentStatsMonitor;
 
 
