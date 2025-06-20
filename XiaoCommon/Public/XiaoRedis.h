@@ -229,7 +229,7 @@ namespace Xiao
 		void command(const std::string& InCommand, const std::string& InArg1, const std::string& InArg2);
 
 	protected:
-		bool HandleReply(redisReply* InReply);
+		bool CheckReply(redisReply* InReply);
 
 	private:
 		redisOptions Options;

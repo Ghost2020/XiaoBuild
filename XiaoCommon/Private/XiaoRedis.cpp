@@ -57,7 +57,7 @@ namespace Xiao
 		{
 			redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "AUTH %s %s", InOptions.user.c_str(), InOptions.password.c_str()));
 
-			if (!HandleReply(reply))
+			if (!CheckReply(reply))
 			{
 				throw ClosedError("AUTH failed");
 				return;
@@ -85,7 +85,7 @@ namespace Xiao
 	std::string Redis::ping()
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "PING"));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return "Failed to execute command: PING";
 		}
@@ -106,7 +106,7 @@ namespace Xiao
 	{
 		int64_t Num = -1;
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "EXISTS %s", InKey.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Num;
 		}
@@ -130,7 +130,7 @@ namespace Xiao
 		const char* argv[] = { "SET", InKey.c_str(), InVal.c_str() };
 		size_t argvlen[] = { 3, InKey.size(), InVal.size() };
 		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 3, argv, argvlen));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return bRtn;
 		}
@@ -158,7 +158,7 @@ namespace Xiao
 	std::optional<std::string> Redis::get(const std::string& InKey)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "GET %s", InKey.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return std::optional<std::string>();
 		}
@@ -187,7 +187,7 @@ namespace Xiao
 	{
 		int64_t Len = -1;
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "LLEN %s", InKey.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Len;
 		}
@@ -211,7 +211,7 @@ namespace Xiao
 		const char* argv[] = { "LPUSH", InKey.c_str(), InVal.c_str() };
 		size_t argvlen[] = { 5, InKey.size(), InVal.size() };
 		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 3, argv, argvlen));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Len;
 		}
@@ -232,7 +232,7 @@ namespace Xiao
 	void Redis::lrange(const std::string& InKey, const int64_t InStart, const int64_t InStop, std::insert_iterator<std::vector<std::string>> Output)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "LRANGE %s %ld %ld", InKey.c_str(), InStart, InStop));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return;
 		}
@@ -257,7 +257,7 @@ namespace Xiao
 	void Redis::ltrim(const std::string& InKey, const int64_t InStart, const int64_t InStop)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "LTRIM %s %ld %ld", InKey.c_str(), InStart, InStop));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return;
 		}
@@ -287,7 +287,7 @@ namespace Xiao
 			++Iter;
 		}
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, Command.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Num;
 		}
@@ -314,7 +314,7 @@ namespace Xiao
 			Command += " " + value;
 		}
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, Command.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return added;
 		}
@@ -335,7 +335,7 @@ namespace Xiao
 	bool Redis::hexists(const std::string& InKey, const std::string& InField)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HEXISTS %s %s", InKey.c_str(), InField.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return false;
 		}
@@ -358,7 +358,7 @@ namespace Xiao
 	{
 		int64_t Len = -1;
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HLEN %s", InKey.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Len;
 		}
@@ -383,7 +383,7 @@ namespace Xiao
 		const char* argv[] = { "HSET", InKey.c_str(), InField.c_str(), InVal.c_str() };
 		size_t argvlen[] = { 4, InKey.size(), InField.size(), InVal.size() };
 		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 4, argv, argvlen));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Val;
 		}
@@ -407,7 +407,7 @@ namespace Xiao
 		const char* argv[] = { "HSET", InKey.c_str(), InItem.first.c_str(), InItem.second.c_str() };
 		size_t argvlen[] = { 4, InKey.size(), InItem.first.size(), InItem.second.size() };
 		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 4, argv, argvlen));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Val;
 		}
@@ -428,7 +428,7 @@ namespace Xiao
 	std::optional<std::string> Redis::hget(const std::string& InKey, const std::string& InField)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HGET %s %s", InKey.c_str(), InField.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return std::optional<std::string>();
 		}
@@ -457,7 +457,7 @@ namespace Xiao
 	{
 		int64_t Val = -1;
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HDEL %s %s", InKey.c_str(), InField.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Val;
 		}
@@ -478,7 +478,7 @@ namespace Xiao
 	void Redis::hgetall(const std::string& InKey, std::insert_iterator<std::unordered_map<std::string, std::string>> OutMap)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HGETALL %s", InKey.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return;
 		}
@@ -512,7 +512,7 @@ namespace Xiao
 	void Redis::hkeys(const std::string& InKey, std::insert_iterator<std::vector<std::string>> Output)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HKEYS %s", InKey.c_str()));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return;
 		}
@@ -547,7 +547,7 @@ namespace Xiao
 		const char* argv[] = { "PUBLISH", InKey.c_str(), InVal.c_str() };
 		size_t argvlen[] = { 7, InKey.size(), InVal.size() };
 		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 3, argv, argvlen));
-		if (!HandleReply(reply))
+		if (!CheckReply(reply))
 		{
 			return Result;
 		}
@@ -575,11 +575,11 @@ namespace Xiao
 	void Redis::command(const std::string& InCommand, const std::string& InArg1, const std::string& InArg2)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "%s %s", InCommand.c_str(), InArg1.c_str(), InArg2.c_str()));
-		(void)HandleReply(reply);
+		(void)CheckReply(reply);
 		freeReplyObject(reply);
 	}
 
-	bool Redis::HandleReply(redisReply* InReply)
+	bool Redis::CheckReply(redisReply* InReply)
 	{
 		if (InReply == nullptr)
 		{
