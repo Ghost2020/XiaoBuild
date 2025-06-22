@@ -33,15 +33,15 @@ private:
 	TSharedPtr<SNumericEntryBox<uint16>> XiaobuildManagerPort = nullptr;
 	TSharedPtr<SNumericEntryBox<uint16>> MessageTransportPort = nullptr;
 	TSharedPtr<SNumericEntryBox<uint16>> AgentCommunicationPort = nullptr;
-	TSharedPtr<SNumericEntryBox<uint16>> LicenseServicePort = nullptr;
+	// TSharedPtr<SNumericEntryBox<uint16>> LicenseServicePort = nullptr;
 	TSharedPtr<SCheckBox> AutomaticallyOpenCheckBox = nullptr;
 	bool bPass = true;
 
 	TSharedPtr<class SInstallationFolderView> InstallationFolderView = nullptr;
 
 	bool bCoordiServerPort = false;
-	bool bUIManagerPort = false;
+	// bool bUIManagerPort = false;
 	bool bMessageTransPort = false;
 	bool bAgentCommunicatePort = false;
-	bool bLicenseServicePort = false;
+	// bool bLicenseServicePort = false;
 };

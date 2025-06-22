@@ -7,7 +7,7 @@
 #include "Misc/Paths.h"
 #include "HAL/PlatformFilemanager.h"
 
-static const FString SCoordiServicePath = TEXT("/Library/LaunchDaemons/com.xiao.XiaoCoordi.plist");
+static const FString SCoordiServicePath = TEXT("/Library/LaunchDaemons/com.XiaoBuild.XiaoCoordi.plist");
 
 FMacCoordiService::FMacCoordiService(const FServiceCommandLineOptions& InOptions, const FServiceDesc& InServiceDesc)
 	: FGenericService(InOptions, InServiceDesc)
@@ -26,11 +26,11 @@ bool FMacCoordiService::OnInstall()
 		"<plist version = \"1.0\">\n"
 		"\t<dict>\n"
 		"\t\t<key>Label</key>\n"
-		"\t\t<string>com.xiao.CoordiService</string>\n"
+		"\t\t<string>com.XiaoBuild.CoordiService</string>\n"
 		"\n"
 		"\t\t<key>ProgramArguments</key>\n"
 		"\t\t<array>\n"
-		"\t\t\t<string>/Applications/XiaoBuild/Engine/Binaries/Mac/XiaoCoordiService</string>\n"
+		"\t\t\t<string>/Applications/XiaoApp.app/Contents/UE/Engine/Binaries/Mac/XiaoCoordiService</string>\n"
 		"\t\t\t<string></string>\n"
 		"\t\t</array>\n"
 		"\n"

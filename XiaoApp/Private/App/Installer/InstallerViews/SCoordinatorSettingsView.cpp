@@ -65,10 +65,11 @@ void SCoordinatorSettingsView::Construct(const FArguments& InArgs)
 					bCoordiServerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.CoordiListenPort);
 					if(bCoordiServerPort)
 					{
-						bCoordiServerPort = GInstallSettings.CoordiListenPort != GInstallSettings.UIListenPort
-						&& GInstallSettings.CoordiListenPort != GInstallSettings.PerfTransport
+						bCoordiServerPort = 
+						/*GInstallSettings.CoordiListenPort != GInstallSettings.UIListenPort
+						&&*/ GInstallSettings.CoordiListenPort != GInstallSettings.PerfTransport
 						&& GInstallSettings.CoordiListenPort != GInstallSettings.AgentListenPort
-						&& GInstallSettings.CoordiListenPort != GInstallSettings.LicenseListenPort
+						/*&& GInstallSettings.CoordiListenPort != GInstallSettings.LicenseListenPort*/
 						&& GInstallSettings.CoordiListenPort != GInstallSettings.CacheListenPort;
 					}
 					ErrorText->SetError(bCoordiServerPort ? FText::GetEmpty() : Xiao::SSamePortError);
@@ -146,9 +147,9 @@ void SCoordinatorSettingsView::Construct(const FArguments& InArgs)
 					if(bAgentCommunicatePort)
 					{
 						bAgentCommunicatePort = GInstallSettings.AgentListenPort != GInstallSettings.CoordiListenPort
-						&& GInstallSettings.AgentListenPort != GInstallSettings.UIListenPort
+						/*&& GInstallSettings.AgentListenPort != GInstallSettings.UIListenPort*/
 						&& GInstallSettings.AgentListenPort != GInstallSettings.PerfTransport
-						&& GInstallSettings.AgentListenPort != GInstallSettings.LicenseListenPort
+						/*&& GInstallSettings.AgentListenPort != GInstallSettings.LicenseListenPort*/
 						&& GInstallSettings.AgentListenPort != GInstallSettings.CacheListenPort;
 					}
 					ErrorText->SetError(bAgentCommunicatePort ? FText::GetEmpty() : Xiao::SSamePortError);
@@ -246,16 +247,16 @@ bool SCoordinatorSettingsView::OnCanNext()
 
 bool SCoordinatorSettingsView::CheckCoordiPort() const
 {
-	return bCoordiServerPort && bUIManagerPort && bMessageTransPort && bAgentCommunicatePort && bLicenseServicePort;
+	return bCoordiServerPort /*&& bUIManagerPort*/ && bMessageTransPort && bAgentCommunicatePort/* && bLicenseServicePort*/;
 }
 
 void SCoordinatorSettingsView::OnCheckButtonClicked()
 {
 	bCoordiServerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.CoordiListenPort);
-	bUIManagerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.UIListenPort);
+	// bUIManagerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.UIListenPort);
 	bMessageTransPort = XiaoNetwork::IsPortAvailable(GInstallSettings.PerfTransport);
 	bAgentCommunicatePort = XiaoNetwork::IsPortAvailable(GInstallSettings.AgentListenPort);
-	bLicenseServicePort = XiaoNetwork::IsPortAvailable(GInstallSettings.LicenseListenPort);
+	// bLicenseServicePort = XiaoNetwork::IsPortAvailable(GInstallSettings.LicenseListenPort);
 }
 
 #undef LOCTEXT_NAMESPACE

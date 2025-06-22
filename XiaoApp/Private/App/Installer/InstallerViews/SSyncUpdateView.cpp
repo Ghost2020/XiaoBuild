@@ -62,7 +62,7 @@ bool SSyncUpdateView::CanSyncUpdate()
 		return false;
 	}
 
-	const FString XiaoHome = FPlatformMisc::GetEnvironmentVariable(TEXT("XIAO_HOME"));
+	const FString XiaoHome = GetXiaoHomePath();
 	if (!FPaths::DirectoryExists(XiaoHome))
 	{
 		ErrorText->SetError(LOCTEXT("XiaoHomeVavLost_Text", "环境变量\"XIAO_HOME\"不存在！"));

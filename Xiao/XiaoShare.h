@@ -382,6 +382,15 @@ static const FText GMultiValue = LOCTEXT("Multi_Text", "Multi");
 
 inline FString GLocalization = TEXT("zh-CN");
 
+static FString GetXiaoHomePath()
+{
+#if PLATFORM_MAC
+	return TEXT("/Applications/XiaoApp.app/Contents/UE/Engine");
+#else
+	return FPlatformMisc::GetEnvironmentVariable(TEXT("XIAO_HOME"));
+#endif
+}
+
 static bool IsValidDir()
 {
 	// 所在目录判断

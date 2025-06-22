@@ -202,9 +202,11 @@ struct FInstallSettings : FJsonSerializable
 	FString InstallFolder;
 	FString CacheFolder =
 #if PLATFORM_WINDOWS
-		FPaths::ConvertRelativePathToFull(FPaths::Combine( GetWindowsKnownDir(FOLDERID_ProgramData), TEXT("XiaoBuild/Cache") ))
-#else
-		TEXT("")
+		FPaths::ConvertRelativePathToFull(FPaths::Combine( GetWindowsKnownDir(FOLDERID_ProgramData), TEXT("XiaoBuild/Cache")))
+#elif PLATFORM_MAC
+		TEXT("/Library/Caches/XiaoBuild")
+#elif PLATFORM_UNIX
+		TEXT("~/.cache/XiaoBuild")
 #endif
 		;
 	bool bAddEnvironment = true;
@@ -552,7 +554,7 @@ static bool IsSupportUBAC(const FString& InVersionStr)
 	if (!Support)
 	{
 		// 检查目录下是否有对应的版本
-		const FString XIAO_HOME = FPlatformMisc::GetEnvironmentVariable(TEXT("XIAO_HOME"));
+		const FString XIAO_HOME = GetXiaoHomePath();
 		const FString UBACFolder = FPaths::Combine(XIAO_HOME, TEXT("Binaries/DotNET/UnrealBuildTool/UBAC"));
 		if (FPaths::DirectoryExists(UBACFolder))
 		{

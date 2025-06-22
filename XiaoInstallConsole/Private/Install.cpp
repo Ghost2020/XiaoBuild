@@ -743,7 +743,7 @@ static bool OverrideFiles()
 		XIAO_LOG(Error, TEXT("DeleteFile [%s] failed!"), *XiaoInstallConsolePath);
 	}
 	const TSet<FString> IgonoreFiles = { TEXT("XiaoInstallConsole") };
-	const FString DescDir = FPlatformMisc::GetEnvironmentVariable(TEXT("XIAO_HOME"));
+	const FString DescDir = GetXiaoHomePath();
 	if (!PlatformFile.CopyDirectoryTree(*DescDir, *DecompressDir, true))
 	{
 		XIAO_LOG(Error, TEXT("CopyDirectoryTree from [%s]->[%s] failed!"), *DecompressDir, *DescDir);

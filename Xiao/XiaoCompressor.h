@@ -384,7 +384,7 @@ public:
 
 static bool GetSystemHash(FString& OutHash, std::string& OutBuffer)
 {
-	const FString XiaoHome = FPlatformMisc::GetEnvironmentVariable(TEXT("XIAO_HOME"));
+	const FString XiaoHome = GetXiaoHomePath();
 	if (!FPaths::DirectoryExists(XiaoHome))
 	{
 		XIAO_LOG(Error, TEXT("SyncVersion failed::XIAO_HOME::[%s] not exist!"), *XiaoHome);

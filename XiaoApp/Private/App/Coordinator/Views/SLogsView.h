@@ -6,6 +6,8 @@
 
 #include "CoreMinimal.h"
 #include "SBaseView.h"
+#include <string>
+#include <unordered_map>
 
 class FException;
 

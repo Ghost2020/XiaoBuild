@@ -8,7 +8,9 @@
 #include "HAL/PlatformFilemanager.h"
 
 
-static const FString SAgentServicePath = TEXT("/Library/LaunchDaemons/com.xiao.XiaoAgent.plist");
+static const FString SAgentServicePath = TEXT("/Library/LaunchDaemons/com.XiaoBuild.XiaoAgent.plist");
+static const FString SAgentEnvPath = TEXT("/Library/LaunchDaemons/com.XiaoBuild.XiaoEnv.plist");
+
 
 FMacBuildAgentService::FMacBuildAgentService(const FServiceCommandLineOptions& InOptions, const FServiceDesc& InServiceDesc)
 	: FGenericService(InOptions, InServiceDesc)
@@ -18,16 +20,16 @@ FMacBuildAgentService::FMacBuildAgentService(const FServiceCommandLineOptions& I
 
 bool FMacBuildAgentService::OnInstall()
 {
-	static const FString XmlContent = TEXT(
+	static const FString XmlAgentContent = TEXT(
 		"<?xml version=\"1.0\" encoding = \"UTF-8\"?>\n"
 		"<plist version = \"1.0\">\n"
 		"\t<dict>\n"
 		"\t\t<key>Label</key>\n"
-		"\t\t<string>com.xiao.AgentService</string>\n"
+		"\t\t<string>com.XiaoBuild.AgentService</string>\n"
 		"\n"
 		"\t\t<key>ProgramArguments</key>\n"
 		"\t\t<array>\n"
-		"\t\t\t<string>/Applications/XiaoBuild/Engine/Binaries/Mac/XiaoAgentService</string>\n"
+		"\t\t\t<string>/Applications/XiaoApp.app/Contents/UE/Engine/Binaries/Mac/XiaoAgentService</string>\n"
 		"\t\t\t<string></string>\n"
 		"\t\t</array>\n"
 		"\n"
@@ -46,7 +48,30 @@ bool FMacBuildAgentService::OnInstall()
 		"</plist>"
 	);
 
-	return FFileHelper::SaveStringToFile(XmlContent, *SAgentServicePath);
+	static const FString XmlEnvContent = TEXT(
+		"<?xml version="1.0" encoding="UTF-8"?>\n"
+		"<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\""
+ 		"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
+		"<plist version=\"1.0\">\n"
+		"<dict>\n"
+    		"\t<key>Label</key>\n"
+    		"\t<string>com.XiaoBuild.XiaoEnv</string>\n"
+		"\n"
+    		"\t<key>ProgramArguments</key>\n"
+    		"\t<array>\n"
+        		"\t\t<string>launchctl</string>\n"
+       			"\t\t<string>setenv</string>\n"
+        		"\t\t<string>XIAO_HOME</string>\n"
+        		"\t\t<string>/Applications/XiaoApp.app/Contents/UE/Engine/Binaries/Mac</string>\n"
+    		"\t</array>\n"
+		"\n"
+    		"\t<key>RunAtLoad</key>\n"
+    		"\t<true/>\n"
+		"</dict>\n"
+		"</plist>\n"
+	);
+
+	return FFileHelper::SaveStringToFile(XmlAgentContent, *SAgentServicePath) && FFileHelper::SaveStringToFile(XmlEnvContent, *SAgentEnvPath);
 }
 
 bool FMacBuildAgentService::OnStart()
@@ -83,10 +108,14 @@ bool FMacBuildAgentService::OnStop()
 
 bool FMacBuildAgentService::OnDelete()
 {
-	if (FPaths::FileExists(SAgentServicePath))
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if(FPaths::FileExists(SAgentServicePath))
 	{
-		IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
-		return PlatformFile.DeleteFile(*SAgentServicePath);
+		PlatformFile.DeleteFile(*SAgentServicePath);
+	}
+	if(FPaths::FileExists(SAgentEnvPath))
+	{
+		PlatformFile.DeleteFile(*SAgentEnvPath);
 	}
 	return true;
 }

@@ -165,8 +165,18 @@ static void BeforeExit()
 
 static QString GetIconDir()
 {
-	static const QString IconDir = TCHAR_TO_UTF8(*FPaths::ConvertRelativePathToFull(FPaths::Combine(GetEngineBinariesDir(), TEXT("../../Content/Slate/XiaoBuild/Icons/Tray"))));
-	return IconDir;
+	FString IconDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(GetEngineBinariesDir(), TEXT("../../Content/Slate/XiaoBuild/Icons/Tray")));
+#if PLATFORM_MAC
+	if(!FPaths::DirectoryExists(IconDir))
+	{
+		IconDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::RootDir(), TEXT("../UE/Engine/Content/Slate/XiaoBuild/Icons/Tray")));
+		if(!FPaths::DirectoryExists(IconDir))
+		{
+			XIAO_LOG(Error, TEXT("IconDir not valid::%s"), *IconDir);
+		}
+	}
+#endif
+	return TCHAR_TO_UTF8(*IconDir);
 }
 
 

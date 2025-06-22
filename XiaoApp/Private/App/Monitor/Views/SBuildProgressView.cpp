@@ -2,8 +2,6 @@
   * @author cxx2020@outlook.com
   * @date 11:02 PM
  */
-#pragma once
-
 #include "SBuildProgressView.h"
 
 #include "HAL/PlatformApplicationMisc.h"
