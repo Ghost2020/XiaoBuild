@@ -20,6 +20,7 @@ public:
 	virtual bool OnCanNext() override;
 	virtual FText GetNextTitle() override;
 	virtual bool IsFinal() override;
+	virtual bool OnCanExit() override;
 	virtual void OnFinish() override;
 
 protected:

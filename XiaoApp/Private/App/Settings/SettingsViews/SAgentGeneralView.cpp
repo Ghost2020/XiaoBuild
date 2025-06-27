@@ -470,7 +470,11 @@ FText SAgentGeneralView::OnServiceWorkState() const
 
 void SAgentGeneralView::OnStartService()
 {
-	SetServiceState(XiaoAppName::SBuildAgentService, true);
+	FString Error;
+	if(!SetServiceState(XiaoAppName::SBuildAgentService, true, Error))
+	{
+		XIAO_LOG(Error, TEXT("SetServiceState::%s"), *Error);
+	}
 }
 
 bool SAgentGeneralView::OnGetStartEnable() const
@@ -480,7 +484,11 @@ bool SAgentGeneralView::OnGetStartEnable() const
 
 void SAgentGeneralView::OnStopService()
 {
-	SetServiceState(XiaoAppName::SBuildAgentService, false);
+	FString Error;
+	if(!SetServiceState(XiaoAppName::SBuildAgentService, false, Error))
+	{
+		XIAO_LOG(Error, TEXT("SetServiceState::%s"), *Error);
+	}
 }
 
 bool SAgentGeneralView::OnGetStopEnable() const

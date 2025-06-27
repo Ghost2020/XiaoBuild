@@ -7,7 +7,7 @@
 #include "Misc/Paths.h"
 #include "HAL/PlatformFilemanager.h"
 
-static const FString SCoordiServicePath = TEXT("/Library/LaunchDaemons/com.XiaoBuild.XiaoCoordi.plist");
+static const FString SCoordiServicePath = TEXT("/Library/LaunchDaemons/com.XiaoBuild.XiaoCoordiService.plist");
 
 FMacCoordiService::FMacCoordiService(const FServiceCommandLineOptions& InOptions, const FServiceDesc& InServiceDesc)
 	: FGenericService(InOptions, InServiceDesc)
@@ -26,7 +26,7 @@ bool FMacCoordiService::OnInstall()
 		"<plist version = \"1.0\">\n"
 		"\t<dict>\n"
 		"\t\t<key>Label</key>\n"
-		"\t\t<string>com.XiaoBuild.CoordiService</string>\n"
+		"\t\t<string>com.XiaoBuild.XiaoCoordiService</string>\n"
 		"\n"
 		"\t\t<key>ProgramArguments</key>\n"
 		"\t\t<array>\n"
@@ -34,8 +34,14 @@ bool FMacCoordiService::OnInstall()
 		"\t\t\t<string></string>\n"
 		"\t\t</array>\n"
 		"\n"
+		"\t\t<key>Disabled</key>\n"
+		"\t\t<false/>\n"
+		"\n"
 		"\t\t<key>RunAtLoad</key>\n"
 		"\t\t<true/>\n"
+		"\n"
+		"\t\t<key>WorkingDirectory</key>\n"
+		"\t\t<string>/Applications/XiaoApp.app/Contents/UE/Engine/Binaries/Mac</string>\n"
 		"\n"
 		"\t\t<key>KeepAlive</key>\n"
 		"\t\t<true/>\n"

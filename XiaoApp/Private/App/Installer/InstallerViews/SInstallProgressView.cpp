@@ -67,14 +67,9 @@ void SInstallProgressView::Construct(const FArguments& InArgs)
 
 	if (GInstallSettings.SetupUpType == 0)
 	{
-		if (!TryCreateIPC())
-		{
-			ErrorText->SetError(LOCTEXT("InterprocessError_Text", "进程间通信出现异常"));
-			return;
-		}
-
-		ErrorText->SetError(FText::GetEmpty());
-		SetCanTick(true);
+		const bool bSuccess = TryCreateIPC();
+		ErrorText->SetError(bSuccess ? FText::GetEmpty() : LOCTEXT("InterprocessError_Text", "进程间通信出现异常"));
+		SetCanTick(bSuccess);
 	}
 	else if (GInstallSettings.SetupUpType == 1)
 	{
@@ -145,10 +140,17 @@ void SInstallProgressView::Tick(const FGeometry& AllottedGeometry, const double 
 				}
 			}
 		}
+
+		if(!IsAppRunning(XiaoAppName::SInstallConsole))
+		{
+			ErrorText->SetError(LOCTEXT("NotRunning_Text", "Install Console is not running!"));
+		}
 	}
 	catch (interprocess_exception& Ex)
 	{
-		XIAO_LOG(Error, TEXT("Interprocee Object Create Exception::%s!"), UTF8_TO_TCHAR(Ex.what()));
+		const FString Erorr = FString::Printf(TEXT("Interprocee Object Create Exception::%s!"), UTF8_TO_TCHAR(Ex.what()));
+		ErrorText->SetError(FText::FromString(Erorr));
+		XIAO_LOG(Error, TEXT("%s"), *Erorr);
 		return;
 	}
 }
@@ -165,12 +167,17 @@ bool SInstallProgressView::OnCanNext()
 
 FText SInstallProgressView::GetNextTitle()
 {
-	return FText::FromString(TEXT("完成"));
+	return FText::FromString(ErrorText->HasError() ? TEXT("Exit"): TEXT("Finish"));
 }
 
 bool SInstallProgressView::IsFinal()
 {
 	return true;
+}
+
+bool SInstallProgressView::OnCanExit()
+{
+	return ErrorText->HasError();
 }
 
 void SInstallProgressView::OnFinish()
@@ -212,7 +219,14 @@ bool SInstallProgressView::OnInstall() const
 	}
 	SaveAgentSettings(AgentSettings);
 
-	const FString SaveInstallSettingPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir()), TEXT("install_setting.json")));
+	const FString SaveInstallSettingPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(
+#if PLATFORM_MAC
+		TEXT("/Library/Application Support/XiaoBuild")
+#else
+		FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir())
+#endif
+		, TEXT("install_setting.json"))
+	);
 	if(!FFileHelper::SaveStringToFile(GInstallSettings.ToJson(true), *SaveInstallSettingPath, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), FILEWRITE_EvenIfReadOnly))
 	{
 		const FText ErrorMessage = LOCTEXT("SaveString_Text", "保存安装参数文件失败");
@@ -222,21 +236,21 @@ bool SInstallProgressView::OnInstall() const
 	}
 	
 	const FString Params = FString::Printf(TEXT("-install -install_setting=\"%s\" -ppid=%d -LOG=%s.log"), *SaveInstallSettingPath, FPlatformProcess::GetCurrentProcessId(), *XiaoAppName::SInstallConsole);
-	RunAsAdmin(XiaoAppName::SInstallConsole, Params);
-	XIAO_LOG(Log, TEXT("Execute Intall Finish"));
+	RunXiaoApp(XiaoAppName::SInstallConsole, Params);
+	XIAO_LOG(Log, TEXT("Execute Intall Begin!"));
 	return true;
 }
 
 bool SInstallProgressView::OnUpdate()
 {
-	RunAsAdmin(XiaoAppName::SInstallConsole, FString::Printf(TEXT("-update -ppid=%d -LOG=%s.log"), FPlatformProcess::GetCurrentProcessId(), *XiaoAppName::SInstallConsole));
+	RunXiaoApp(XiaoAppName::SInstallConsole, FString::Printf(TEXT("-update -ppid=%d -LOG=%s.log"), FPlatformProcess::GetCurrentProcessId(), *XiaoAppName::SInstallConsole));
 	XIAO_LOG(Log, TEXT("Execute Update Finish"));
 	return true;
 }
 
 bool SInstallProgressView::OnUninstall()
 {
-	RunAsAdmin(XiaoAppName::SInstallConsole, FString::Printf(TEXT("-uninstall -ppid=%d -LOG=%s.log"), FPlatformProcess::GetCurrentProcessId(), *XiaoAppName::SInstallConsole));
+	RunXiaoApp(XiaoAppName::SInstallConsole, FString::Printf(TEXT("-uninstall -ppid=%d -LOG=%s.log"), FPlatformProcess::GetCurrentProcessId(), *XiaoAppName::SInstallConsole));
 	XIAO_LOG(Log, TEXT("Execute Update Finish"));
 	return true;
 }

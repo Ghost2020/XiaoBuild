@@ -20,12 +20,12 @@
 		+SHorizontalBox::Slot() \
 		[ \
 			SNew(SOverlay) \
-			+SOverlay::Slot().HAlign(HAlign_Left).VAlign(VAlign_Center) \
+			+SOverlay::Slot().HAlign(HAlign_Left).VAlign(VAlign_Center).Padding(FMargin(20.0f, 0.0f, 5.0f, 0.0f)) \
 			[ \
 				SNew(SImage) \
 				.Image(FXiaoStyle::Get().GetBrush("LongLogo")) \
 			] \
-			+SOverlay::Slot().HAlign(HAlign_Right).VAlign(VAlign_Center) \
+			+SOverlay::Slot().HAlign(HAlign_Right).VAlign(VAlign_Center).Padding(FMargin(5.0f, 0.0f, 20.0f, 0.0f)) \
 			[ \
 				SNew(STextBlock) \
 				.Text(FText::FromString(GetBuildVersion())) \

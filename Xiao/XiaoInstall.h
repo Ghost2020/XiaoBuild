@@ -402,7 +402,12 @@ static bool CheckEnvRuning(FString& OutError, const uint32 InIgnore = 0)
 
 	if (GInstallSettings.InstallFolder.IsEmpty() || !(GInstallSettings.InstallFolder.Len() > 0 && FPaths::DirectoryExists(GInstallSettings.InstallFolder)))
 	{
-		GInstallSettings.InstallFolder = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), TEXT("../../")));
+		GInstallSettings.InstallFolder = 
+#if PLATFORM_MAC
+		TEXT("/Applications/XiaoApp.app/Contents/UE/Engine");
+#else
+		FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), TEXT("../../")));
+#endif
 	}
 
 	if (GInstallSettings.InstallFolder.EndsWith(TEXT("/")))

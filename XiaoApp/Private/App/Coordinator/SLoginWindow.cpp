@@ -302,7 +302,7 @@ void SLoginWindow::Construct(const FArguments& InArgs)
 					]
 					.OnClicked_Lambda([]() 
 					{
-						RunXiaoApp(XiaoAppName::SBuildApp, FString::Printf(TEXT("-app=%s"), *XiaoAppName::SBuildAgentSettings), true, true, true, true);
+						RunXiaoApp(XiaoAppName::SBuildApp, FString::Printf(TEXT("-app=%s"), *XiaoAppName::SBuildAgentSettings), false, true, true, true);
 						return FReply::Handled();
 					})
 				]

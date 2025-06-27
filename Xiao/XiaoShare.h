@@ -710,13 +710,20 @@ static FString GetEngineBinariesDir()
 #endif
 }
 
-static FString GetXiaoAppPath(const FString& InAppName, const FString& InMiddlePath = TEXT(""), const bool bStandardPath = false, const bool bHasExtension = false)
+static FString GetXiaoAppPath(const FString& InAppName, const FString& InMiddlePath = TEXT(""), const bool bStandardPath = false)
 {
 	FString AppPath;
 #if PLATFORM_WINDOWS
 	AppPath = FString::Printf(TEXT("%s\\%s%s.exe"), *FPlatformProcess::GetCurrentWorkingDirectory(), *InMiddlePath, *InAppName);
 #elif PLATFORM_MAC
-	AppPath = FString::Printf(TEXT("%s/%s%s%s"), *GetEngineBinariesDir(), *InMiddlePath, *InAppName, bHasExtension ? TEXT(".app") : TEXT(""));
+	if(InAppName == TEXT("XiaoApp"))
+	{
+		AppPath = FString::Printf(TEXT("%s/%s%s%s"), *GetEngineBinariesDir(), *InMiddlePath, *InAppName, TEXT(".app/Contents/MacOS/XiaoApp"));
+	}
+	else
+	{
+		AppPath = FString::Printf(TEXT("/Applications/XiaoApp.app/Contents/UE/Engine/Binaries/Mac/%s"), *InAppName);
+	}
 #else
 	AppPath = FString::Printf(TEXT("%s/%s%s"), *FPlatformProcess::GetCurrentWorkingDirectory(), *InMiddlePath, *InAppName);
 #endif
@@ -729,7 +736,7 @@ static FString GetXiaoAppPath(const FString& InAppName, const FString& InMiddleP
 		FPaths::MakePlatformFilename(AppPath);
 	}
 
-	if (!FPaths::FileExists(AppPath))
+	if (!FPaths::FileExists(AppPath) && !FPaths::DirectoryExists(AppPath))
 	{
 		XIAO_LOG(Error, TEXT("App file: \"%s\" not exist"), *AppPath);
 	}
@@ -740,12 +747,25 @@ static void RunAs(const FString& InAppPath, const FString& InWorkingPath, const 
 {
 #if PLATFORM_WINDOWS
 	ShellExecute(nullptr, TEXT("runas"), *InAppPath, *InParam, *InWorkingPath, bShowWindow ? SW_SHOWNORMAL : SW_HIDE);
+#elif PLATFORM_MAC
+	// 转义成 AppleScript 命令
+	const FString AppleScriptCommand = FString::Printf(TEXT("do shell script \\\"%s %s\\\" with administrator privileges"), *InAppPath, *InParam);
+	// 再包成 osascript -e "..." 注意最终这一层需要再加双引号
+	const FString FinalCmd = FString::Printf(TEXT("-e \"%s\""), *AppleScriptCommand);
+	// 调用 osascript
+	FPlatformProcess::CreateProc(TEXT("/usr/bin/osascript"), *FinalCmd, true, false, false, nullptr, 0, nullptr, nullptr);	
+#elif PLATFORM_UNIX
+	const FString Command = FString::Printf(TEXT("%s %s"), *InAppPath, *InParam);
+	const FString CmdLine = FString::Printf(TEXT("pkexec bash -c \"%s\""), *Command.ReplaceCharWithEscapedChar());
+	FPlatformProcess::CreateProc(TEXT("/bin/bash"), *FString::Printf(TEXT("-c \"%s\""), *CmdLine), true, false, false, nullptr, 0, nullptr, nullptr);
+#else
+	check(0);
 #endif
 }
 
 static void RunAsAdmin(const FString& InAppName, const FString& InParam = TEXT(""), const bool bShowWindow = false)
 {
-	const FString XiaoAppPath = GetXiaoAppPath(InAppName);
+	const FString XiaoAppPath = GetXiaoAppPath(InAppName, TEXT(""), false);
 	const FString WorkingPath = FPaths::GetPath(XiaoAppPath);
 	RunAs(XiaoAppPath, WorkingPath, InParam, bShowWindow);
 }

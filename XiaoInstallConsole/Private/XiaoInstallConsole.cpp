@@ -157,8 +157,14 @@ static bool ParseCommandLine(const int32 ArgC, TCHAR* ArgV[])
 
 	FString Out;
 	FString InstallSettingPath;
-	if (FParse::Value(*CmdLine, TEXT("-install_setting="), InstallSettingPath) && FPaths::FileExists(InstallSettingPath))
+	if (FParse::Value(*CmdLine, TEXT("-install_setting="), InstallSettingPath))
 	{
+		if(!FPaths::FileExists(InstallSettingPath))
+		{
+			XIAO_LOG(Error, TEXT("install_setting file not exist::%s"), *InstallSettingPath);
+			return false;
+		}
+
 		FString SettingString;
 		if (!FFileHelper::LoadFileToString(SettingString, *InstallSettingPath))
 		{

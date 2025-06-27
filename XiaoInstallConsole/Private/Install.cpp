@@ -429,17 +429,40 @@ static bool RegistService()
 		}
 	}
 
+#if PLATFORM_WINDOWS
 	if (GInstallSettings.InstallType == CT_AgentCoordiVisulizer)
 	{
 		RunAs(TEXT("sc"), FPlatformProcess::GetCurrentWorkingDirectory(), FString::Printf(TEXT("config %s depend=%s"), *SBuildAgentService, *SBuildCoordiService), true);
 	}
+#endif
 
 	// Cache从服务器
-	if (GInstallSettings.InstallType & CT_BackCoordi)
+	if ((GInstallSettings.InstallType & CT_Coordinator) || (GInstallSettings.InstallType & CT_BackCoordi))
 	{
-		const FString RedisConfigFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::ExecutablePath(), TEXT("../../Config/cache.conf")));
+		const FString RedisConfigFile = 
+#if PLATFORM_MAC
+			TEXT("/Applications/XiaoApp.app/Contents/UE/Engine/Config/cache.conf");
+#else
+			FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::ExecutablePath(), TEXT("../../Config/cache.conf")));
+#endif
+		if(!FPaths::FileExists(RedisConfigFile))
+		{
+			UpdateError(FString::Printf(TEXT("CacheConfig %s file not exist"), *RedisConfigFile));
+			return false;
+		}
+
 		FString Content;
-		if (FFileHelper::LoadFileToString(Content, *RedisConfigFile))
+		if (!FFileHelper::LoadFileToString(Content, *RedisConfigFile))
+		{
+			UpdateError(FString::Printf(TEXT("LoadFileToString %s file failed"), *RedisConfigFile));
+			return false;
+		}
+
+		if(GInstallSettings.InstallType & CT_Coordinator)
+		{
+			Content.ReplaceInline(TEXT("port 37000"), *FString::Printf(TEXT("port %u"), GInstallSettings.CoordiPort));
+		}
+		else
 		{
 			const FString SlaveOf = FString::Printf(TEXT("slaveof %s %u\n"), *GInstallSettings.CoordiIp, GInstallSettings.CoordiPort);
 			int32 Index = Content.ReplaceInline(TEXT("# slaveof <masterip> <masterport>"), *SlaveOf);
@@ -457,7 +480,7 @@ static bool RegistService()
 	return true;
 }
 
-static void RunService()
+static bool RunService()
 {
 	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
@@ -466,7 +489,12 @@ static void RunService()
 
 	if ((GInstallSettings.InstallType & CT_Coordinator) || (GInstallSettings.InstallType & CT_BackCoordi))
 	{
-		SetServiceState(SBuildCoordiService, true);
+		FString Error;
+		if(!SetServiceState(SBuildCoordiService, true, Error))
+		{
+			UpdateError(FString::Printf(TEXT("Change [%s] service state FAILED::%s!"), *SBuildCoordiService, *Error));
+			return false;
+		}
 		UpdateMessage(0.65f, FString::Printf(TEXT("startup \"%s\" service finish..."), *SBuildCoordiService));
 
 		if (GInstallSettings.InstallType & CT_Coordinator)
@@ -514,9 +542,16 @@ static void RunService()
 			PlatformFile.CreateDirectoryTree(*AgentCacheDir);
 		}
 
-		SetServiceState(SBuildAgentService, true);
+		FString Error;
+		if(!SetServiceState(SBuildAgentService, true, Error))
+		{
+			UpdateError(FString::Printf(TEXT("Change [%s] service state FAILED::%s!"), *SBuildAgentService, *Error));
+			return false;
+		}
 		UpdateMessage(0.7f, FString::Printf(TEXT("startup \"%s\" service finish..."), *SBuildAgentService));
 	}
+
+	return true;
 }
 
 bool OnInstall()
@@ -542,8 +577,10 @@ bool OnInstall()
 	{
 		return false;
 	}
-
-	RunService();
+	if(!RunService())
+	{
+		return false;
+	}
 	RegistApp(SBuildApp);
 
 	UpdateMessage(0.9f, TEXT("Startup all service finish..."));
@@ -802,7 +839,12 @@ bool OnUpdate()
 	}
 
 	// 开始运行服务程序
-	SetServiceState(SBuildAgentService, true);
+	FString Error;
+	if(!SetServiceState(SBuildAgentService, true, Error))
+	{
+		UpdateError(FString::Printf(TEXT("Change [%s] service state FAILED::%s!"), *SBuildAgentService, *Error));
+		return false;
+	}
 
 	// 运行Tray
 	RunXiaoApp(SBuildTray);

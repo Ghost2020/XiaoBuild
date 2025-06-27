@@ -458,16 +458,13 @@ static void RunXiaoApp(const FString& InAppName, const FString& InParam = TEXT("
 	}
 
 	LoadAgentSettings(SOriginalAgentSettings, bIgnoreTime);
-	const FString Params = FString::Printf(TEXT("%s -LogCmds=%s -CULTURE=%s -LOG=%s.log"),
+	const FString Params = FString::Printf(TEXT("%s -LogCmds=\"%s\" -CULTURE=%s -LOG=%s.log"),
 		*InParam,
 		*FAgentGeneral::GetLevelString(SOriginalAgentSettings.AgentGeneral.Level),
 		*SOriginalAgentSettings.Localization,
 		*FakeAppName
 	);
 	XIAO_LOG(Log, TEXT("RunXiaoApp::AppName:%s Params:%s"), *InAppName, *Params);
-
-	const FString XiaoAppPath = GetXiaoAppPath(InAppName, TEXT(""), false, bHasExtension);
-	const FString WorkingDir = FPlatformProcess::GetCurrentWorkingDirectory();
 
 	void* PipeRead = nullptr;
 	void* PipeWrite = nullptr;
@@ -479,6 +476,8 @@ static void RunXiaoApp(const FString& InAppName, const FString& InParam = TEXT("
 	}
 	else
 	{
+		const FString XiaoAppPath = GetXiaoAppPath(InAppName, TEXT(""), false);
+		const FString WorkingDir = FPlatformProcess::GetCurrentWorkingDirectory();
 		FProcHandle Handle = FPlatformProcess::CreateProc(*XiaoAppPath, *Params, bDetach, false, false, &ProcessID, 0, *WorkingDir, PipeRead, PipeWrite);
 		if (!Handle.IsValid())
 		{
@@ -487,10 +486,10 @@ static void RunXiaoApp(const FString& InAppName, const FString& InParam = TEXT("
 	}
 }
 
-static void SetServiceState(const FString& InServiceName, const bool InbStart)
+static bool SetServiceState(const FString& InServiceName, const bool InbStart, FString& OutError)
 {
 	int32 RtnCode = -1;
-	FString Out, Error;
+	FString Out;
 #if PLATFORM_WINDOWS
 	const FString Url = TEXT("sc.exe");
 	const FString Param = FString::Printf(TEXT("%s %s"), InbStart ? TEXT("start") : TEXT("stop"), *InServiceName);
@@ -498,10 +497,13 @@ static void SetServiceState(const FString& InServiceName, const bool InbStart)
 	const FString Url = TEXT("systemctl");
 	const FString Param = FString::Printf(TEXT("%s %s"), InbStart ? TEXT("restart") : TEXT("stop"), *InServiceName);
 #elif PLATFORM_MAC
+	// 下面注释的方式启动服务程序会失败，也没有错误返回
 	const FString Url = TEXT("launchctl");
-	const FString Param = FString::Printf(TEXT("%s %s"), InbStart ? TEXT("load") : TEXT("unload"), *InServiceName);
+	const FString Param = FString::Printf(TEXT("%s /Library/LaunchAgents/com.XiaoBuild.%s.plist"), InbStart ? TEXT("bootstrap") : TEXT("bootout"), *InServiceName);
+#else
+	check(0);
 #endif
-	FPlatformProcess::CreateProc(*Url, *Param, false, true, true, nullptr, 0, nullptr, nullptr, nullptr);
+	return FPlatformProcess::ExecProcess(*Url, *Param, &RtnCode, &Out, &OutError);
 }
 
 #undef UTF82TCHAR

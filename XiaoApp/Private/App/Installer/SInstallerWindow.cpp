@@ -166,6 +166,10 @@ void SInstallerWindow::Construct(const FArguments& Args)
 							{
 								if (this->CurrentView.IsValid())
 								{
+									if(this->CurrentView.Pin()->OnCanExit())
+									{
+										return EVisibility::Visible;
+									}
 									return this->CurrentView.Pin()->IsFinal() ? EVisibility::Collapsed : EVisibility::Visible;
 								}
 								return EVisibility::Collapsed;
@@ -184,7 +188,7 @@ void SInstallerWindow::Construct(const FArguments& Args)
 								{
 									return this->CurrentView.Pin()->OnCanExit();
 								}
-								return false;
+								return true;
 							})
 						]
 						+ SHorizontalBox::Slot()
