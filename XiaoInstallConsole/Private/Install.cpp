@@ -443,7 +443,7 @@ static bool RegistService()
 #if PLATFORM_MAC
 			TEXT("/Applications/XiaoApp.app/Contents/UE/Engine/Config/cache.conf");
 #else
-			FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::ExecutablePath(), TEXT("../../Config/cache.conf")));
+			FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), TEXT("../../Config/cache.conf")));
 #endif
 		if(!FPaths::FileExists(RedisConfigFile))
 		{

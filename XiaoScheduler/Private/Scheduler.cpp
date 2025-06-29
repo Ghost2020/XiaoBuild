@@ -140,6 +140,14 @@ namespace uba
 
 			FParse::Value(*InCmdLine, TEXT("-ppid="), InInfo.PPID);
 		}
+		if (!FPaths::DirectoryExists(UbaScheduler.Dir))
+		{
+			IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+			if (!PlatformFile.CreateDirectoryTree(*UbaScheduler.Dir))
+			{
+				logger.Error(TC("CreateDirectoryTree %s failed!"), *UbaScheduler.Dir);
+			}
+		}
 		if (FParse::Param(*InCmdLine, TEXT("visualizer")))
 		{
 			UbaScheduler.bVisualizer = true;

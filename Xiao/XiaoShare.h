@@ -938,7 +938,7 @@ static void GetHelp(const FString& InParam)
 
 static FString GetBuildVersion()
 {
-	return TEXT("Version 1.0.8(build 1)");
+	return TEXT("Version 1.1.0(build 1)");
 }
 
 #ifdef WITH_UNREALPNG

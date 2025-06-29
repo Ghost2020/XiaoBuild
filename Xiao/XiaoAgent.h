@@ -500,8 +500,10 @@ static bool SetServiceState(const FString& InServiceName, const bool InbStart, F
 	int32 RtnCode = -1;
 	FString Out;
 #if PLATFORM_WINDOWS
-	const FString Url = TEXT("sc.exe");
+	const FString Url = TEXT("C:/Windows/System32/sc.exe");
 	const FString Param = FString::Printf(TEXT("%s %s"), InbStart ? TEXT("start") : TEXT("stop"), *InServiceName);
+	FPlatformProcess::CreateProc(*Url, *Param, false, true, true, nullptr, 0, nullptr, nullptr, nullptr);
+	return true;
 #elif PLATFORM_UNIX
 	const FString Url = TEXT("/usr/bin/systemctl");
 	const FString Param = FString::Printf(TEXT("%s %s"), InbStart ? TEXT("restart") : TEXT("stop"), *InServiceName);

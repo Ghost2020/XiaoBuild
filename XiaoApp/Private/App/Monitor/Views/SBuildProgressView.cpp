@@ -2527,7 +2527,7 @@ void SBuildProgressView::SetTrackPosY(const TSharedPtr<FBaseTimingTrack>& TrackP
 		Track = TrackPtr->GetChildTracks().Last();
 	}
 #else
-	auto Track = TrackPtr->GetChildTrack()
+	auto Track = TrackPtr->GetChildTrack();
 #endif
 	if(Track.IsValid())
 	{

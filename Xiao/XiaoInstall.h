@@ -1189,7 +1189,7 @@ static bool InstallUBT(const bool bInstallOrUninstall = true)
 				}
 				else
 				{
-					XIAO_LOG(Error, TEXT("Copy BuildConfiguration.xml SrcFile::%s -> DesFile::%s With LastError::%d"), *SrcBuildConfigPath, *DesBuildConfigPath, FPlatformMisc::GetLastError());
+					XIAO_LOG(Error, TEXT("Copy BuildConfiguration.xml SrcFile::%s -> DesFile::%s With LastError::%d"), *SrcBuildConfigPath, *BuildConfPath, FPlatformMisc::GetLastError());
 				}
 				continue;
 			}
