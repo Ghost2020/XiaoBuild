@@ -200,15 +200,15 @@ struct FInstallSettings : FJsonSerializable
 	bool bAutoOpenFirewall = true;
 
 	FString InstallFolder;
-	FString CacheFolder =
+	FString CacheFolder = FPaths::ConvertRelativePathToFull(FPaths::Combine( 
 #if PLATFORM_WINDOWS
-		FPaths::ConvertRelativePathToFull(FPaths::Combine( GetWindowsKnownDir(FOLDERID_ProgramData), TEXT("XiaoBuild/Cache")))
+		GetWindowsKnownDir(FOLDERID_ProgramData)
 #elif PLATFORM_MAC
-		TEXT("/Library/Caches/XiaoBuild")
+		TEXT("/Users/Shared")
 #elif PLATFORM_UNIX
-		TEXT("~/.cache/XiaoBuild")
+		TEXT("/var/tmp")
 #endif
-		;
+		,TEXT("XiaoBuild/Cache")));
 	bool bAddEnvironment = true;
 
 	bool bHasSSL = true;
@@ -471,6 +471,7 @@ static bool GetCanSyncUpdate(std::string& OutData)
 
 static const FString SBuildCongfig(TEXT("BuildConfiguration"));
 static const FString SBuildConfigXml(SBuildCongfig+TEXT(".xml"));
+static const FString SPrePlusBuildConfigXml = FString("Unreal Engine/UnrealBuildTool") / SBuildConfigXml;
 
 static void EditConfigXml(const FString& InXmlPath, const bool bInEnableUBAC)
 {
@@ -1103,6 +1104,7 @@ static bool InstallUBT(const bool bInstallOrUninstall = true)
 	const FString SrcEngineDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), TEXT("../../")));
 	const FString SrcPluginDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(SrcEngineDir, TEXT("Plugins")));
 	const FString SrcBuildConfigPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(SrcPluginDir, SBuildConfigXml));
+
 	/*
 	* In addition to being added to the generated Unreal Engine (UE) project under the Config/UnrealBuildTool folder, Unreal Build Tool (UBT) reads settings from XML config files in the following locations 
 	
@@ -1115,49 +1117,88 @@ static bool InstallUBT(const bool bInstallOrUninstall = true)
 		/Users/USER/.config//Unreal Engine/UnrealBuildTool/BuildConfiguration.xml
 		/Users/USER/Unreal Engine/UnrealBuildTool/BuildConfiguration.xml
 	*/
-	// 全局配置文件
-	FString DesBuildConfigPath = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%sUnreal Engine/UnrealBuildTool/%s"),
+	TSet<FString> BuildConfFiles;
 #if PLATFORM_WINDOWS
-		*GetWindowsKnownDir(FOLDERID_ProgramData), 
-#else
-		TEXT("/Users/Shared"),
-#endif
-		*SBuildConfigXml));
-	const FString UnrealBuildToolFolder = FPaths::GetPath(DesBuildConfigPath);
-	if (!FPaths::DirectoryExists(UnrealBuildToolFolder))
+// 全局配置文件
+	BuildConfFiles.Add(FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/%s"), *GetWindowsKnownDir(FOLDERID_ProgramData), *SPrePlusBuildConfigXml)));
+	// AppData Local
+	BuildConfFiles.Add(FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/%s"), *GetWindowsKnownDir(FOLDERID_LocalAppData), *SPrePlusBuildConfigXml)));
+	// Documents 
+	BuildConfFiles.Add(FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/%s"), *GetWindowsKnownDir(FOLDERID_Documents), *SPrePlusBuildConfigXml)));
+	// AppData Roaming
+	BuildConfFiles.Add(FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/%s"), *GetWindowsKnownDir(FOLDERID_RoamingAppData), *SPrePlusBuildConfigXml)));
+#elif PLATFORM_MAC || PLATFORM_UNIX
+	const bool bIsRoot = geteuid() == 0;
+	const FString UsersDir = TEXT("/Users");
+	if(bIsRoot)
 	{
-		if (!Platform.CreateDirectoryTree(*UnrealBuildToolFolder))
+		const FString SearchPath = UsersDir / TEXT("*");
+		TArray<FString> FoundFilesAndDirs;
+    	IFileManager::Get().FindFiles(FoundFilesAndDirs, *SearchPath, false, true);
+		const FString UserDir = UsersDir / UserName;
+		for(const FString& UserName : FoundFilesAndDirs)
 		{
-			XIAO_LOG(Error, TEXT("CreateDirectoryTree %s failed with LastError::%d"), *UnrealBuildToolFolder, FPlatformMisc::GetLastError());
+			FString BuildConfFile = UserDir / FString(TEXT(".config")) / SPrePlusBuildConfigXml;
+			if(FPaths::FileExists(BuildConfFile))
+			{
+				BuildConfFiles.Add(BuildConfFile);
+			}
+			BuildConfFile = UserDir / SPrePlusBuildConfigXml;
+			if(FPaths::FileExists(BuildConfFile))
+			{
+				BuildConfFiles.Add(BuildConfFile);
+			}
 		}
 	}
-	if (FPaths::FileExists(DesBuildConfigPath))
+	else
 	{
-		EditConfigXml(DesBuildConfigPath, bInstallOrUninstall);
+		const FString UserDir = UsersDir / FPlatformProcess::UserName();
+		FString BuildConfFile = UserDir / FString(TEXT(".config")) / SPrePlusBuildConfigXml;
+		if(FPaths::FileExists(BuildConfFile))
+		{
+			BuildConfFiles.Add(BuildConfFile);
+		}
+		BuildConfFile = UserDir / SPrePlusBuildConfigXml;
+		if(FPaths::FileExists(BuildConfFile))
+		{
+			BuildConfFiles.Add(BuildConfFile);
+		}
 	}
-	else if (bInstallOrUninstall && !Platform.CopyFile(*DesBuildConfigPath, *SrcBuildConfigPath, EPlatformFileRead::AllowWrite))
-	{
-		XIAO_LOG(Error, TEXT("Copy BuildConfiguration.xml SrcFile::%s -> DesFile::%s With LastError::%d"), *SrcBuildConfigPath, *DesBuildConfigPath, FPlatformMisc::GetLastError());
-	}
-
-#if PLATFORM_WINDOWS
-	// AppData Local
-	DesBuildConfigPath = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%sUnreal Engine/UnrealBuildTool/%s"),
-		*GetWindowsKnownDir(FOLDERID_LocalAppData), 
-		*SBuildConfigXml));
-	EditConfigXml(DesBuildConfigPath, bInstallOrUninstall);
-
-	// Documents 
-	DesBuildConfigPath = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%sUnreal Engine/UnrealBuildTool/%s"),
-		*GetWindowsKnownDir(FOLDERID_Documents),
-		*SBuildConfigXml));
-	EditConfigXml(DesBuildConfigPath, bInstallOrUninstall);
-
-	// AppData Roaming
-	DesBuildConfigPath = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%sUnreal Engine/UnrealBuildTool/%s"),
-		*GetWindowsKnownDir(FOLDERID_RoamingAppData),
-		*SBuildConfigXml));
-	EditConfigXml(DesBuildConfigPath, bInstallOrUninstall);
 #endif
+
+	bool bOnce = true;
+	for(const FString& BuildConfPath : BuildConfFiles)
+	{
+		// 需要保证至少有一个BuildConfiguration.xml文件存在
+		if(bOnce && bInstallOrUninstall)
+		{
+			const FString UnrealBuildToolFolder = FPaths::GetPath(BuildConfPath);
+			if (!FPaths::DirectoryExists(UnrealBuildToolFolder))
+			{
+				if (!Platform.CreateDirectoryTree(*UnrealBuildToolFolder))
+				{
+					XIAO_LOG(Error, TEXT("CreateDirectoryTree %s failed with LastError::%d"), *UnrealBuildToolFolder, FPlatformMisc::GetLastError());
+				}
+			}
+
+			if(!FPaths::FileExists(BuildConfPath))
+			{
+				if(Platform.CopyFile(*BuildConfPath, *SrcBuildConfigPath, EPlatformFileRead::AllowWrite))
+				{
+					bOnce = false;
+				}
+				else
+				{
+					XIAO_LOG(Error, TEXT("Copy BuildConfiguration.xml SrcFile::%s -> DesFile::%s With LastError::%d"), *SrcBuildConfigPath, *DesBuildConfigPath, FPlatformMisc::GetLastError());
+				}
+				continue;
+			}
+			else
+			{
+				bOnce = true;
+			}
+		}
+		EditConfigXml(BuildConfPath, bInstallOrUninstall);
+	}
 	return true;
 }

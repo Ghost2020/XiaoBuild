@@ -53,12 +53,6 @@ INT32_MAIN_INT32_ARGC_TCHAR_ARGV()
 
 	atexit(BeforeExit);
 
-	if (!CheckSingleton())
-	{
-		XIAO_LOG(Error, TEXT("Must run in singleton mode!"));
-		return -1;
-	}
-
 	// 解析参数
 	ParseCommandLine(ArgC, ArgV);
 

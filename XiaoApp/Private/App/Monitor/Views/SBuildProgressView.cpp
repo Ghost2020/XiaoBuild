@@ -3,7 +3,7 @@
   * @date 11:02 PM
  */
 #include "SBuildProgressView.h"
-
+#include "Runtime/Launch/Resources/Version.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "SlateOptMacros.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
@@ -2214,7 +2214,16 @@ void SBuildProgressView::UpdateHoveredTimingEvent(const float InMousePosX, const
 			Stopwatch.Start();
 
 			HoveredEvent = NewHoveredEvent;
-			ensure(HoveredTrack == HoveredEvent->GetTrack() || HoveredTrack->GetChildTrack() == HoveredEvent->GetTrack());
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+			TSharedPtr<FBaseTimingTrack> HoveredChildTrack = nullptr;
+			if(!HoveredTrack->GetChildTracks().IsEmpty())
+			{			
+				 HoveredChildTrack = HoveredTrack->GetChildTracks().Last();
+			}
+#else
+			auto HoveredChildTrack = HoveredTrack->GetChildTrack();
+#endif
+			ensure(HoveredTrack == HoveredEvent->GetTrack() || HoveredChildTrack == HoveredEvent->GetTrack());
 			HoveredTrack->UpdateEventStats(const_cast<ITimingEvent&>(*HoveredEvent));
 
 			Stopwatch.Update();
@@ -2511,9 +2520,18 @@ void SBuildProgressView::ScrollAtTime(const double StartTime)
 void SBuildProgressView::SetTrackPosY(const TSharedPtr<FBaseTimingTrack>& TrackPtr, const float TrackPosY) const
 {
 	TrackPtr->SetPosY(TrackPosY);
-	if (TrackPtr->GetChildTrack().IsValid())
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
+	TSharedPtr<FBaseTimingTrack> Track = nullptr;
+	if(!TrackPtr->GetChildTracks().IsEmpty())
+	{			
+		Track = TrackPtr->GetChildTracks().Last();
+	}
+#else
+	auto Track = TrackPtr->GetChildTrack()
+#endif
+	if(Track.IsValid())
 	{
-		TrackPtr->GetChildTrack()->SetPosY(TrackPosY + this->GetViewport().GetLayout().TimelineDY + 1.0f);
+		Track->SetPosY(TrackPosY + this->GetViewport().GetLayout().TimelineDY + 1.0f);
 	}
 }
 

@@ -10,7 +10,16 @@
 
 using namespace XiaoAgentParam;
 
-static const FString SAppSettingsFile = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/XiaoBuild/%s.json"), *FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir()), TEXT("AgentSettings")));
+static const FString SAppSettingsFile = FPaths::ConvertRelativePathToFull(FString::Printf(TEXT("%s/XiaoBuild/%s.json"), 
+#if PLATFORM_WINDOWS
+	*FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir()),
+#elif PLATFORM_MAC
+	TEXT("/Users/Shared"),
+#elif PLATFORM_UNIX
+	TEXT("/etc",)
+#endif
+	TEXT("AgentSettings"))
+);
 static const std::string GAgentUID = TCHAR_TO_UTF8(*GetUniqueDeviceID());
 
 #define UTF82TCHAR(X) UTF8_TO_TCHAR(X.c_str())
@@ -494,12 +503,18 @@ static bool SetServiceState(const FString& InServiceName, const bool InbStart, F
 	const FString Url = TEXT("sc.exe");
 	const FString Param = FString::Printf(TEXT("%s %s"), InbStart ? TEXT("start") : TEXT("stop"), *InServiceName);
 #elif PLATFORM_UNIX
-	const FString Url = TEXT("systemctl");
+	const FString Url = TEXT("/usr/bin/systemctl");
 	const FString Param = FString::Printf(TEXT("%s %s"), InbStart ? TEXT("restart") : TEXT("stop"), *InServiceName);
 #elif PLATFORM_MAC
-	// 下面注释的方式启动服务程序会失败，也没有错误返回
-	const FString Url = TEXT("launchctl");
-	const FString Param = FString::Printf(TEXT("%s /Library/LaunchAgents/com.XiaoBuild.%s.plist"), InbStart ? TEXT("bootstrap") : TEXT("bootout"), *InServiceName);
+	const bool bIsDaemons = InServiceName==TEXT("XiaoCoordiService");
+	const FString BootStrap = bIsDaemons ? TEXT("bootstrap system") : TEXT("load");
+	const FString BootOut = bIsDaemons ? TEXT("bootout system") : TEXT("unload");
+	const FString Url = TEXT("/bin/launchctl");
+	const FString Param = FString::Printf(TEXT("%s /Library/Launch%s/com.XiaoBuild.%s.plist"), 
+							*(InbStart ? BootStrap : BootOut), 
+							(bIsDaemons ? TEXT("Daemons") : TEXT("Agents")), 
+							*InServiceName
+						);
 #else
 	check(0);
 #endif

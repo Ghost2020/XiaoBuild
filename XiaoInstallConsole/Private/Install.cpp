@@ -530,18 +530,6 @@ static bool RunService()
 	}
 	if (GInstallSettings.InstallType & CT_Agent)
 	{
-		const FString SchedulerCacheDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(GInstallSettings.CacheFolder, XiaoAppName::SXiaoScheduler));
-		if (!FPaths::DirectoryExists(SchedulerCacheDir))
-		{
-			PlatformFile.CreateDirectoryTree(*SchedulerCacheDir);
-		}
-
-		const FString AgentCacheDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(GInstallSettings.CacheFolder, XiaoAppName::SUbaAgent));
-		if (!FPaths::DirectoryExists(AgentCacheDir))
-		{
-			PlatformFile.CreateDirectoryTree(*AgentCacheDir);
-		}
-
 		FString Error;
 		if(!SetServiceState(SBuildAgentService, true, Error))
 		{

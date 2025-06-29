@@ -247,14 +247,14 @@ bool SCoordinatorSettingsView::OnCanNext()
 
 bool SCoordinatorSettingsView::CheckCoordiPort() const
 {
-	return bCoordiServerPort /*&& bUIManagerPort*/ && bMessageTransPort && bAgentCommunicatePort/* && bLicenseServicePort*/;
+	return bCoordiServerPort /*&& bUIManagerPort && bMessageTransPort*/ && bAgentCommunicatePort/* && bLicenseServicePort*/;
 }
 
 void SCoordinatorSettingsView::OnCheckButtonClicked()
 {
 	bCoordiServerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.CoordiListenPort);
 	// bUIManagerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.UIListenPort);
-	bMessageTransPort = XiaoNetwork::IsPortAvailable(GInstallSettings.PerfTransport);
+	// bMessageTransPort = XiaoNetwork::IsPortAvailable(GInstallSettings.PerfTransport);
 	bAgentCommunicatePort = XiaoNetwork::IsPortAvailable(GInstallSettings.AgentListenPort);
 	// bLicenseServicePort = XiaoNetwork::IsPortAvailable(GInstallSettings.LicenseListenPort);
 }

@@ -554,7 +554,7 @@ bool FAgentService::TryRunUbaAgent()
 	XiaoAgentName += TEXT(".exe");
 #endif
 
-	const FString XiaoAgentExePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::GetCurrentWorkingDirectory(), TEXT("UBAC"), SArc, XiaoAgentName));
+	const FString XiaoAgentExePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), TEXT("UBAC"), SArc, XiaoAgentName));
 	if (!FPaths::FileExists(XiaoAgentExePath))
 	{
 		XIAO_LOG(Error, TEXT("XiaoAgent executable file not exist::%s!"), *XiaoAgentExePath);
@@ -596,7 +596,7 @@ bool FAgentService::TryRunUbaAgent()
 	const bool bRtn = GetUsablePort(static_cast<uint16>(SAgentProto.helperport()), OutPort);
 	if (!bRtn)
 	{
-		XIAO_LOG(Error, TEXT(""));
+		XIAO_LOG(Error, TEXT("Not Usable port to use!"));
 	}
 
 	if (bRtn)
@@ -649,7 +649,8 @@ bool FAgentService::TryRunUbaAgent()
 
 void FAgentService::TryRunIPerfServer()
 {
-	FString ConfigPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::GetCurrentWorkingDirectory(), TEXT("../../Config/config.json")));
+	const FString BinariesDir = FPaths::GetPath(FPlatformProcess::ExecutablePath());
+	FString ConfigPath = FPaths::ConvertRelativePathToFull(BinariesDir, TEXT("../../Config/config.json"));
 	FPaths::MakeStandardFilename(ConfigPath);
 	if (!FPaths::FileExists(ConfigPath))
 	{
@@ -662,7 +663,7 @@ void FAgentService::TryRunIPerfServer()
 	IPerfServerName += TEXT(".exe");	
 #endif
 
-	FString ServerExePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::GetCurrentWorkingDirectory(), IPerfServerName));
+	FString ServerExePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(BinariesDir, IPerfServerName));
 	FPaths::MakeStandardFilename(ServerExePath);
 	if (!FPaths::FileExists(ServerExePath))
 	{

@@ -118,13 +118,13 @@ static const FColor XiaoRed = FColor(237, 28, 36, 255);
 static const FColor XiaoGreen = FColor(73, 222, 172, 255);
 static const FColor XiaoGrey = FColor(195, 195, 195, 255);
 
-static FTextBlockStyle NormalText;
+inline FTextBlockStyle NormalText;
 
-static FTextBlockStyle XiaoH1TextStyle;
-static FTextBlockStyle XiaoH2TextStyle;
-static FTextBlockStyle XiaoH3TextStyle;
+inline FTextBlockStyle XiaoH1TextStyle;
+inline FTextBlockStyle XiaoH2TextStyle;
+inline FTextBlockStyle XiaoH3TextStyle;
 
-static FButtonStyle XiaoButton;
+inline FButtonStyle XiaoButton;
 
 
 class FXiaoStyle final : public FSlateStyleSet

@@ -8,7 +8,7 @@
 #include "HAL/PlatformFilemanager.h"
 
 
-static const FString SAgentServicePath = TEXT("/Library/LaunchDaemons/com.XiaoBuild.XiaoAgentService.plist");
+static const FString SAgentServicePath = TEXT("/Library/LaunchAgents/com.XiaoBuild.XiaoAgentService.plist");
 
 
 FMacBuildAgentService::FMacBuildAgentService(const FServiceCommandLineOptions& InOptions, const FServiceDesc& InServiceDesc)
@@ -43,12 +43,6 @@ bool FMacBuildAgentService::OnInstall()
 		"\n"
 		"\t\t<key>KeepAlive</key>\n"
 		"\t\t<true/>\n"
-		"\n"
-		"\t\t<key>StandardErrorPath</key>\n"
-		"\t\t<string>/Library/Logs/XiaoAgentService.err</string>\n"
-		"\n"
-		"\t\t<key>StandardOutPath</key>\n"
-		"\t\t<string>/Library/Logs/XiaoAgentService.log</string>\n"
 		"\t</dict>\n"
 		"</plist>"
 	);

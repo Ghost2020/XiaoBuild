@@ -141,7 +141,7 @@ void SInstallProgressView::Tick(const FGeometry& AllottedGeometry, const double 
 			}
 		}
 
-		if(!IsAppRunning(XiaoAppName::SInstallConsole))
+		if(GProgress.Progress < 1.0f && !IsAppRunning(XiaoAppName::SInstallConsole))
 		{
 			ErrorText->SetError(LOCTEXT("NotRunning_Text", "Install Console is not running!"));
 		}
@@ -208,15 +208,7 @@ bool SInstallProgressView::OnInstall() const
 	AgentSettings.NetworkCoordinate.IP = GInstallSettings.CoordiIp;
 	AgentSettings.NetworkCoordinate.Port = GInstallSettings.CoordiPort;
 	AgentSettings.UbaAgent.Dir = FPaths::ConvertRelativePathToFull(FPaths::Combine(GInstallSettings.CacheFolder, XiaoAppName::SUbaAgent));
-	if (!FPaths::DirectoryExists(AgentSettings.UbaAgent.Dir))
-	{
-		PlatformFile.CreateDirectoryTree(*AgentSettings.UbaAgent.Dir);
-	}
 	AgentSettings.UbaScheduler.Dir = FPaths::ConvertRelativePathToFull(FPaths::Combine(GInstallSettings.CacheFolder, XiaoAppName::SXiaoScheduler));
-	if (!FPaths::DirectoryExists(AgentSettings.UbaScheduler.Dir))
-	{
-		PlatformFile.CreateDirectoryTree(*AgentSettings.UbaScheduler.Dir);
-	}
 	SaveAgentSettings(AgentSettings);
 
 	const FString SaveInstallSettingPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(

@@ -134,7 +134,7 @@ protected:
 	TArray<int32> GpuTemperature;
 };
 
-#if PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS || PLATFORM_MAC || PLATFORM_UNIX
 #include COMPILED_PLATFORM_HEADER(AgentStatsMonitor.h)
 #else
 typedef FGenericAgentStatsMonitor FAgentStatsMonitor;

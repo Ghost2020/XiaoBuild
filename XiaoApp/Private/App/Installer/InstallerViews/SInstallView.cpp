@@ -96,7 +96,7 @@ public:
 						[
 							SNew(STextBlock)
 							.TextStyle(&XiaoH2TextStyle)
-							.Text(InArgs._Item->Name)
+							.Text(Item.Pin()->Name)
 							.ColorAndOpacity_Lambda
 							(
 								[this]()

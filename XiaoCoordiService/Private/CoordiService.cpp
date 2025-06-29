@@ -261,12 +261,7 @@ bool FCoordiService::TryRunRedisServer()
 	}
 	
 	// 配置文件
-	FString RedisConfigPath = 
-#if PLATFORM_MAC
-		TEXT("/Applications/XiaoApp.app/Contents/UE/Engine/Config/cache.conf");
-#else
-		FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::GetCurrentWorkingDirectory(), TEXT("../../Config/cache.conf")));
-#endif
+	FString RedisConfigPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), TEXT("../../Config/cache.conf")));
 	FPaths::MakeStandardFilename(RedisConfigPath);
 	if (!FPaths::FileExists(RedisConfigPath))
 	{
