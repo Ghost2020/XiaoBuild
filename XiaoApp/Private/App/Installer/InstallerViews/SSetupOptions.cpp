@@ -8,7 +8,6 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Input/SCheckBox.h"
 #include "Widgets/Layout/SBorder.h"
-
 #include "SInstallView.h"
 #include "SReadyToUpdate.h"
 #include "SUninstallView.h"
@@ -22,6 +21,16 @@ BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SSetupOptions::Construct(const FArguments& InArgs)
 {
 	SelectionContainer = SNew(SVerticalBox);
+
+	bool bInstallAready = false;
+#if PLATFORM_WINDOWS || PLATFORM_UNIX
+	const FString XiaoHome = FPlatformMisc::GetEnvironmentVariable(*SXiaoHome);
+	bInstallAready = !XiaoHome.IsEmpty() && FPaths::DirectoryExists(XiaoHome);
+#elif PLATFORM_MAC
+	bInstallAready = FPaths::DirectoryExists(TEXT("/Applications/XiaoApp.app/Contents/UE/Engine"));
+#endif
+
+#pragma region GuiInstall
 	SelectionContainer->AddSlot().AutoHeight().SEC_PADDING
 	[
 		SNew(SVerticalBox)
@@ -62,7 +71,9 @@ void SSetupOptions::Construct(const FArguments& InArgs)
 			]
 		]
 	];
+#pragma endregion
 	
+#pragma region CommandInstall
 	SelectionContainer->AddSlot().AutoHeight().SEC_PADDING
 	[
 		SNew(SVerticalBox)
@@ -102,10 +113,16 @@ void SSetupOptions::Construct(const FArguments& InArgs)
 			]
 		]
 	];
+#pragma endregion
 	
+#pragma region UnInstall
 	SelectionContainer->AddSlot().AutoHeight().SEC_PADDING
 	[
 		SNew(SVerticalBox)
+		.Visibility_Lambda([bInstallAready]()
+		{
+			return bInstallAready ? EVisibility::Visible : EVisibility::Collapsed;
+		})
 		+SVerticalBox::Slot()
 		[
 			SNew(SVerticalBox)
@@ -141,7 +158,7 @@ void SSetupOptions::Construct(const FArguments& InArgs)
 			]
 		]
 	];
-
+#pragma endregion
 	
 	ChildSlot
 	[

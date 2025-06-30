@@ -1195,7 +1195,7 @@ static bool InstallUBT(const bool bInstallOrUninstall = true)
 			}
 			else
 			{
-				bOnce = true;
+				bOnce = false;
 			}
 		}
 		EditConfigXml(BuildConfPath, bInstallOrUninstall);
