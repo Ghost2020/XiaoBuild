@@ -306,6 +306,7 @@ private:
 			Set("Icons.history", new IMAGE_BRUSH_SVG("Icons/BuildMonitor/history", Icon30x30));
 			Set("Icons.Prosesor", new IMAGE_BRUSH_SVG("Icons/BuildMonitor/ProfileDataVisualizer", Icon30x30));
 			Set("Icons.Details", new IMAGE_BRUSH_SVG("Icons/BuildMonitor/Details", Icon30x30));
+			Set("Icons.Compact", new IMAGE_BRUSH("Icons/BuildMonitor/Compact", Icon30x30));
 			Set("TreeTable.RowBackground", new IMAGE_BRUSH("Icons/BuildMonitor/White", Icon16x16));
 			Set("Monitor.Realtime", new BOX_BRUSH("Icons/BuildMonitor/RealtimeBorder", FMargin(18.0f / 64.0f)));
 

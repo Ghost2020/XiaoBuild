@@ -141,7 +141,8 @@ public:
 
 	static const TCHAR* GetLocationName(ETimingTrackLocation Location);
 	
-	const FTimingTrackViewport& GetViewport() const { return Viewport; }
+	const FTimingTrackViewport& GetViewport() const  { return Viewport; }
+	FTimingTrackViewport& GetViewport() { return Viewport; }
 	const FVector2D& GetMousePosition() const { return MousePosition; }
 
 	void RaiseSelectionChanging() const;

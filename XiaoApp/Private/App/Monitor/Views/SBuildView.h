@@ -39,6 +39,8 @@ public:
 	bool IsShowingDetailsTrack() const;
 	void OnViewProcessorTrack();
 	bool IsShowingProcessorTrack() const;
+	void OnToggleCompactMode();
+	bool IsCompactMode() const;
 
 	void ShowTraceView() const;
 	bool IsTraceViewClosed() const;

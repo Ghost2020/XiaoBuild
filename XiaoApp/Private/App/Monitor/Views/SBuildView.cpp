@@ -106,6 +106,19 @@ void SBuildView::Construct(const FArguments& InArgs)
 		EUserInterfaceActionType::ToggleButton
 	);
 
+	LeftToolbar.AddToolBarButton(
+		FUIAction(
+			FExecuteAction::CreateSP(this, &SBuildView::OnToggleCompactMode),
+			FCanExecuteAction::CreateLambda([]() { return true; }),
+			FIsActionChecked::CreateSP(this, &SBuildView::IsCompactMode)
+		),
+		NAME_None,
+		LOCTEXT("CompactMode", "紧凑显示"),
+		LOCTEXT("CompactMode_ToolTip", "Toggle compact mode for supporting tracks"),
+		FSlateIcon(FXiaoStyle::Get().GetStyleSetName(), "Icons.Compact"),
+		EUserInterfaceActionType::ToggleButton
+	);
+
 	ChildSlot
 	[
 		SNew(SVerticalBox)
@@ -360,6 +373,23 @@ bool SBuildView::IsShowingProcessorTrack() const
 	if (ProgressView.IsValid())
 	{
 		return ProgressView->bShowProcessorTrack;
+	}
+	return false;
+}
+
+void SBuildView::OnToggleCompactMode()
+{
+	if (ProgressView.IsValid())
+	{
+		ProgressView->GetViewport().SwitchLayoutCompactMode();
+	}
+}
+
+bool SBuildView::IsCompactMode() const
+{
+	if (ProgressView.IsValid())
+	{
+		return ProgressView->GetViewport().IsLayoutCompactModeEnabled();
 	}
 	return false;
 }
