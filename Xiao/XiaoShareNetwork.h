@@ -210,8 +210,16 @@ namespace XiaoNetwork
 				TSharedRef<FInternetAddr> LocalHostAddr = SocketSubsystem->CreateInternetAddr(FNetworkProtocolTypes::IPv4);
 				LocalHostAddr->SetAnyAddress();
 				LocalHostAddr->SetPort(InProbePort);
-				return TestSocket->Bind(*LocalHostAddr);
+				if (TestSocket->Bind(*LocalHostAddr))
+				{
+					return true;
+				}
 			}
+			XIAO_LOG(Error, TEXT("Can\'t bind socket with port \"%u\",LAST SOCKET ERROR::%s"), InProbePort, SocketSubsystem->GetSocketError());
+		}
+		else
+		{
+			XIAO_LOG(Error, TEXT("Can\'t get socket subsystem"));
 		}
 		return false;
 #elif PLATFORM_WINDOWS
