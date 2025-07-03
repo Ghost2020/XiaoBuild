@@ -4,6 +4,9 @@
  */
 #include "Scheduler.h"
 #include "Runtime/Launch/Resources/Version.h"
+#include "Misc/Paths.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 #include "Misc/CommandLine.h"
 #include "UbaEvent.h"
 #include "UbaProcessHandle.h"
@@ -116,7 +119,7 @@ namespace uba
 	{
 		auto& UbaScheduler = SOriginalAgentSettings.UbaScheduler;
 
-		if (FParse::Value(*InCmdLine, TEXT("-actionFile="), InInfo.YmlFilePath))
+		if (FParse::Value(*InCmdLine, TEXT("-actionFile="), InInfo.ActionFilePath))
 		{
 			InInfo.bDynamic = false;
 		}
@@ -365,7 +368,7 @@ namespace uba
 	{
 		RegistCallback();
 
-		if (!Info.YmlFilePath.IsEmpty() && FPaths::FileExists(Info.YmlFilePath))
+		if (!Info.ActionFilePath.IsEmpty() && FPaths::FileExists(Info.ActionFilePath))
 		{
 			if (!StaticInit())
 			{
@@ -857,7 +860,21 @@ namespace uba
 
 	bool FDynamicScheduler::StaticInit()
 	{
-		if (!EnqueueFromFile(TCHAR_TO_UBASTRING(*Info.YmlFilePath)))
+		if (Info.ActionFilePath.EndsWith(TEXT(".xml")))
+		{
+			if (!EnqueueFromFile(TCHAR_TO_UBASTRING(*Info.ActionFilePath)))
+			{
+				return false;
+			}
+		}
+		else if(Info.ActionFilePath.EndsWith(TEXT(".json")))
+		{
+			if (!EnqueueFromJson(Info.ActionFilePath))
+			{
+				return false;
+			}
+		}
+		else
 		{
 			return false;
 		}
@@ -977,6 +994,159 @@ namespace uba
 			logger.Info(TC("WriteOutThread Finish"));
 			Event.Set();
 		});
+
+		return true;
+	}
+
+	bool FDynamicScheduler::EnqueueFromJson(const FString& InFilePath)
+	{
+		FString JsonStr;
+		if (!FFileHelper::LoadFileToString(JsonStr, *InFilePath))
+		{
+			logger.Error(TC("Can\t load \"%s\" file to string!"), *InFilePath);
+			return false;
+		}
+
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonStr);
+		if (!FJsonSerializer::Deserialize(Reader, JsonObject) || !JsonObject.IsValid())
+		{
+			logger.Error(TC("Can\'t Deserialize \"%s\" file to JsonObject!"), *InFilePath);
+			return false;
+		}
+
+		const FString EnviField(TEXT("environment"));
+		FString Environment;
+		if (!JsonObject->TryGetStringField(EnviField, Environment))
+		{
+			logger.Error(TC("Not contain \"%s\" field!"), *EnviField);
+			return false;
+		}
+#if PLATFORM_WINDOWS
+		SetEnvironmentVariable(TC("PATH"), *Environment);
+#endif
+
+		struct FDepDesc : FJsonSerializable
+		{
+			TArray<FString> KnownInputs;
+			TArray<uba::tchar> KnownInputsBuffer;
+			uint32 KnownInputCount = 0;
+
+			BEGIN_JSON_SERIALIZER
+				JSON_SERIALIZE_ARRAY("known_inputs", KnownInputs);
+				FillKnownInputsBuffer(KnownInputs, KnownInputsBuffer, KnownInputCount, false);
+			END_JSON_SERIALIZER
+		};
+		const FString DepField(TEXT("dep_map"));
+		const TSharedPtr<FJsonObject>* DepMapObject;
+		if (!JsonObject->TryGetObjectField(DepField, DepMapObject) || !DepMapObject)
+		{
+			logger.Error(TC("Not contain \"%s\" field!"), *DepField);
+			return false;
+		}
+		TMap<FString, FDepDesc> App2Dep;
+		for (const auto& Iter : (*DepMapObject)->Values)
+		{
+			if (!Iter.Value.IsValid() || Iter.Value->Type != EJson::Object)
+			{
+				continue;
+			}
+
+			const TSharedPtr<FJsonObject>& DepObject = Iter.Value->AsObject();
+			check(DepObject.IsValid());
+			FDepDesc DepDesc;
+			if (DepDesc.FromJson(DepObject))
+			{
+				App2Dep.Add(MakeTuple(Iter.Key, std::move(DepDesc)));
+			}
+		}
+
+		const FString TasksField(TEXT("tasks"));
+		const TArray<TSharedPtr<FJsonValue>>* Tasks = nullptr;
+		if (!JsonObject->TryGetArrayField(TasksField, Tasks) || !Tasks)
+		{
+			logger.Error(TC("Not contain \"%s\" field!"), *TasksField);
+			return false;
+		}
+
+		struct FTaskDesc : FJsonSerializable
+		{
+			int32 Id = 0;
+			FString App, Arg, Dir, Desc;
+			TArray<FString> KnownInputs, OutputFiles;
+			bool bRemote = true;
+			bool bDetour = true;
+			float Weight = 1.0;
+			TArray<int32> Deps;
+
+			TArray<uba::tchar> KnownInputsBuffer;
+			uint32 KnownInputCount = 0;
+
+			BEGIN_JSON_SERIALIZER
+				JSON_SERIALIZE("id", Id);
+				JSON_SERIALIZE("app", App);
+				JSON_SERIALIZE("arg", Arg);
+				JSON_SERIALIZE("dir", Dir);
+				JSON_SERIALIZE("desc", Desc);
+				JSON_SERIALIZE_ARRAY("known_inputs", KnownInputs);
+				FillKnownInputsBuffer(KnownInputs, KnownInputsBuffer, KnownInputCount, true);
+				JSON_SERIALIZE_ARRAY("output_files", OutputFiles);
+				JSON_SERIALIZE("remote", bRemote);
+				JSON_SERIALIZE("detour", bDetour);
+				JSON_SERIALIZE("weight", Weight);
+				JSON_SERIALIZE_ARRAY("deps", Deps);
+			END_JSON_SERIALIZER
+		};
+
+		TSet<FString> AreadyRegistedFiles;
+		for (const TSharedPtr <FJsonValue>& JsonValue : *Tasks)
+		{
+			if (!JsonValue.IsValid() || JsonValue->Type != EJson::Object)
+			{
+				logger.Error(TC("Invalid task entry. Not an object"));
+				continue;
+			}
+
+			const TSharedPtr<FJsonObject>& TaskObject = JsonValue->AsObject();
+			check(TaskObject.IsValid());
+
+			FTaskDesc TaskDesc;
+			if (!TaskDesc.FromJson(TaskObject))
+			{
+				logger.Error(TC("Invalid task entry. Not an object"));
+				continue;
+			}
+
+			ProcessStartInfo SI;
+			SI.application = TCHAR_TO_UBASTRING(*TaskDesc.App);
+			SI.arguments = TCHAR_TO_UBASTRING(*TaskDesc.Arg);
+			SI.workingDir = TCHAR_TO_UBASTRING(*TaskDesc.Dir);
+			SI.description = TCHAR_TO_UBASTRING(*TaskDesc.Desc);
+
+			EnqueueProcessInfo info{ SI };
+			info.dependencies = reinterpret_cast<const u32*>(TaskDesc.Deps.GetData());
+			info.dependencyCount = static_cast<u32>(TaskDesc.Deps.Num());
+			info.canDetour = TaskDesc.bDetour;
+			info.canExecuteRemotely = TaskDesc.bRemote;
+			info.weight = TaskDesc.Weight;
+			FDepDesc* DepPtr = App2Dep.Find(FPaths::GetCleanFilename(TaskDesc.App));
+			TArray<uba::tchar> KnownInputsBuffer = DepPtr ? DepPtr->KnownInputsBuffer : TArray<uba::tchar>();
+			KnownInputsBuffer.Append(TaskDesc.KnownInputsBuffer);
+			info.knownInputs = KnownInputsBuffer.GetData();
+			info.knownInputsBytes = KnownInputsBuffer.Num() * sizeof(uba::tchar);
+			info.knownInputsCount = TaskDesc.KnownInputCount + (DepPtr ? DepPtr->KnownInputCount : 0);
+
+			for (const FString& InputFile : TaskDesc.KnownInputs)
+			{
+				if (!AreadyRegistedFiles.Contains(InputFile))
+				{
+					session.RegisterNewFile(TCHAR_TO_UBASTRING(*InputFile));
+					AreadyRegistedFiles.Add(InputFile);
+				}
+			}
+
+			EnqueueProcess(info);
+		}
 
 		return true;
 	}
@@ -1638,23 +1808,7 @@ namespace uba
 		{
 			TArray<FString> Sections;
 			KnownInputs.ParseIntoArray(Sections, TEXT(";"), true);
-			for (const FString& File : Sections)
-			{
-#if PLATFORM_WINDOWS
-				auto& FileData = File.GetCharArray();
-				const uba::tchar* FileName = FileData.GetData();
-				const size_t FileNameLen = FileData.Num();
-#else
-				FStringToUbaStringConversion Conv(*File);
-				const uba::tchar* FileName = Conv.Get();
-				const size_t FileNameLen = strlen(FileName) + 1;
-#endif
-				const auto Num = KnownInputsBuffer.Num();
-				KnownInputsBuffer.SetNum(Num + FileNameLen);
-				FMemory::Memcpy(KnownInputsBuffer.GetData() + Num, FileName, FileNameLen * sizeof(uba::tchar));
-				++KnownInputCount;
-			}
-			KnownInputsBuffer.Add('\0');
+			FillKnownInputsBuffer(Sections, KnownInputsBuffer, KnownInputCount, true);
 		}
 
 		uba::EnqueueProcessInfo Epi(ProcessInfo);
@@ -1685,6 +1839,35 @@ namespace uba
 			{
 				logger.Warning(TC("%s"), LogLine.text.c_str());
 			}
+		}
+	}
+
+	void FDynamicScheduler::FillKnownInputsBuffer(const TArray<FString>& InKnownInputs, TArray<uba::tchar>& OutKnownInputsBuffer, uint32& OutKnownInputCount, const bool bContainEndSymbol)
+	{
+		for (const FString& File : InKnownInputs)
+		{
+			if (File.IsEmpty())
+			{
+				continue;
+			}
+
+#if PLATFORM_WINDOWS
+			auto& FileData = File.GetCharArray();
+			const uba::tchar* FileName = FileData.GetData();
+			const size_t FileNameLen = FileData.Num();
+#else
+			FStringToUbaStringConversion Conv(*File);
+			const uba::tchar* FileName = Conv.Get();
+			const size_t FileNameLen = strlen(FileName) + 1;
+#endif
+			const auto Num = OutKnownInputsBuffer.Num();
+			OutKnownInputsBuffer.SetNum(Num + FileNameLen);
+			FMemory::Memcpy(OutKnownInputsBuffer.GetData() + Num, FileName, FileNameLen * sizeof(uba::tchar));
+			++OutKnownInputCount;
+		}
+		if (bContainEndSymbol)
+		{
+			OutKnownInputsBuffer.Add('\0');
 		}
 	}
 }

@@ -62,7 +62,7 @@ namespace uba
 
 	struct FSchedulerInfo
 	{
-		FString YmlFilePath = TEXT("");
+		FString ActionFilePath = TEXT("");
 		uba::NetworkBackend* Backend = nullptr;
 		const uint8* Crypto = nullptr;
 		bool bImmediatelyExit = true;
@@ -74,8 +74,8 @@ namespace uba
 		{
 		}
 
-		FSchedulerInfo(const FString& InYmlFilePath, NetworkBackend* InBackend, const uint8* InCrypto, const bool InbDynamic, const FString& InTraceName, const uint32 InPPID)
-			: YmlFilePath(InYmlFilePath)
+		FSchedulerInfo(const FString& InActionFilePath, NetworkBackend* InBackend, const uint8* InCrypto, const bool InbDynamic, const FString& InTraceName, const uint32 InPPID)
+			: ActionFilePath(InActionFilePath)
 			, Backend(InBackend)
 			, Crypto(InCrypto)
 			, bDynamic(InbDynamic)
@@ -88,7 +88,7 @@ namespace uba
 		{
 			if (this != &InAnotherInfo)
 			{
-				YmlFilePath = InAnotherInfo.YmlFilePath;
+				ActionFilePath = InAnotherInfo.ActionFilePath;
 				Backend = InAnotherInfo.Backend;
 				Crypto = InAnotherInfo.Crypto;
 				bDynamic = InAnotherInfo.bDynamic;
@@ -139,6 +139,8 @@ namespace uba
 		bool StaticInit();
 		bool DynamicInit();
 
+		bool EnqueueFromJson(const FString& InJsonFilePath);
+
 		void RemoteActionFailedCrash(const ProcessHandle& InProcessHandle, const FString& InError);
 
 		void TryConnectAgents();
@@ -147,6 +149,8 @@ namespace uba
 
 		bool HandleTask(FMemoryReader& InReader);
 		void HandleResponse(const ProcessHandle& InPh, const u32 InTaskId);
+
+		static void FillKnownInputsBuffer(const TArray<FString>& InKnownInputs, TArray<uba::tchar>& OutKnownInputsBuffer, uint32& OutKnownInputCount, const bool bContainEndSymbol);
 
 		void UpdateSystemSettings(uint32& OutCurInitAvaNum) const;
 		void UpdateAgents(const int InLocalStatus, const int InAgentStatus, const bool bImmediate);
