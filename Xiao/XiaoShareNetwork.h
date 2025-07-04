@@ -266,39 +266,43 @@ namespace XiaoNetwork
 		WSACleanup();
 		return true; // 端口未被占用
 #else
-		int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+		const int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 		if (sockfd < 0)
 		{
-			XIAO_LOG(Error, TEXT("Socket creation failed:%hs"), strerror(errno));
+			XIAO_LOG(Error, TEXT("Socket creation failed: %hs"), strerror(errno));
 			return false;
+		}
+
+		const int opt = 1;
+		if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+		{
+			XIAO_LOG(Warning, TEXT("setsockopt failed: %hs"), strerror(errno));
 		}
 
 		struct sockaddr_in addr;
 		std::memset(&addr, 0, sizeof(addr));
 		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = INADDR_ANY;  // Bind to any available IP address
-		addr.sin_port = htons(InProbePort);  // Convert port number to network byte order
+		addr.sin_addr.s_addr = INADDR_ANY;
+		addr.sin_port = htons(InProbePort);
 
-		// Try to bind the socket to the port
-		int bindResult = bind(sockfd, (struct sockaddr*)&addr, sizeof(addr));
+		const int bindResult = bind(sockfd, (struct sockaddr*)&addr, sizeof(addr));
+
+		close(sockfd);
+
 		if (bindResult == 0)
 		{
-			// Binding was successful, port is available
-			close(sockfd);  // Close the socket
-			return false;
+			return true;
+		}
+		
+		if (errno == EADDRINUSE)
+		{
+			XIAO_LOG(Info, TEXT("Port %d is already in use."), InProbePort);
 		}
 		else
 		{
-			// Binding failed, port is already in use
-			if (errno == EADDRINUSE)
-			{
-				close(sockfd);
-				return true;
-			}
 			XIAO_LOG(Error, TEXT("Bind failed: %hs"), strerror(errno));
-			close(sockfd);
-			return false;
 		}
+		return false;
 #endif
 	}
 

@@ -43,6 +43,7 @@ void SAgentSettingsView::Construct(const FArguments& InArgs)
 			SNew(SBorder)
 		]
 
+#pragma region AgentServicePort
 		+SVerticalBox::Slot().THR_PADDING
 		[
 			SNew(SHorizontalBox)
@@ -76,7 +77,9 @@ void SAgentSettingsView::Construct(const FArguments& InArgs)
 				})
 			]
 		]
+#pragma endregion
 
+#pragma region SchedulerServicePort
 		+ SVerticalBox::Slot().THR_PADDING
 		[
 			SNew(SHorizontalBox)
@@ -110,6 +113,7 @@ void SAgentSettingsView::Construct(const FArguments& InArgs)
 							})
 				]
 		]
+#pragma endregion
 
 		+SVerticalBox::Slot().THR_PADDING
 		[
@@ -176,14 +180,13 @@ TWeakPtr<SWizardView> SAgentSettingsView::GetNext()
 
 bool SAgentSettingsView::OnCanNext()
 {
-	return bAgentServerPort && bSchedulerServerPort && bHelperPort;
+	return bAgentServerPort && bSchedulerServerPort;
 }
 
 void SAgentSettingsView::OnCheckButtonClicked()
 {
 	bAgentServerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.AgentListenPort);
 	bSchedulerServerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.SchedulerServerPort);
-	bHelperPort = XiaoNetwork::IsPortAvailable(GInstallSettings.HelpListenPort);
 }
 
 #undef LOCTEXT_NAMESPACE

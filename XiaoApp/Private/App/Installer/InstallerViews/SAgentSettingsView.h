@@ -37,5 +37,4 @@ private:
 
 	bool bAgentServerPort = false;
 	bool bSchedulerServerPort = false;
-	bool bHelperPort = false;
 };
