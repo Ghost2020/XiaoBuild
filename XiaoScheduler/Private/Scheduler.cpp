@@ -719,10 +719,6 @@ namespace uba
 
 				GBuildStats.BuildStatus = false;
 				++GBuildStats.ErrorNum;
-				if (Info.bImmediatelyExit)
-				{
-					Event.Set();
-				}
 			}
 			// #FIXME 验证outputs文件的大小是否有效
 
@@ -789,6 +785,7 @@ namespace uba
 					Event.Set();
 				}
 			}
+
 #if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
 			static double LastTime = 0.0f;
 			if(FPlatformTime::Seconds() - LastTime > 3.0f)
@@ -798,6 +795,11 @@ namespace uba
 				GetSession().SaveSnapshotOfTrace();
 			}
 #endif
+
+			if (!GBuildStats.BuildStatus && Info.bImmediatelyExit)
+			{
+				Event.Set();
+			}
 		});
 
 		session.RegisterGetNextProcess([this](Process& ProcessHandle, NextProcessInfo& OutNextProcess, u32 PrevExitCode) 

@@ -14,8 +14,6 @@ public class Redis : ModuleRules
 		PrivateDependencyModuleNames.Add("OpenSSL");
 
 		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "redis-cpp/include"));
-		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "redis-cpp/include/sw/redis++/cxx17"));
-		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "redis-cpp/include/sw/redis++/tls"));
 
 		var libraryPath = Path.Combine(ModuleDirectory, "redis-cpp/lib");
 
