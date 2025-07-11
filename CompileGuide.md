@@ -21,10 +21,7 @@
 ### 3.1 hiredis
 - URL[https://github.com/redis/hiredis](https://github.com/redis/hiredis)
 
-### 3.2 redis-plus-plus
-- URL: [https://github.com/sewenew/redis-plus-plus](https://github.com/sewenew/redis-plus-plus)
-
-### 3.3 QtBase
+### 3.2 QtBase
 - URL: [https://github.com/qt/qtbase](https://github.com/qt/qtbase)
 
 ---

@@ -17,8 +17,6 @@ public class Redis : ModuleRules
 		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "redis-cpp/include/sw/redis++/cxx17"));
 		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "redis-cpp/include/sw/redis++/tls"));
 
-		bool UseRedisCplusCplus = false;
-
 		var libraryPath = Path.Combine(ModuleDirectory, "redis-cpp/lib");
 
 		if (Target.Platform == UnrealTargetPlatform.Win64)
@@ -26,10 +24,6 @@ public class Redis : ModuleRules
 			libraryPath = Path.Combine(libraryPath, "Win64");
 			PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "hiredis.lib"));
 			PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "hiredis_ssl.lib"));
-			if (UseRedisCplusCplus)
-			{
-				PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "redis.lib"));
-			}
 			PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "WS2_32.Lib"));
 			PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "NetAPI32.Lib"));
 			PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "Crypt32.lib"));
@@ -52,10 +46,6 @@ public class Redis : ModuleRules
 			}
 
 			PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "libhiredis.a"));
-			if (UseRedisCplusCplus)
-			{
-				PublicAdditionalLibraries.Add(Path.Combine(libraryPath, "libredis++.a"));
-			}
 		}
 	}
 }
