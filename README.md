@@ -258,6 +258,7 @@ A brief description of the software license, or a link to the full license agree
 Providing user support contact information:
 
 - **Email**：cxx2020@outlook.com
+- **Twitter**: Ghost202081
 - **QQ**：794569465
 - **QQ Group**：910420853
 - **WeChat**：c794569465
