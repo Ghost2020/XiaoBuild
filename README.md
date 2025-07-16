@@ -20,7 +20,7 @@ Release Date: ：2025-05-22
 | Engine Version     | Source Compilation | Material Compilation  |
 |--------------------|--------------------|-----------------------|
 | 4_26    | ✔        | ✔       |
-| 4_27    | ✔        | ✔       |
+| 4_27    | ✔        | ✔ [▶️](https://www.bilibili.com/video/BV1Beu4z7E9U/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65)      |
 | 5_0     | ✔ [▶️](https://youtu.be/H8qjjH1VbRo?si=YAnu5DE9qh3JFa5M&t=73)      | ✔       |
 | 5_1     | ✔ [▶️](https://youtu.be/Id_Khmcypw0?si=yDGeibHtfjDIBHyH&t=191)      | ✔       |
 | 5_2     | ✔ [▶️](https://youtu.be/gRwpNMGWrb4?si=EIRa0z3PNzHSqsWE&t=167)      | ✔       |
