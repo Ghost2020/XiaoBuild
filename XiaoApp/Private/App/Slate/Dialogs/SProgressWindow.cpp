@@ -43,7 +43,7 @@ END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SProgressWindow::EnterProgressFrame(const float InExpectedWorkThisFrame, const FText& InText)
 {
 	Amount += InExpectedWorkThisFrame;
-	Text->SetText(InText);
+	Text->SetText(FText::FromString(InText.ToString() + FString::Printf(TEXT(" [%.f/%.f]"), Amount, AllAmount)));
 	ProgressBar->SetPercent(Amount / AllAmount);
 	FSlateApplication::Get().Tick();
 }

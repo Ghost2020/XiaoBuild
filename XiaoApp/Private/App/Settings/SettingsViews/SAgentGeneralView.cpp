@@ -215,8 +215,15 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 							{
 								SModifiedAgentSettings.bEnableUbac = true;
 							}
-							InstallUBT(SModifiedAgentSettings.bEnableUbac);
+
+							static FText UpdateUBACText = LOCTEXT("UpdateComponent_Text", "更新UBAC");
+							auto Window = SNew(SProgressWindow).AllAmount(GInstallSettings.EngineFolders.Num()).TiTile(UpdateUBACText);
+							FSlateApplication::Get().AddWindow(Window, true);
+							InstallUBT(SModifiedAgentSettings.bEnableUbac, [Window]() {
+								Window->EnterProgressFrame(1.0f, FText::FromString(UpdateUBACText.ToString()));
+							});
 							Update(true);
+							FSlateApplication::Get().DestroyWindowImmediately(Window);
 						}
 						).Content()
 						[
@@ -226,7 +233,7 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 						]
 				]
 
-				+ SVerticalBox::Slot().SEC_PADDING
+				/*+ SVerticalBox::Slot().SEC_PADDING
 				[
 					SAssignNew(AgentHelperCheckBox, SCheckBox)
 						.IsEnabled_Lambda([]() {
@@ -260,7 +267,7 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 							.Text(LOCTEXT("EnableAsHelper_Text", "是否开启协助"))
 							.ToolTipText(LOCTEXT("EnableAsHelper_ToolTip", "是否开启作为协助机器，在网络中有联合编译需求时，作为协助机器"))
 						]
-				]
+				]*/
 
 				+ SVerticalBox::Slot().SEC_PADDING
 				[

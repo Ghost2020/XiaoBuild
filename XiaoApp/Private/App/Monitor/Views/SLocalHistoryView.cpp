@@ -514,7 +514,7 @@ void SLocalHistoryView::UpdateHistory(const bool bInForce)
 			XIAO_LOG(Log, TEXT("TraceReader ReadFile::Begin::%s"), *FilePath);
 			GLog->Flush();
 
-			Window->EnterProgressFrame(1.0f, FText::FromString(ParseTraceFile.ToString() + FilePath));
+			Window->EnterProgressFrame(1.0f, FText::FromString(ParseTraceFile.ToString()));
 
 			Xiao::FTraceView TraceView;
 			Xiao::FTraceReader TraceReader;

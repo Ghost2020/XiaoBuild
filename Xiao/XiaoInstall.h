@@ -1086,7 +1086,7 @@ static bool InstallComponent(const FInstallFolder& InDesc)
 	return true;
 }
 
-static bool InstallUBT(const bool bInstallOrUninstall = true)
+static bool InstallUBT(const bool bInstallOrUninstall = true, const TFunction<void()> InFunction = {})
 {
 	// 核心组件安装
 	int Index = 0;
@@ -1095,6 +1095,10 @@ static bool InstallUBT(const bool bInstallOrUninstall = true)
 		const bool bSouceEngine = GInstallSettings.EngineTypes[Index] == 1 ? true : false;
 		FInstallFolder InstallDesc(EngineFolder, bSouceEngine, bInstallOrUninstall);
 		InstallDesc.EngineVersion = GInstallSettings.EngineVersions[Index];
+		if (InFunction.IsSet())
+		{
+			InFunction();
+		}
 		InstallComponent(InstallDesc);
 		++Index;
 	}
