@@ -264,8 +264,8 @@ namespace Xiao
 							recvPerS = uint64((u.recv - Session->prevRecv) / duration);
 						}
 						Msg = FString::Printf(TEXT("ClientId:%u TopCount: %u"), Session->clientUid.data1, u.connectionCount);
-						RecvMsg = FString::Printf(TEXT("Recv:%ls mb(%sps)"), *BytesToText(u.recv), *BytesToText(recvPerS * 8));
-						SendMsg = FString::Printf(TEXT("Send:%ls mb(%sps)"), *BytesToText(u.send), *BytesToText(sendPerS * 8));
+						RecvMsg = FString::Printf(TEXT("Recv:%ls (%sps)"), *BytesToText(u.recv), *BytesToText(recvPerS * 8));
+						SendMsg = FString::Printf(TEXT("Send:%ls (%sps)"), *BytesToText(u.send), *BytesToText(sendPerS * 8));
 					}
 
 					if (Session->disconnectTime == ~uint64(0))
