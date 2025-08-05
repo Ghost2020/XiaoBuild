@@ -225,8 +225,7 @@ namespace Xiao
 
 		int64_t publish(const std::string& InKey, const std::string& InVal);
 
-		redisReply* command(const std::string& InCommand, const std::string& InArg);
-		void command(const std::string& InCommand, const std::string& InArg1, const std::string& InArg2);
+		redisReply* command(const std::vector<std::string>& InArgs, const bool bDiscardReply = false);
 
 	protected:
 		bool CheckReply(redisReply* InReply);

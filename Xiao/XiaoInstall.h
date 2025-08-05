@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Templates/UniquePtr.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "Serialization/JsonSerializerMacros.h"
 #include "XmlFile.h"
 #include "HAL/PlatformFileManager.h"
@@ -1095,10 +1096,15 @@ static bool InstallUBT(const bool bInstallOrUninstall = true, const TFunction<vo
 		const bool bSouceEngine = GInstallSettings.EngineTypes[Index] == 1 ? true : false;
 		FInstallFolder InstallDesc(EngineFolder, bSouceEngine, bInstallOrUninstall);
 		InstallDesc.EngineVersion = GInstallSettings.EngineVersions[Index];
+
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
 		if (InFunction.IsSet())
 		{
+#endif
 			InFunction();
+#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
 		}
+#endif
 		InstallComponent(InstallDesc);
 		++Index;
 	}

@@ -432,16 +432,17 @@ void SCoordinatorWindow::OnUpdate()
 	try
 	{
 		static const std::string SINFO("INFO");
-		if (const auto CpuReplay = SRedisClient->command(SINFO, "cpu"))
+		if (auto CpuReplay = SRedisClient->command({ SINFO, "cpu"} ))
 		{
 			const std::string Val = TryGetVal(CpuReplay->str, "used_cpu_sys_children:");
 			if (!Val.empty())
 			{
 				GRedisInfo.UseCpuPerc = std::atof(Val.c_str());
 			}
+			freeReplyObject(CpuReplay);
 		}
 
-		if (const auto StatsReplay = SRedisClient->command(SINFO, "stats"))
+		if (auto StatsReplay = SRedisClient->command({ SINFO, "stats"} ))
 		{
 			std::string Val = TryGetVal(StatsReplay->str, "instantaneous_ops_per_sec:");
 			if (!Val.empty())
@@ -462,24 +463,27 @@ void SCoordinatorWindow::OnUpdate()
 			{
 				GRedisInfo.NetworkOutPer = std::atof(Val.c_str());
 			}
+			freeReplyObject(StatsReplay);
 		}
 
-		if (const auto MemoryReplay = SRedisClient->command(SINFO, "memory"))
+		if (auto MemoryReplay = SRedisClient->command({ SINFO, "memory" }))
 		{
 			const std::string Val = TryGetVal(MemoryReplay->str, "used_memory:");
 			if (!Val.empty())
 			{
 				GRedisInfo.TotalMemUsed = std::atof(Val.c_str()) / 1024.0/ 1024.0f;
 			}
+			freeReplyObject(MemoryReplay);
 		}
 
-		if (const auto ClientsReplay = SRedisClient->command(SINFO, "clients"))
+		if (auto ClientsReplay = SRedisClient->command({ SINFO, "clients" }))
 		{
 			const std::string Val = TryGetVal(ClientsReplay->str, "connected_clients:");
 			if (!Val.empty())
 			{
 				GRedisInfo.ConntectedClients = std::atoi(Val.c_str());
 			}
+			freeReplyObject(ClientsReplay);
 		}
 	}
 	CATCH_REDIS_EXCEPTRION();

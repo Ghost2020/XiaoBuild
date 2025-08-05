@@ -765,7 +765,7 @@ void FCoordiService::TryBecomeMaster()
 				{
 					// 将当前的从服务器升格为主服务器
 					XIAO_LOG(Warning, TEXT("About to switch to master server"));
-					SRedisClient->command("REPLICAOF", "NO", "ONE");
+					SRedisClient->command({ "REPLICAOF", "NO", "ONE" }, true);
 
 					// 将原有Master状态设置为false
 					auto& MasterNode = std::get<1>(SRedisMasterNode);

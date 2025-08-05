@@ -8,6 +8,20 @@
 
 namespace Xiao
 {
+	redisReply* _RedisCommand(redisContext* InContext, const std::vector<std::string>& InArgs)
+	{
+		std::vector<const char*> Argv;
+		std::vector<size_t> ArgvLen;
+
+		for (const auto& Arg : InArgs) 
+		{
+			Argv.push_back(Arg.c_str());
+			ArgvLen.push_back(Arg.size());
+		}
+
+		return static_cast<redisReply*>(redisCommandArgv(InContext, static_cast<int>(Argv.size()), Argv.data(), ArgvLen.data()));
+	}					
+
 	Redis::Redis(const ConnectionOptions& InOptions)
 		: Context(nullptr)
 	{
@@ -44,6 +58,9 @@ namespace Xiao
 			return;
 		}
 
+		struct timeval timeout = { 5, 0 };
+		redisSetTimeout(Context, timeout);
+
 		if (InOptions.keep_alive)
 		{
 			if (redisEnableKeepAlive(Context) != REDIS_OK)
@@ -55,15 +72,13 @@ namespace Xiao
 
 		if (!InOptions.user.empty() && !InOptions.password.empty())
 		{
-			redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "AUTH %s %s", InOptions.user.c_str(), InOptions.password.c_str()));
-
+			redisReply* reply = _RedisCommand(Context, {"AUTH", InOptions.user, InOptions.password });
+			ON_SCOPE_EXIT{ freeReplyObject(reply); };
 			if (!CheckReply(reply))
 			{
 				throw ClosedError("AUTH failed");
 				return;
 			}
-
-			ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 			if (reply->type == REDIS_REPLY_ERROR) 
 			{
@@ -84,12 +99,12 @@ namespace Xiao
 
 	std::string Redis::ping()
 	{
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "PING"));
+		redisReply* reply = _RedisCommand(Context, { "PING" });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return "Failed to execute command: PING";
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_STATUS && strcmp(reply->str, "PONG") == 0) 
 		{
@@ -105,12 +120,12 @@ namespace Xiao
 	int64_t Redis::exists(const std::string& InKey)
 	{
 		int64_t Num = -1;
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "EXISTS %s", InKey.c_str()));
+		redisReply* reply = _RedisCommand(Context, { "EXISTS", InKey });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return Num;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
@@ -127,14 +142,12 @@ namespace Xiao
 	bool Redis::set(const std::string& InKey, const std::string& InVal)
 	{
 		bool bRtn = false;
-		const char* argv[] = { "SET", InKey.c_str(), InVal.c_str() };
-		size_t argvlen[] = { 3, InKey.size(), InVal.size() };
-		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 3, argv, argvlen));
+		redisReply* reply = _RedisCommand(Context, { "SET", InKey, InVal });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return bRtn;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_STATUS) 
 		{
@@ -149,7 +162,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for SET {} {}", reply->type, InKey, InVal));
 		}
 
 		return bRtn;
@@ -157,7 +170,7 @@ namespace Xiao
 
 	std::optional<std::string> Redis::get(const std::string& InKey)
 	{
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "GET %s", InKey.c_str()));
+		redisReply* reply = _RedisCommand(Context, { "GET", InKey});
 		if (!CheckReply(reply))
 		{
 			return std::optional<std::string>();
@@ -177,7 +190,7 @@ namespace Xiao
 			std::cerr << "Key: " << InKey << " does not exist." << std::endl;
 			break;
 		default:
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for GET {}", reply->type, InKey));
 		}
 
 		return std::optional<std::string>();
@@ -185,13 +198,13 @@ namespace Xiao
 
 	int64_t Redis::llen(const std::string& InKey)
 	{
+		redisReply* reply = _RedisCommand(Context, { "LLEN", InKey });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		int64_t Len = -1;
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "LLEN %s", InKey.c_str()));
 		if (!CheckReply(reply))
 		{
 			return Len;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
@@ -199,7 +212,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for LLEN {}", reply->type, InKey));
 		}
 
 		return Len;
@@ -208,14 +221,12 @@ namespace Xiao
 	int64_t Redis::lpush(const std::string& InKey, const std::string& InVal)
 	{
 		int64_t Len = -1;
-		const char* argv[] = { "LPUSH", InKey.c_str(), InVal.c_str() };
-		size_t argvlen[] = { 5, InKey.size(), InVal.size() };
-		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 3, argv, argvlen));
+		redisReply* reply = _RedisCommand(Context, { "LPUSH", InKey, InVal });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return Len;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
@@ -223,7 +234,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for LPUSH {} {}", reply->type, InKey, InVal));
 		}
 
 		return Len;
@@ -250,7 +261,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for LRANGE {} {} {}", reply->type, InKey, InStart, InStop));
 		}
 	}
 
@@ -272,7 +283,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for LTRIM {} {} {}", reply->type, InKey, InStart, InStop));
 		}
 	}
 
@@ -299,7 +310,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for RPUSH {}", reply->type, InKey));
 		}
 
 		return Num;
@@ -326,7 +337,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for SADD {}", reply->type, InKey));
 		}
 
 		return added;
@@ -334,12 +345,12 @@ namespace Xiao
 
 	bool Redis::hexists(const std::string& InKey, const std::string& InField)
 	{
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HEXISTS %s %s", InKey.c_str(), InField.c_str()));
+		redisReply* reply = _RedisCommand(Context, { "HEXISTS", InKey, InField });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return false;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		bool exists = false;
 		if (reply->type == REDIS_REPLY_INTEGER) 
@@ -348,7 +359,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for HEXISTS {} {}", reply->type, InKey, InField));
 		}
 
 		return exists;
@@ -356,13 +367,13 @@ namespace Xiao
 
 	int64_t Redis::hlen(const std::string& InKey)
 	{
+		redisReply* reply = _RedisCommand(Context, { "HLEN", InKey });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		int64_t Len = -1;
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HLEN %s", InKey.c_str()));
 		if (!CheckReply(reply))
 		{
 			return Len;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
@@ -370,7 +381,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for HLEN {}", reply->type, InKey));
 			return Len;
 		}
 
@@ -379,15 +390,13 @@ namespace Xiao
 
 	int64_t Redis::hset(const std::string& InKey, const std::string& InField, const std::string& InVal)
 	{
+		redisReply* reply = _RedisCommand(Context, { "HSET", InKey, InField, InVal });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		int64_t Val = -1;
-		const char* argv[] = { "HSET", InKey.c_str(), InField.c_str(), InVal.c_str() };
-		size_t argvlen[] = { 4, InKey.size(), InField.size(), InVal.size() };
-		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 4, argv, argvlen));
 		if (!CheckReply(reply))
 		{
 			return Val;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
@@ -395,7 +404,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for HSET {} {} {}", reply->type, InKey, InField, InVal));
 		}
 
 		return Val;
@@ -404,14 +413,12 @@ namespace Xiao
 	int64_t Redis::hset(const std::string& InKey, const std::pair<std::string, std::string>& InItem)
 	{
 		int64_t Val = -1;
-		const char* argv[] = { "HSET", InKey.c_str(), InItem.first.c_str(), InItem.second.c_str() };
-		size_t argvlen[] = { 4, InKey.size(), InItem.first.size(), InItem.second.size() };
-		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 4, argv, argvlen));
+		redisReply* reply = _RedisCommand(Context, { "HSET", InKey, InItem.first, InItem.second });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return Val;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER)
 		{
@@ -419,7 +426,7 @@ namespace Xiao
 		}
 		else
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for HSET {} {} {}", reply->type, InKey, InItem.first, InItem.second));
 		}
 
 		return Val;
@@ -427,12 +434,12 @@ namespace Xiao
 
 	std::optional<std::string> Redis::hget(const std::string& InKey, const std::string& InField)
 	{
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HGET %s %s", InKey.c_str(), InField.c_str()));
+		redisReply* reply = _RedisCommand(Context, { "HGET", InKey, InField });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return std::optional<std::string>();
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		switch (reply->type) 
 		{
@@ -447,7 +454,7 @@ namespace Xiao
 			std::cout << "Field: " << InField << " does not exist in hash: " << InKey << std::endl;
 			break;
 		default:
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for HGET {} {}", reply->type, InKey, InField));
 		}
 
 		return std::optional<std::string>();
@@ -455,13 +462,13 @@ namespace Xiao
 
 	int64_t Redis::hdel(const std::string& InKey, const std::string& InField)
 	{
+		redisReply* reply = _RedisCommand(Context, { "HDEL", InKey, InField });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		int64_t Val = -1;
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HDEL %s %s", InKey.c_str(), InField.c_str()));
 		if (!CheckReply(reply))
 		{
 			return Val;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
@@ -469,7 +476,7 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for HDEL {} {}", reply->type, InKey, InField));
 		}
 
 		return Val;
@@ -477,12 +484,12 @@ namespace Xiao
 
 	void Redis::hgetall(const std::string& InKey, std::insert_iterator<std::unordered_map<std::string, std::string>> OutMap)
 	{
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HGETALL %s", InKey.c_str()));
+		redisReply* reply = _RedisCommand(Context, { "HGETALL", InKey });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_ARRAY) 
 		{
@@ -505,18 +512,18 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type or empty hash: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for HGETALL {}", reply->type, InKey));
 		}
 	}
 
 	void Redis::hkeys(const std::string& InKey, std::insert_iterator<std::vector<std::string>> Output)
 	{
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "HKEYS %s", InKey.c_str()));
+		redisReply* reply = _RedisCommand(Context, { "HKEYS", InKey });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_ARRAY) 
 		{
@@ -537,46 +544,41 @@ namespace Xiao
 		}
 		else 
 		{
-			throw ReplyError(std::format("Unexpected reply type or empty hash: {}", reply->type));
+			throw ReplyError(std::format("Unexpected reply type: {} for HKEYS {}", reply->type, InKey));
 		}
 	}
 
 	int64_t Redis::publish(const std::string& InKey, const std::string& InVal)
 	{
 		int64_t Result = -1;
-		const char* argv[] = { "PUBLISH", InKey.c_str(), InVal.c_str() };
-		size_t argvlen[] = { 7, InKey.size(), InVal.size() };
-		redisReply* reply = static_cast<redisReply*>(redisCommandArgv(Context, 3, argv, argvlen));
+		redisReply* reply = _RedisCommand(Context, { "PUBLISH", InKey, InVal });
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return Result;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
-
+		
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
 			Result = reply->integer;
 		}
 		else 
 		{
-			throw ReplyError("Unexpected reply type");
+			throw ReplyError(std::format("Unexpected reply type: {} for PUBLISH {} {}", reply->type, InKey, InVal));
 		}
 
 		return Result;
 	}
 
-	redisReply* Redis::command(const std::string& InCommand, const std::string& InArg)
+	redisReply* Redis::command(const std::vector<std::string>& InArgs, const bool bDiscardReply)
 	{
-		const char* argv[] = { InCommand.c_str(), InArg.c_str() };
-		size_t argvlen[] = { InCommand.size(), InArg.size()};
-		return static_cast<redisReply*>(redisCommandArgv(Context, 2, argv, argvlen));
-	}
-
-	void Redis::command(const std::string& InCommand, const std::string& InArg1, const std::string& InArg2)
-	{
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "%s %s", InCommand.c_str(), InArg1.c_str(), InArg2.c_str()));
-		(void)CheckReply(reply);
-		freeReplyObject(reply);
+		redisReply* reply = _RedisCommand(Context, InArgs);
+		if (bDiscardReply)
+		{
+			(void)CheckReply(reply);
+			freeReplyObject(reply);
+		}
+		return reply;
 	}
 
 	bool Redis::CheckReply(redisReply* InReply)

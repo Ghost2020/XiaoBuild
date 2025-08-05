@@ -98,7 +98,7 @@ static FORCEINLINE bool TryGetPublicIp()
 		SIpv4Address = TCHAR_TO_UTF8(*GetLANV4());
 		try
 		{
-			if (const auto ClientsReplay = SRedisClient->command("CLIENT", "LIST"))
+			if (const auto ClientsReplay = SRedisClient->command({ "CLIENT", "LIST" }))
 			{
 				const FString Result = UTF8_TO_TCHAR(ClientsReplay->str);
 				TArray<FString> List;

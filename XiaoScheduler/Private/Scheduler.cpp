@@ -1449,6 +1449,10 @@ namespace uba
 					logger.Warning(TC("FAgentProto ParseFromString failed!"));
 					continue;
 				}
+				if (Proto.macaddress() != Id)
+				{
+					continue;
+				}
 
 				// 本地IP忽略
 				FString Ip = String2FString(Proto.routerip());

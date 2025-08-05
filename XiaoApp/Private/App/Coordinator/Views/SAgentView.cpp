@@ -1273,10 +1273,14 @@ void SAgentView::OnUpdate(const bool bRebuild) const
 			{
 				continue;
 			}
-
 			if (!Item->ParseFromString(Iter.second))
 			{
 				XIAO_LOG(Error, TEXT("ParseFromString failed::%s"), UTF8_TO_TCHAR(Iter.second.c_str()));
+				continue;
+			}
+			if (Iter.first != Item->macaddress())
+			{
+				XIAO_LOG(Error, TEXT("Not valid agent data Guid[%s] != Mac[%hs]"), *UniqueId, Item->macaddress().c_str());
 				continue;
 			}
 
