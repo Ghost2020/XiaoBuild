@@ -318,6 +318,7 @@ namespace uba
 		Scheduler = nullptr;
 		SessionServer = nullptr;
 		StorageServer = nullptr;
+		NetworkServer->DisconnectClients();
 		NetworkServer = nullptr;
 		NetworkBackend = nullptr;
 		Logger = nullptr;
