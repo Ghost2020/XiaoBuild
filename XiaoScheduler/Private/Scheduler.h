@@ -22,6 +22,12 @@
 #undef Yield
 #endif
 
+#if !UE_BUILD_SHIPPING
+	#ifdef MemoryBarrier
+	#undef MemoryBarrier
+	#endif
+#endif
+
 
 #include "XiaoShareRedis.h"
 #include "boost/interprocess/interprocess_fwd.hpp"
