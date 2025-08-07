@@ -180,6 +180,10 @@ namespace uba
 		{
 			UbaScheduler.bStoreRaw = true;
 		}
+		if (FParse::Param(*InCmdLine, TEXT("exclusive")))
+		{
+			InInfo.bExclusive = true;
+		}
 		if (FParse::Param(*InCmdLine, TEXT("?")) || FParse::Param(*InCmdLine, TEXT("help")) || FParse::Param(*InCmdLine, TEXT("h")))
 		{
 			return PrintHelp(TC(""), logger) == 0;
@@ -261,6 +265,7 @@ namespace uba
 		ServerInfo.remoteLogEnabled = true;
 		ServerInfo.deleteSessionsOlderThanSeconds = 1;
 		ServerInfo.logToFile = UbaScheduler.bLog;
+		// ServerInfo.exclusive = GInfo.bExclusive;
 #if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
 		// ServerInfo.allowLocalDetour = false;
 		ServerInfo.readIntermediateFilesCompressed = true;
@@ -530,7 +535,7 @@ namespace uba
 		}
 
 		// 设置本机最大运行核心
-		const uint32 MaxLocalCpu = InitiatorProto.localmaxcpu();
+		const uint32 MaxLocalCpu = Info.bExclusive ? 1 : InitiatorProto.localmaxcpu();
 		if (MaxLocalCpu > 0)
 		{
 			SetMaxLocalProcessors(MaxLocalCpu);
@@ -630,15 +635,6 @@ namespace uba
 			[this](const Guid& InClientUid, u32 InClientId)
 			{
 				session.OnDisconnected(InClientUid, InClientId);
-
-				/*if (Info.bDynamic)
-				{
-					if (InitiatorInfo.internalData && InitiatorInfo.GetUid() == InClientUid && InitiatorInfo.GetId() == InClientId)
-					{
-						logger.Info(TC("UbacController clientId \"%d\" disconnected!"), InClientId);
-						Event.Set();
-					}
-				}*/
 				
 				if (CId2Id.Contains(InClientId))
 				{
@@ -805,27 +801,6 @@ namespace uba
 
 		session.RegisterGetNextProcess([this](Process& ProcessHandle, NextProcessInfo& OutNextProcess, u32 PrevExitCode) 
 		{
-			/*if (Info.bDynamic)
-			{
-				static double LastCheck = FPlatformTime::Seconds();
-				static uint32 queued, activeLocal, activeRemote, outFinished;
-				queued = 0; activeLocal = 0; activeRemote = 0; outFinished = 0;
-				GetStats(queued, activeLocal, activeRemote, outFinished);
-				if ((activeLocal + activeRemote + outFinished) == 0)
-				{
-					if (FPlatformTime::Seconds() - LastCheck > 10.f)
-					{
-						logger.Warning(TC("Aready not has task over 10.0 seconds, ready to exit the proc!"));
-						Event.Set();
-						return false;
-					}
-				}
-				else
-				{
-					LastCheck = FPlatformTime::Seconds();
-				}
-			}*/
-
 			// 请求过滤
 			if (ProcessHandle.IsRemote() && HostsFailed.Contains(ProcessHandle.GetExecutingHost()))
 			{
@@ -835,18 +810,6 @@ namespace uba
 
 			return HandleReuseMessage(ProcessHandle, OutNextProcess, PrevExitCode);
 		});
-
-		// # TODO
-		/*
-		SessionServer& SessionServer = GetSession();
-		SessionServer.SetRemoteProcessSlotAvailableEvent([]()
-		{
-
-		});
-		SessionServer.SetRemoteProcessReturnedEvent([](Process& Process) 
-		{
-
-		});*/
 
 		GOnRedisChanged.Bind([this](uint8 InStatus)
 		{
@@ -1292,16 +1255,9 @@ namespace uba
 			return;
 		}
 
-		/*SessionServer& SessionServer = GetSession();
-		const auto& ClientSessions = SessionServer.GetClientSessions();*/
 		for (const auto& Iter : Ip2Id)
 		{
 			std::string AgentMessage = "Helping " + GLocalMachineDesc;
-
-			/*if (const auto Client = GetClientSession(Iter.Value))
-			{
-				AgentMessage = std::format("Helping \"{}\" with {}/{} core(s)", GLocalMachineDesc.c_str(), Client->usedSlotCount, Client->processSlotCount);
-			}*/
 			if (!UpdateAgent(Iter.Value, InAgentStatus, AgentMessage))
 			{
 				return;
@@ -1533,7 +1489,7 @@ namespace uba
 					{
 						Id2CId.insert_or_assign(NewAgentId, AgentIndex++);
 						++ConnectedAgentCount;
-						MaxCoreAvailable += Proto.helpercore();
+						MaxCoreAvailable += Info.bExclusive ? 1 : Proto.helpercore();
 						UpdateAgent(Id, EAgentStatus::Status_Helping, Message);
 						Ip2Id.Add(MakeTuple(Ip, Id));
 						AreadyConnectedSet.insert(NewAgentId);

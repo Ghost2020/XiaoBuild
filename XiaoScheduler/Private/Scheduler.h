@@ -75,18 +75,20 @@ namespace uba
 		bool bDynamic = false;
 		FString TraceName;
 		uint32 PPID = 0;
+		bool bExclusive = false;
 
 		FSchedulerInfo()
 		{
 		}
 
-		FSchedulerInfo(const FString& InActionFilePath, NetworkBackend* InBackend, const uint8* InCrypto, const bool InbDynamic, const FString& InTraceName, const uint32 InPPID)
+		FSchedulerInfo(const FString& InActionFilePath, NetworkBackend* InBackend, const uint8* InCrypto, const bool InbDynamic, const FString& InTraceName, const uint32 InPPID, const bool InbExclusize)
 			: ActionFilePath(InActionFilePath)
 			, Backend(InBackend)
 			, Crypto(InCrypto)
 			, bDynamic(InbDynamic)
 			, TraceName(InTraceName)
 			, PPID(InPPID)
+			, bExclusive(InbExclusize)
 		{
 		}
 
@@ -100,6 +102,7 @@ namespace uba
 				bDynamic = InAnotherInfo.bDynamic;
 				TraceName = InAnotherInfo.TraceName;
 				PPID = InAnotherInfo.PPID;
+				bExclusive = InAnotherInfo.bExclusive;
 			}
 			return *this;
 		}
