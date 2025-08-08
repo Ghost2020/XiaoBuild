@@ -287,7 +287,7 @@ namespace uba
 		}
 
 		SchedulerCreateInfo CreateInfo(*SessionServer);
-		CreateInfo.maxLocalProcessors = UbaScheduler.MaxLocalCore;
+		CreateInfo.maxLocalProcessors = GInfo.bExclusive ? 1 : UbaScheduler.MaxLocalCore;
 		GInfo.Backend = &(*NetworkBackend);
 
 		Scheduler = std::make_unique<uba::FDynamicScheduler>(CreateInfo, GInfo, *Logger);
@@ -1453,9 +1453,10 @@ namespace uba
 					}
 
 					// 是否已经足够连接的代理运行的了
-					if (GBuildStats.RemainJobNum > uint32(InitiatorProto.localmaxcpu()))
+					const auto MaxLocalCpu = GetMaxLocalProcessors();
+					if (GBuildStats.RemainJobNum > uint32(MaxLocalCpu))
 					{
-						if (MaxCoreAvailable >= (GBuildStats.RemainJobNum - InitiatorProto.localmaxcpu()))
+						if (MaxCoreAvailable >= (GBuildStats.RemainJobNum - MaxLocalCpu))
 						{
 							logger.Info(TC("Already enough %u agent(s)! no need more agent(s)"), MaxAgentConCount);
 							return;
