@@ -60,7 +60,7 @@ void SInitiatorAdvancedView::Construct(const FArguments& InArgs)
 							else
 							{
 								SaveDirFolderText->SetError(TEXT(""));
-								SModifiedAgentSettings.UbaScheduler.Dir = Str;
+								ChangeDir(Str);
 							}
 						})
 						.Text_Lambda([]()
@@ -83,7 +83,7 @@ void SInitiatorAdvancedView::Construct(const FArguments& InArgs)
 									OutFolder
 								))
 								{
-									SModifiedAgentSettings.UbaScheduler.Dir = OutFolder;
+									ChangeDir(OutFolder);
 									SaveDirFolderText->SetText(FText::FromString(OutFolder));
 								}
 							}
@@ -156,6 +156,17 @@ END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 bool SInitiatorAdvancedView::GetCanChangeDir() const
 {
 	return !IsAppRunning(XiaoAppName::SXiaoScheduler);
+}
+
+void SInitiatorAdvancedView::ChangeDir(const FString& InNewDir)
+{
+	FString& Dir = SModifiedAgentSettings.UbaScheduler.Dir;
+	if(!Dir.IsEmpty() && FPaths::DirectoryExists(Dir))
+	{
+		IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+		PlatformFile.DeleteDirectoryRecursively(*Dir);
+	}
+	Dir = InNewDir;
 }
 
 #undef LOCTEXT_NAMESPACE

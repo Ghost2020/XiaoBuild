@@ -1145,9 +1145,9 @@ static bool InstallUBT(const bool bInstallOrUninstall = true, const TFunction<vo
 		const FString SearchPath = UsersDir / TEXT("*");
 		TArray<FString> FoundFilesAndDirs;
     	IFileManager::Get().FindFiles(FoundFilesAndDirs, *SearchPath, false, true);
-		const FString UserDir = UsersDir / UserName;
 		for(const FString& UserName : FoundFilesAndDirs)
 		{
+			const FString UserDir = UsersDir / UserName;
 			FString BuildConfFile = UserDir / FString(TEXT(".config")) / SPrePlusBuildConfigXml;
 			if(FPaths::FileExists(BuildConfFile))
 			{

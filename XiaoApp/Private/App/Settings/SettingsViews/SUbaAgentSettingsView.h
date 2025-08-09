@@ -27,6 +27,7 @@ public:
 protected:
 	FString QueryComputerConfiguration();
 	bool GetCanChangeDir() const;
+	void ChangeDir(const FString& InNewDir);
 
 private:
 	FString HardwareDesc;

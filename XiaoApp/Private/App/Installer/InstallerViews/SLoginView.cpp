@@ -139,17 +139,17 @@ void SLoginView::OnPasswordChanged(const FText& InText)
 {
 	const FString Password = InText.ToString();
 	bIsValidPassword = Password.Len() >= 8 && StringContainUpperCase(Password);
-	FText ErrorText;
+	FText _ErrorText;
 	if (!bIsValidPassword)
 	{
-		ErrorText = LOCTEXT("Minimal_Text", "最少8个字符，至少包含一个大写字符");
+		_ErrorText = LOCTEXT("Minimal_Text", "最少8个字符，至少包含一个大写字符");
 	}
 	FSlateApplication& App = FSlateApplication::Get();
 	if (App.GetModifierKeys().AreCapsLocked())
 	{
-		ErrorText = LOCTEXT("CapsLocked_Text", "大写键开启中");
+		_ErrorText = LOCTEXT("CapsLocked_Text", "大写键开启中");
 	}
-	PasswordTextBox->SetError(ErrorText);
+	PasswordTextBox->SetError(_ErrorText);
 }
 
 void SLoginView::OnRePasswordChanged(const FText& InText)
@@ -163,12 +163,12 @@ void SLoginView::OnRePasswordChanged(const FText& InText)
 		GInstallSettings.Password = Password;
 	}
 					
-	FText ErrorText;
+	FText _ErrorText;
 	if (!bIsSamePassword)
 	{
-		ErrorText = LOCTEXT("NotSame_Text", "密码不一致");
+		_ErrorText = LOCTEXT("NotSame_Text", "密码不一致");
 	}
-	RePasswordTextBox->SetError(ErrorText);
+	RePasswordTextBox->SetError(_ErrorText);
 }
 
 #undef LOCTEXT_NAMESPACE

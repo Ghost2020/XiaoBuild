@@ -509,11 +509,13 @@ static bool SetServiceState(const FString& InServiceName, const bool InbStart, F
 	const FString Param = FString::Printf(TEXT("%s %s"), InbStart ? TEXT("restart") : TEXT("stop"), *InServiceName);
 #elif PLATFORM_MAC
 	const bool bIsDaemons = InServiceName==TEXT("XiaoCoordiService");
-	const FString BootStrap = bIsDaemons ? TEXT("bootstrap system") : TEXT("load");
-	const FString BootOut = bIsDaemons ? TEXT("bootout system") : TEXT("unload");
+	const FString Scope = bIsDaemons ? TEXT("system") : FString::Printf(TEXT("gui/%d"), getuid());
+	const FString BootStrap = bIsDaemons ? TEXT("bootstrap") : TEXT("load");
+	const FString BootOut = bIsDaemons ? TEXT("bootout") : TEXT("unload");
 	const FString Url = TEXT("/bin/launchctl");
-	const FString Param = FString::Printf(TEXT("%s /Library/Launch%s/com.XiaoBuild.%s.plist"), 
+	const FString Param = FString::Printf(TEXT("%s %s /Library/Launch%s/com.XiaoBuild.%s.plist"), 
 							*(InbStart ? BootStrap : BootOut), 
+							*Scope,
 							(bIsDaemons ? TEXT("Daemons") : TEXT("Agents")), 
 							*InServiceName
 						);

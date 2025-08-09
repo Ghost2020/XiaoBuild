@@ -71,8 +71,8 @@ public:
 	// ITimingViewSession interface Begin
 	virtual const FName& GetName() const override 
 	{
-		static const FName SName(TEXT("BuildProgress"));
-		return SName;
+		static const FName _SName(TEXT("BuildProgress"));
+		return _SName;
 	}
 	virtual void AddTopDockedTrack(const TSharedPtr<FBaseTimingTrack> Track) override { AddTrack(Track, ETimingTrackLocation::TopDocked); }
 	virtual bool RemoveTopDockedTrack(const TSharedPtr<FBaseTimingTrack> Track) override { return RemoveTrack(Track); }

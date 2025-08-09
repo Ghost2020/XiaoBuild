@@ -68,7 +68,7 @@ void SUbaAgentSettingsView::Construct(const FArguments& InArgs)
 							else
 							{
 								SaveDirFolderText->SetError(TEXT(""));
-								SModifiedAgentSettings.UbaAgent.Dir = Str;
+								ChangeDir(Str);
 							}
 						})
 						.Text_Lambda([this]() {
@@ -90,7 +90,7 @@ void SUbaAgentSettingsView::Construct(const FArguments& InArgs)
 									OutFolder
 								))
 								{
-									SModifiedAgentSettings.UbaAgent.Dir = OutFolder;
+									ChangeDir(OutFolder);
 									SaveDirFolderText->SetText(FText::FromString(OutFolder));
 								}
 							}
@@ -178,28 +178,6 @@ void SUbaAgentSettingsView::Construct(const FArguments& InArgs)
 				V_ADD_SPINBOX(MemWaitSpinBox, SModifiedAgentSettings.UbaAgent.MemWait, 50, 100, LOCTEXT("MemWait_Text", "Mem Wait"), LOCTEXT("MemWait_ToolTipText", "The amount of memory needed to spawn a process. Set this to 100 to disable. Defaults to 95%"))
 				V_ADD_SPINBOX(MemKillSpinBox, SModifiedAgentSettings.UbaAgent.MemKill, 70, 100, LOCTEXT("MemKill_Text", "Mem Kill"), LOCTEXT("MemKill_ToolTipText", "The amount of memory needed before processes starts to be killed. Set this to 100 to disable. Defaults to 95%"))
 
-				/*+ SVerticalBox::Slot().SEC_PADDING
-				[
-					SNew(SHorizontalBox)
-					+ SHorizontalBox::Slot().AutoWidth()
-					[
-						SNew(STextBlock).Text(LOCTEXT("Name_Text", "代理名称")).ToolTipText(LOCTEXT("Name_ToolTipText", "The identifier of this agent"))
-					]
-
-					+ SHorizontalBox::Slot().L_PADDING(10)
-					[
-						SAssignNew(AgentNameText, SEditableTextBox)
-						.OnTextCommitted_Lambda([](const FText& InText, ETextCommit::Type InType)
-							{
-								SModifiedAgentSettings.UbaAgent.Name = InText.ToString();
-							})
-						.Text_Lambda([this]()
-							{
-								return FText::FromString(SModifiedAgentSettings.UbaAgent.Name);
-							})
-					]	
-				]*/
-
 				V_ADD_SPINBOX(StatsSpinBox, SModifiedAgentSettings.UbaAgent.Stats, 1, 65535, LOCTEXT("Stats_Text", "Stats"), LOCTEXT("Stats_ToolTipText", "Print stats for each process if higher than threshold"))
 
 				V_ADD_CHECKBOX(VerboseCheckBox, SModifiedAgentSettings.UbaAgent.bVerbose, LOCTEXT("Verbose_Text", "将调试信息打印到控制台"))
@@ -269,6 +247,17 @@ FString SUbaAgentSettingsView::QueryComputerConfiguration()
 bool SUbaAgentSettingsView::GetCanChangeDir() const
 {
 	return !IsAppRunning(XiaoAppName::SUbaAgent);
+}
+
+void SUbaAgentSettingsView::ChangeDir(const FString& InNewDir)
+{
+	FString& Dir = SModifiedAgentSettings.UbaAgent.Dir;
+	if(!Dir.IsEmpty() && FPaths::DirectoryExists(Dir))
+	{
+		IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+		PlatformFile.DeleteDirectoryRecursively(*Dir);
+	}
+	Dir = InNewDir;
 }
 
 #undef LOCTEXT_NAMESPACE
