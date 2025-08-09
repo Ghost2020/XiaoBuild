@@ -125,7 +125,7 @@ void SBuildProgressView::Construct(const FArguments& InArgs)
 	TimeRulerTrack->Reset();
 	AddTopDockedTrack(TimeRulerTrack);
 
-	OnOptionsChanged.BindLambda([this](const FXiaoTimingGraphTrack* InGraphTrack)
+	GOnOptionsChanged.BindLambda([this](const FXiaoTimingGraphTrack* InGraphTrack)
 	{
 		if (InGraphTrack)
 		{
@@ -143,7 +143,7 @@ void SBuildProgressView::Construct(const FArguments& InArgs)
 		}
 		
 	});
-	OnSeriesVisibilityChanged.BindLambda([this](const FXiaoTimingGraphTrack* InTrack, const FXiaoTimingGraphSeries* InSeries)
+	GOnSeriesVisibilityChanged.BindLambda([this](const FXiaoTimingGraphTrack* InTrack, const FXiaoTimingGraphSeries* InSeries)
 	{
 		static double SLastTrigger = 0.0f;
 		if (InSeries)

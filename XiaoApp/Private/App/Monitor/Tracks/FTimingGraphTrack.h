@@ -13,7 +13,7 @@
 class FXiaoTimingGraphTrack;
 
 DECLARE_DELEGATE_TwoParams(FOnSeriesVisibilityChanged, FXiaoTimingGraphTrack*, const class FXiaoTimingGraphSeries*)
-static FOnSeriesVisibilityChanged OnSeriesVisibilityChanged;
+inline FOnSeriesVisibilityChanged GOnSeriesVisibilityChanged;
 
 class FXiaoTimingGraphSeries final : public FGraphSeries
 {
@@ -26,7 +26,7 @@ public:
 		{
 			LastTrigger = FPlatformTime::Seconds();
 			FGraphSeries::SetVisibility(bOnOff);
-			OnSeriesVisibilityChanged.ExecuteIfBound(ParentTrack, this);
+			GOnSeriesVisibilityChanged.ExecuteIfBound(ParentTrack, this);
 		}
 	}
 	virtual FString FormatValue(double Value) const override;
@@ -58,7 +58,7 @@ struct FRawSystemGraph
 };
 
 DECLARE_DELEGATE_OneParam(FOnOptionsChanged, const FXiaoTimingGraphTrack*)
-static FOnOptionsChanged OnOptionsChanged;
+inline FOnOptionsChanged GOnOptionsChanged;
 	
 class FXiaoTimingGraphTrack final : public FGraphTrack
 {

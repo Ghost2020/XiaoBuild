@@ -212,7 +212,7 @@ void FXiaoTimingGraphTrack::BuildContextMenu(FMenuBuilder& MenuBuilder)
 void FXiaoTimingGraphTrack::ContextMenu_ToggleOption_Execute(EGraphOptions Option)
 {
 	FGraphTrack::ContextMenu_ToggleOption_Execute(Option);
-	OnOptionsChanged.ExecuteIfBound(this);
+	GOnOptionsChanged.ExecuteIfBound(this);
 }
 
 void FXiaoTimingGraphTrack::UpdateGraph(const Xiao::FTraceView::FSession& InSession)
