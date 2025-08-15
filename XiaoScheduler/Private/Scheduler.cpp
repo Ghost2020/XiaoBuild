@@ -1437,7 +1437,7 @@ namespace uba
 				}
 				if (LocalGroup != AgentGroup)
 				{
-					logger.Info(TC("Agent %s group:[%s] different group:[%s] with us!"), *AgentDesc, *AgentGroup, *LocalGroup);
+					logger.Debug(TC("Agent %s group:[%s] different group:[%s] with us!"), *AgentDesc, *AgentGroup, *LocalGroup);
 					CantConnectSet.insert(Id);
 					continue;
 				}
@@ -1448,7 +1448,7 @@ namespace uba
 					// 是否超过最大能够启动的最大Processor
 					if (MaxCoreAvailable >= MaxProcessorCount)
 					{
-						logger.Info(TC("Already over %d max processors!"), MaxProcessorCount);
+						logger.Debug(TC("Already over %d max processors!"), MaxProcessorCount);
 						return;
 					}
 
@@ -1456,9 +1456,9 @@ namespace uba
 					const auto MaxLocalCpu = GetMaxLocalProcessors();
 					if (GBuildStats.RemainJobNum > uint32(MaxLocalCpu))
 					{
-						if (MaxCoreAvailable >= (GBuildStats.RemainJobNum - MaxLocalCpu))
+						if (MaxCoreAvailable > (GBuildStats.RemainJobNum - MaxLocalCpu))
 						{
-							logger.Info(TC("Already enough %u agent(s)! no need more agent(s)"), MaxAgentConCount);
+							logger.Debug(TC("Already enough %u agent(s)! no need more agent(s)"), MaxAgentConCount);
 							return;
 						}
 					}
@@ -1503,7 +1503,7 @@ namespace uba
 				}
 				else
 				{
-					logger.Info(TC("Already connected %u Agents, over allow max %u agents!"), ConnectedAgentCount, MaxAgentConCount);
+					logger.Debug(TC("Already connected %u Agents, over allow max %u agents!"), ConnectedAgentCount, MaxAgentConCount);
 					return;
 				}
 			}
@@ -1575,12 +1575,6 @@ namespace uba
 
 	void FDynamicScheduler::TryReleaseAgents()
 	{
-		// 动态任务
-		if (Info.bDynamic)
-		{
-			return;
-		}
-
 		// 独占式发起者
 		if (InitiatorProto.bfixedinitator())
 		{
@@ -1600,7 +1594,7 @@ namespace uba
 		}
 		LastRelease = FPlatformTime::Seconds();
 
-		const uint32 MaxRemoteCanRunNumNow = GetProcessCountThatCanRunRemotelyNow() - SActiveRemote;
+		const uint32 MaxRemoteCanRunNumNow = GetProcessCountThatCanRunRemotelyNow();
 		const uint32 MaxLocalProcessors = GetMaxLocalProcessors();
 		if ((MaxCoreAvailable - MaxLocalProcessors) < MaxRemoteCanRunNumNow)
 		{
