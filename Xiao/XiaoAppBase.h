@@ -112,13 +112,6 @@ public:
 		}
 #pragma endregion
 
-#ifdef HTTP_PACKAGE
-		if (FModuleManager::Get().ModuleExists(TEXT("HTTP")))
-		{
-			FModuleManager::Get().LoadModule("HTTP");
-		}
-#endif
-
 #pragma region Delagate
 		WillDeactivateHandle = FCoreDelegates::ApplicationWillDeactivateDelegate.AddLambda([this]()
 		{
