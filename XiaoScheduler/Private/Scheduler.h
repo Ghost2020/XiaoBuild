@@ -214,6 +214,8 @@ namespace uba
 		FAgentProto InitiatorProto;
 		FBuildProgress BuildProgress;
 
+		bool bContainObserver = false;
+
 		static FBuildStats GBuildStats;
 		static FCriticalSection* GCriticalSection;
 	};

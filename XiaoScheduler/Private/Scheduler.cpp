@@ -590,11 +590,17 @@ namespace uba
 		}
 		
 		SetProcessFinishedCallback([](const ProcessHandle& InPh) {});
+		
 		logger.Info(TC("Scheduler run took %s"), TimeToText(time).str);
 		logger.Info(TC("---------------------------------------XiaoBuild Finish with (%d)---------------------------------------"), GBuildStats.BuildStatus ? 0 : -1);
 		GBuildStats.End = FPlatformTime::Seconds();
 		UpdateBuildStats();
-		
+		// 让观察者有时间能够接收到完成消息
+		if (bContainObserver)
+		{
+			FPlatformProcess::Sleep(1.0f);
+		}
+		GOnRedisChanged.Clear();
 		return GBuildStats.BuildStatus;
 	}
 
@@ -1608,6 +1614,7 @@ namespace uba
 			return;
 		}
 
+		bContainObserver = false;
 		// 尝试释放代理
 		for (int Index = Sessions.size() - 1; Index >= 0; --Index)
 		{
@@ -1626,6 +1633,7 @@ namespace uba
 			// 有些是观察者 
 			if (Client->processSlotCount == 0)
 			{
+				bContainObserver = true;
 				continue;
 			}
 
