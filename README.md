@@ -28,6 +28,7 @@ Release Date: ：2025-08-10
 | 5_4     | ✔ [▶️](https://youtu.be/WxD754CTsPE?si=-EcJWkgddUdlma5j&t=95)      | ✔  | ✔ |
 | 5_5     | ✔ [▶️](https://youtu.be/QL_PEHftOOs?si=-QcaSyq6IM7EdPRT&t=152)     | ✔  | ✔ [▶️](https://www.bilibili.com/video/BV1pghCzWEEF/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65) |
 | 5_6     | ✔       | ✔       | ✔ |
+| 5_7     | ✔       | ✔       | ✔ |
 
 ## Table of contents
 
