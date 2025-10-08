@@ -45,7 +45,6 @@ public:
 	{
 		check(InArgs._FolderDesc.IsValid());
 		FolderDesc = InArgs._FolderDesc;
-
 		SMultiColumnTableRow::Construct(FSuperRowType::FArguments(), InOwnerTableView);
 	}
 
@@ -76,6 +75,7 @@ public:
 						+ SHorizontalBox::Slot().HAlign(HAlign_Center).VAlign(VAlign_Center)
 						[
 							SNew(SCheckBox)
+								.IsEnabled(FolderDesc.IsValid() ? FolderDesc.Pin()->bSupport : false)
 								.IsChecked(Folder->bInstall ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
 								.OnCheckStateChanged_Lambda([this](ECheckBoxState InState)
 								{
@@ -98,7 +98,7 @@ public:
 								.IsChecked(Folder->bPluginInstall ? ECheckBoxState::Checked : ECheckBoxState::Unchecked)
 								.IsEnabled_Lambda([this]() 
 								{
-									return FolderDesc.IsValid() ? FolderDesc.Pin()->bInstall : false;	
+									return FolderDesc.IsValid() ? FolderDesc.Pin()->bSupport && FolderDesc.Pin()->bInstall : false;
 								})
 								.OnCheckStateChanged_Lambda([this](ECheckBoxState InState)
 								{
@@ -460,7 +460,7 @@ void SAgentGeneralView::Update(const bool bInRebuildTable)
 	GetEngineStates(OriginlFolderArray);
 	for (const auto& Desc : OriginlFolderArray)
 	{
-		ModiefyFolderArray.Add(MakeShareable(new FInstallFolder(Desc->Folder, Desc->Type, Desc->bInstall, Desc->bPluginInstall)));
+		ModiefyFolderArray.Add(MakeShareable(new FInstallFolder(Desc->Folder, Desc->bSupport, Desc->Type, Desc->bInstall, Desc->bPluginInstall)));
 		ModiefyFolderArray.Last()->EngineVersion = Desc->EngineVersion;
 	}
 

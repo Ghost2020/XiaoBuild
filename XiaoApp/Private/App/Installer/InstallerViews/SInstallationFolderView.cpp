@@ -185,6 +185,10 @@ void SInstallationFolderView::Construct(const FArguments& InArgs, const bool InT
 	bType = InType;
 
 	GetAllEngineFolder(FolderArray);
+	FolderArray.RemoveAll([](const TSharedPtr<FInstallFolder> InFolder) 
+	{
+		return !InFolder->bSupport;
+	});
 
 	static FText SelectText = LOCTEXT("SelectInstallFolder_FileDesc", "选择安装目录...");
 	

@@ -276,13 +276,15 @@ struct FInstallSettings : FJsonSerializable
 struct FInstallFolder
 {
 	FString Folder;
+	bool bSupport = false;
 	bool Type = false;
 	bool bInstall = true;
 	bool bPluginInstall = true;
 	FString EngineVersion;
 
-	explicit FInstallFolder(const FString& InFolder, const bool InType, const bool bInInstall, const bool bInPluginInstall=true)
+	explicit FInstallFolder(const FString& InFolder, const bool bInSupport, const bool InType, const bool bInInstall, const bool bInPluginInstall=true)
 		: Folder(InFolder)
+		, bSupport(bInSupport)
 		, Type(InType)
 		, bInstall(bInInstall)
 		, bPluginInstall(bInPluginInstall)
@@ -291,6 +293,7 @@ struct FInstallFolder
 	FInstallFolder& operator=(const FInstallFolder& InAnother)
 	{
 		this->Folder = InAnother.Folder;
+		this->bSupport = InAnother.bSupport;
 		this->Type = InAnother.Type;
 		this->bInstall = InAnother.bInstall;
 		this->bPluginInstall = InAnother.bPluginInstall;
@@ -540,10 +543,6 @@ static FString GetEnghineVersion(const FString& InEngineVersion)
 
 static bool IsSupportUBAC(const FString& InVersionStr)
 {
-	static const TSet<FString> InternalSupportEngineSet = { 
-		TEXT("4.26."), TEXT("4.27."), 
-		TEXT("5.0."), TEXT("5.1."), TEXT("5.2."), TEXT("5.3."), TEXT("5.4."), TEXT("5.5."), TEXT("5.6.") 
-	};
 	auto IsInSet = [](const TSet<FString>& InSet, const FString& InString) ->bool
 	{
 		for (const FString& InStr : InSet)
@@ -557,37 +556,34 @@ static bool IsSupportUBAC(const FString& InVersionStr)
 		return false;
 	};
 
-	bool Support = IsInSet(InternalSupportEngineSet, InVersionStr);
-	if (!Support)
+	// 检查目录下是否有对应的版本
+	FString XIAO_HOME = GetXiaoHomePath();
+	if (XIAO_HOME.IsEmpty() || FPaths::DirectoryExists(XIAO_HOME))
 	{
-		// 检查目录下是否有对应的版本
-		const FString XIAO_HOME = GetXiaoHomePath();
-		const FString UBACFolder = FPaths::Combine(XIAO_HOME, TEXT("Binaries/DotNET/UnrealBuildTool/UBAC"));
-		if (FPaths::DirectoryExists(UBACFolder))
-		{
-			auto& Platform = FPlatformFileManager::Get().GetPlatformFile();
-			static TSet<FString> SUbacFolders;
-			if (SUbacFolders.IsEmpty())
-			{
-				Platform.IterateDirectory(*UBACFolder, [](const TCHAR* FileOrFolderPath, bool bIsDirectory) ->bool
-				{
-					if (bIsDirectory)
-					{
-						const FString Folder = FileOrFolderPath;
-						if (Folder.StartsWith(TEXT("4.")) || Folder.StartsWith(TEXT("5.")))
-						{
-							SUbacFolders.Add(Folder);
-							return true;
-						}
-					}
-					return false;
-				});
-			}
-			
-			Support = IsInSet(SUbacFolders, InVersionStr);
-		}
+		XIAO_HOME = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::ExecutablePath(), TEXT("../../../")));
 	}
-	return Support;
+	const FString UBACFolder = FPaths::Combine(XIAO_HOME, TEXT("Binaries/DotNET/UnrealBuildTool/UBAC"));
+	if (FPaths::DirectoryExists(UBACFolder))
+	{
+		auto& Platform = FPlatformFileManager::Get().GetPlatformFile();
+		static TSet<FString> SUbacFolders;
+		if (SUbacFolders.IsEmpty())
+		{
+			Platform.IterateDirectory(*UBACFolder, [](const TCHAR* FileOrFolderPath, bool bIsDirectory) ->bool
+			{
+				if (bIsDirectory)
+				{
+					SUbacFolders.Add(FPaths::GetPathLeaf(FileOrFolderPath));
+					return true;
+				}
+				return false;
+			});
+		}
+		
+		return IsInSet(SUbacFolders, InVersionStr);
+	}
+	
+	return false;
 }
 
 static void GetAllEngineFolder(TArray<TSharedPtr<FInstallFolder>>& OutFolderArray)
@@ -604,11 +600,12 @@ static void GetAllEngineFolder(TArray<TSharedPtr<FInstallFolder>>& OutFolderArra
 		FEngineVersion EngineVersion;
 		DeskPlatformModule->TryGetEngineVersion(Iter.Value, EngineVersion);
 		const FString VersionString = EngineVersion.ToString();
-		if (IsSupportUBAC(VersionString))
+		const bool bSupport = IsSupportUBAC(VersionString);
+		const bool bSourceEngine = DeskPlatformModule->IsSourceDistribution(Iter.Value);
+		OutFolderArray.Add(MakeShareable(new FInstallFolder(Iter.Value, bSupport, bSourceEngine, bSupport, bSupport)));
+		OutFolderArray.Last()->EngineVersion = VersionString;
+		if (bSupport)
 		{
-			const bool bSourceEngine = DeskPlatformModule->IsSourceDistribution(Iter.Value);
-			OutFolderArray.Add(MakeShareable(new FInstallFolder(Iter.Value, bSourceEngine, true)));
-			OutFolderArray.Last()->EngineVersion = VersionString;
 			GInstallSettings.EngineFolders.Add(Iter.Value);
 			GInstallSettings.EngineTypes.Add(bSourceEngine ? 1 : 0);
 			GInstallSettings.EngineVersions.Add(VersionString);
@@ -1094,7 +1091,7 @@ static bool InstallUBT(const bool bInstallOrUninstall = true, const TFunction<vo
 	for (const auto& EngineFolder : GInstallSettings.EngineFolders)
 	{
 		const bool bSouceEngine = GInstallSettings.EngineTypes[Index] == 1 ? true : false;
-		FInstallFolder InstallDesc(EngineFolder, bSouceEngine, bInstallOrUninstall);
+		FInstallFolder InstallDesc(EngineFolder, true, bSouceEngine, bInstallOrUninstall);
 		InstallDesc.EngineVersion = GInstallSettings.EngineVersions[Index];
 
 #if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
