@@ -226,7 +226,7 @@ namespace uba
 			}
 		}
 
-		CleanHistory(UbaScheduler.Dir);
+		CleanHistory(FPaths::GetPath(UbaScheduler.Dir));
 
 		const tchar* dbgStr = TC("");
 		Logger->Info(TC("XiaoScheduler v%s%s (RootDir: \"%s\", StoreCapacity: %uGb)\n"), Version, dbgStr, *UbaScheduler.Dir, UbaScheduler.Capacity);
@@ -1836,4 +1836,5 @@ namespace uba
 			OutKnownInputsBuffer.Add('\0');
 		}
 	}
+
 }
