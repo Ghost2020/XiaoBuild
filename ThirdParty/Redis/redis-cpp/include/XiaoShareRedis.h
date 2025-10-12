@@ -63,6 +63,11 @@ public:
 		return !Listeners.empty();
 	}
 
+	void Clear()
+	{
+		Listeners.clear();
+	}
+
 private:
 	std::vector<std::function<void(uint8)>> Listeners;
 };

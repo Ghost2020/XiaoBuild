@@ -558,7 +558,7 @@ static bool IsSupportUBAC(const FString& InVersionStr)
 
 	// 检查目录下是否有对应的版本
 	FString XIAO_HOME = GetXiaoHomePath();
-	if (XIAO_HOME.IsEmpty() || FPaths::DirectoryExists(XIAO_HOME))
+	if (XIAO_HOME.IsEmpty() || !FPaths::DirectoryExists(XIAO_HOME))
 	{
 		XIAO_HOME = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPlatformProcess::ExecutablePath(), TEXT("../../../")));
 	}
@@ -1045,8 +1045,9 @@ static bool InstallComponent(const FInstallFolder& InDesc)
 			// 公版引擎插件的BuildID修改
 			else
 			{
-				const FString SrcModulesFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(InDesc.Folder, TEXT("Engine/Plugins"), SXGEControllerPlugin, TEXT("Binaries"), SPlatformName, TEXT("UnrealEditor.modules")));
-				const FString DesModulesFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(DesXiaoControllerDir, TEXT("Binaries"), SPlatformName, TEXT("UnrealEditor.modules")));
+				const FString UrealEditorModules = EngineVersion.StartsWith(TEXT("4")) ? TEXT("UE4Editor.modules") : TEXT("UnrealEditor.modules");
+				const FString SrcModulesFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(InDesc.Folder, TEXT("Engine/Plugins"), SXGEControllerPlugin, TEXT("Binaries"), SPlatformName, UrealEditorModules));
+				const FString DesModulesFile = FPaths::ConvertRelativePathToFull(FPaths::Combine(DesXiaoControllerDir, TEXT("Binaries"), SPlatformName, UrealEditorModules));
 				_ModifyBuildID(DesModulesFile, SrcModulesFile);
 			}
 		}
@@ -1094,14 +1095,11 @@ static bool InstallUBT(const bool bInstallOrUninstall = true, const TFunction<vo
 		FInstallFolder InstallDesc(EngineFolder, true, bSouceEngine, bInstallOrUninstall);
 		InstallDesc.EngineVersion = GInstallSettings.EngineVersions[Index];
 
-#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
-		if (InFunction.IsSet())
+		if (InFunction)
 		{
-#endif
 			InFunction();
-#if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
 		}
-#endif
+
 		InstallComponent(InstallDesc);
 		++Index;
 	}
