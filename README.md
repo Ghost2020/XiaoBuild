@@ -11,7 +11,7 @@
 ## Version Information
 
 Current Version：v1.1.1
-Release Date: ：2025-08-10
+Release Date: ：2025-10-12
 
 ---
 
