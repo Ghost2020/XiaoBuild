@@ -2,6 +2,7 @@
 #include "Sockets.h"
 #include "SocketSubsystem.h"
 #include "XiaoLog.h"
+#include "XiaoShareNetwork.h"
 #include "Runtime/Launch/Resources/Version.h"
 
 namespace Xiao
@@ -67,6 +68,12 @@ namespace Xiao
 
 	bool FNetworkTrace::Connect(const FString& InIp, const int32 InPort)
 	{
+		if ((InIp == TEXT("127.0.0.1") || InIp == TEXT("localhost")) && XiaoNetwork::IsPortAvailable(InPort))
+		{
+			XIAO_LOG(Error, TEXT("The service on the specified port [%d] does not exist!"), InPort);
+			return false;
+		}
+
 		TSharedPtr<FInternetAddr> Addr = SocketSubsystem->CreateInternetAddr();
 		if (!Addr.IsValid())
 		{
