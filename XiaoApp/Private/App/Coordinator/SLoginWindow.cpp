@@ -434,9 +434,9 @@ bool SLoginWindow::CheckPassword(const FString& InPassword) const
 	{
 		Error = LOCTEXT("PasswordRequire_TEXT", "需要密码");
 	}
-	if(InPassword.Len() < 8 || !StringContainUpperCase(InPassword))
+	if(InPassword.Len() < 6/* || !StringContainUpperCase(InPassword)*/)
 	{
-		Error = LOCTEXT("PasswordNotlid_TEXT", "至少有8个字符且至少包含一个大写字符  ");
+		Error = LOCTEXT("PasswordNotlid_TEXT", "至少有6个字符");
 	}
 
 	this->CodeButton->SetVisibility(InPassword.IsEmpty() ? EVisibility::Hidden : EVisibility::Visible);

@@ -138,7 +138,7 @@ void SLoginView::OnUsernameChanged(const FText& InText)
 void SLoginView::OnPasswordChanged(const FText& InText)
 {
 	const FString Password = InText.ToString();
-	bIsValidPassword = Password.Len() >= 8 && StringContainUpperCase(Password);
+	bIsValidPassword = Password.Len() >= 6/* && StringContainUpperCase(Password)*/;
 	FText _ErrorText;
 	if (!bIsValidPassword)
 	{
@@ -155,7 +155,7 @@ void SLoginView::OnPasswordChanged(const FText& InText)
 void SLoginView::OnRePasswordChanged(const FText& InText)
 {
 	const FString RePassword = InText.ToString();
-	bIsValidPassword = RePassword.Len() >= 8 && StringContainUpperCase(RePassword);
+	bIsValidPassword = RePassword.Len() >= 6/* && StringContainUpperCase(RePassword)*/;
 	if (bIsValidPassword)
 	{
 		const FString Password = PasswordTextBox->GetText().ToString();

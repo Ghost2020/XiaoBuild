@@ -66,7 +66,7 @@ public:
 				}
 				if (InColumnName == SFolderType)
 				{
-					return V_CENTER_WIGET(SNew(STextBlock).Text(Folder->Type ? LOCTEXT("Source_Text", "源码引擎") : LOCTEXT("NotSource_Text", "非源码引擎")));
+					return V_CENTER_WIGET(SNew(STextBlock).Text(Folder->Type ? LOCTEXT("Source_Text", "源码") : LOCTEXT("NotSource_Text", "公版")));
 				}
 				if(InColumnName == SFolderPath)
 				{

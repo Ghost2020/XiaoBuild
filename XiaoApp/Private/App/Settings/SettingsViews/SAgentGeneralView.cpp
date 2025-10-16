@@ -62,7 +62,7 @@ public:
 				if (InColumnName == SIDType)
 				{
 					return V_CENTER_WIGET(SNew(STextBlock)
-						.Text(Folder->Type ? LOCTEXT("Source_Text", "源码引擎") : LOCTEXT("NotSource_Text", "非源码引擎")));
+						.Text(Folder->Type ? LOCTEXT("Source_Text", "源码") : LOCTEXT("NotSource_Text", "公版")));
 				}
 				if (InColumnName == SIDPath)
 				{
@@ -415,7 +415,7 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 							.FillSized(60.0f)
 							.VAlignHeader(VAlign_Center)
 							.DefaultLabel(LOCTEXT("UBTFlag_Text", "UBT"))
-							.DefaultTooltip(LOCTEXT("UBTFlag_Tooltip", "是否安装联合编译"))
+							.DefaultTooltip(LOCTEXT("UBTFlag_Tooltip", "源代码联合编译"))
 							.InitialSortMode(EColumnSortMode::Type::Ascending)
 							.OnSort_Static(&SAgentGeneralView::OnSortTable)
 							.SortMode_Raw(this, &SAgentGeneralView::GetSortModeForColumn, SIDUBTFlag)
@@ -424,7 +424,7 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 							.FillSized(60.0f)
 							.VAlignHeader(VAlign_Center)
 							.DefaultLabel(LOCTEXT("PluginFlag_Text", "Plugin"))
-							.DefaultTooltip(LOCTEXT("PluginFlag_Tooltip", "是否安装材质编译分发插件"))
+							.DefaultTooltip(LOCTEXT("PluginFlag_Tooltip", "材质联合编译"))
 							.InitialSortMode(EColumnSortMode::Type::Ascending)
 							.OnSort_Static(&SAgentGeneralView::OnSortTable)
 							.SortMode_Raw(this, &SAgentGeneralView::GetSortModeForColumn, SIDPluginFlag)
