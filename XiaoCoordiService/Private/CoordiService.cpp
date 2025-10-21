@@ -390,6 +390,7 @@ void FCoordiService::UpdateAgentStatus()
 				}
 
 				// 同步网络相关数据
+				const EAgentStatus Status = static_cast<EAgentStatus>(Proto.status());
 				if (SAgentNetworkMap.contains(AgentId))
 				{
 					auto& NetDesc = SAgentNetworkMap[AgentId];
@@ -411,12 +412,13 @@ void FCoordiService::UpdateAgentStatus()
 						NetDesc.NotActiveCount = 0;
 					}
 
-					if (Proto.status() == 0)
+					if (Status == EAgentStatus::Status_Ready && NetDesc.NotActiveCount > 3)
 					{
-						if (NetDesc.NotActiveCount > 3)
-						{
-							Proto.set_status(EAgentStatus::Status_Offline);
-						}
+						Proto.set_status(EAgentStatus::Status_Offline);
+					}
+					else if (Status == EAgentStatus::Status_Offline && NetDesc.NotActiveCount == 0)
+					{
+						Proto.set_status(EAgentStatus::Status_Ready);
 					}
 
 					std::string RawStr;
@@ -426,7 +428,6 @@ void FCoordiService::UpdateAgentStatus()
 					}
 				}
 
-				const EAgentStatus Status = static_cast<EAgentStatus>(Proto.status());
 				if (Status == EAgentStatus::Status_Initiating)
 				{
 					const std::string Initiator = (Proto.desc().empty() ? Proto.loginuser() : Proto.desc());
