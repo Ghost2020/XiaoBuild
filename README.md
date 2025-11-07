@@ -30,31 +30,6 @@ Release Date: ：2025-10-12
 | 5_6     | ✔       | ✔       | ✔ |
 | 5_7     | ✔       | ✔       | ✔ |
 
-## Table of contents
-
-- [XiaoBuild](#xiaobuild)
-  - [Introduction](#introduction)
-  - [Version Information](#version-information)
-  - [Engine Support](#engine-support)
-  - [Table of contents](#table-of-contents)
-  - [Features](#features)
-  - [System Requirements](#system-requirements)
-  - [Installation Guide](#installation-guide)
-  - [User Manual](#user-manual)
-    - [1.Installing and Configuring the Tool](#1installing-and-configuring-the-tool)
-    - [2.Tray Tool](#2tray-tool)
-    - [3.Real-time Build Insight Tool](#3real-time-build-insight-tool)
-    - [4.Build Coordinator Tool](#4build-coordinator-tool)
-    - [5.Agent Settings Tool](#5agent-settings-tool)
-  - [QA](#qa)
-    - [The project gets stuck at 45% during material compilation, and the progress does not change for a long time?](#the-project-gets-stuck-at-45-during-material-compilation-and-the-progress-does-not-change-for-a-long-time)
-    - [Sometimes the agent exceeds the maximum number of concurrent processes set by the system?](#sometimes-the-agent-exceeds-the-maximum-number-of-concurrent-processes-set-by-the-system)
-    - [Backup Machine Setup](#backup-machine-setup)
-  - [Changelog](#changelog)
-    - [v1.0.9](#v109)
-  - [License Agreement](#license-agreement)
-  - [Contact Us](#contact-us)
-
 ---
 
 ## Features
@@ -109,6 +84,8 @@ A brief description of the software license, or a link to the full license agree
 > This software follows the MIT License. For details, please [refer to](.COPYRIGHT).
 
 ---
+
+## QA please [ refer to](./常见问题.md)
 
 ## Contact Us
 
