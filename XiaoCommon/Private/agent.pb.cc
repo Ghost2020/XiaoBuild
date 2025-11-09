@@ -3,7 +3,7 @@
 
 #include "agent.pb.h"
 
-#if defined(PLATFORM_WINDOWS)
+#if PLATFORM_WINDOWS
 #pragma warning(disable : 4125 4800)
 #endif
 
@@ -37,6 +37,7 @@ constexpr FAgentProto::FAgentProto(
   , message_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , cpuarch_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , portmappedaddress_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , version_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , status_(0)
   , type_(0)
   , cpuava_(0)
@@ -150,6 +151,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_agent_2eproto::offsets[] PROTO
   PROTOBUF_FIELD_OFFSET(::FAgentProto, avagpu_),
   PROTOBUF_FIELD_OFFSET(::FAgentProto, cpuarch_),
   PROTOBUF_FIELD_OFFSET(::FAgentProto, portmappedaddress_),
+  PROTOBUF_FIELD_OFFSET(::FAgentProto, version_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::FAgentArrayProto, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -160,7 +162,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_agent_2eproto::offsets[] PROTO
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::FAgentProto)},
-  { 54, -1, -1, sizeof(::FAgentArrayProto)},
+  { 55, -1, -1, sizeof(::FAgentArrayProto)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -169,7 +171,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_agent_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\013agent.proto\"\260\007\n\013FAgentProto\022\016\n\006Status\030"
+  "\n\013agent.proto\"\301\007\n\013FAgentProto\022\016\n\006Status\030"
   "\001 \001(\005\022\020\n\010Username\030\002 \001(\t\022\014\n\004Type\030\003 \001(\005\022\014\n"
   "\004Desc\030\004 \001(\t\022\r\n\005Group\030\005 \001(\t\022\016\n\006CpuAva\030\006 \001"
   "(\002\022\017\n\007LastCon\030\007 \001(\t\022\026\n\016TotalHelpCache\030\010 "
@@ -193,12 +195,12 @@ const char descriptor_table_protodef_agent_2eproto[] PROTOBUF_SECTION_VARIABLE(p
   "\001(\005\022\021\n\tTracePort\030+ \001(\005\022\023\n\013LocalMaxCpu\030, "
   "\001(\005\022\017\n\007AvalNet\030- \001(\002\022\016\n\006AvaGpu\030. \001(\002\022\017\n\007"
   "CpuArch\030/ \001(\t\022\031\n\021PortMappedAddress\0300 \001(\t"
-  "\"0\n\020FAgentArrayProto\022\034\n\006Agents\030\001 \003(\0132\014.F"
-  "AgentProtob\006proto3"
+  "\022\017\n\007version\0301 \001(\t\"0\n\020FAgentArrayProto\022\034\n"
+  "\006Agents\030\001 \003(\0132\014.FAgentProtob\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_agent_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_agent_2eproto = {
-  false, false, 1018, descriptor_table_protodef_agent_2eproto, "agent.proto", 
+  false, false, 1035, descriptor_table_protodef_agent_2eproto, "agent.proto", 
   &descriptor_table_agent_2eproto_once, nullptr, 0, 2,
   schemas, file_default_instances, TableStruct_agent_2eproto::offsets,
   file_level_metadata_agent_2eproto, file_level_enum_descriptors_agent_2eproto, file_level_service_descriptors_agent_2eproto,
@@ -303,6 +305,11 @@ FAgentProto::FAgentProto(const FAgentProto& from)
     portmappedaddress_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_portmappedaddress(), 
       GetArenaForAllocation());
   }
+  version_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_version().empty()) {
+    version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_version(), 
+      GetArenaForAllocation());
+  }
   ::memcpy(&status_, &from.status_,
     static_cast<size_t>(reinterpret_cast<char*>(&avagpu_) -
     reinterpret_cast<char*>(&status_)) + sizeof(avagpu_));
@@ -325,6 +332,7 @@ id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyIn
 message_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 cpuarch_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 portmappedaddress_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+version_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&status_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&avagpu_) -
@@ -355,6 +363,7 @@ inline void FAgentProto::SharedDtor() {
   message_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   cpuarch_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   portmappedaddress_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  version_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void FAgentProto::ArenaDtor(void* object) {
@@ -388,6 +397,7 @@ void FAgentProto::Clear() {
   message_.ClearToEmpty();
   cpuarch_.ClearToEmpty();
   portmappedaddress_.ClearToEmpty();
+  version_.ClearToEmpty();
   ::memset(&status_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&avagpu_) -
       reinterpret_cast<char*>(&status_)) + sizeof(avagpu_));
@@ -814,6 +824,16 @@ const char* FAgentProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID
         } else
           goto handle_unusual;
         continue;
+      // string version = 49;
+      case 49:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 138)) {
+          auto str = _internal_mutable_version();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "FAgentProto.version"));
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -1191,6 +1211,16 @@ failure:
         48, this->_internal_portmappedaddress(), target);
   }
 
+  // string version = 49;
+  if (!this->_internal_version().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_version().data(), static_cast<int>(this->_internal_version().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "FAgentProto.version");
+    target = stream->WriteStringMaybeAliased(
+        49, this->_internal_version(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1310,6 +1340,13 @@ size_t FAgentProto::ByteSizeLong() const {
     total_size += 2 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_portmappedaddress());
+  }
+
+  // string version = 49;
+  if (!this->_internal_version().empty()) {
+    total_size += 2 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_version());
   }
 
   // int32 Status = 1;
@@ -1566,6 +1603,9 @@ void FAgentProto::MergeFrom(const FAgentProto& from) {
   if (!from._internal_portmappedaddress().empty()) {
     _internal_set_portmappedaddress(from._internal_portmappedaddress());
   }
+  if (!from._internal_version().empty()) {
+    _internal_set_version(from._internal_version());
+  }
   if (from._internal_status() != 0) {
     _internal_set_status(from._internal_status());
   }
@@ -1758,6 +1798,11 @@ void FAgentProto::InternalSwap(FAgentProto* other) {
       &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       &portmappedaddress_, lhs_arena,
       &other->portmappedaddress_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &version_, lhs_arena,
+      &other->version_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(FAgentProto, avagpu_)

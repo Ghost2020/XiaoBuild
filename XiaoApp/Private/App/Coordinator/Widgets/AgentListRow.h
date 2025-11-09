@@ -42,6 +42,7 @@ static const FName S_ColumnIdRoutingIP = TEXT("RoutingIP");
 static const FName S_ColumeIdListenPort = TEXT("ListenPort");
 static const FName S_ColumnIdPortMappedAddress = TEXT("Port-mappedAddress");
 static const FName S_ColumnIdUpDownTime = TEXT("UpDownTime");
+static const FName S_ColumnIdVersion = TEXT("Version");
 static const FName S_ColumeIdResetState = TEXT("ResetState");
 
 class SAgentListRow final : public SMultiColumnTableRow<TSharedPtr<FAgentProto>>

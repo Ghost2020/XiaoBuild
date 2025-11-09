@@ -99,6 +99,8 @@ message FAgentProto
 	string CpuArch = 47;
 	// Port-MappedAddress
 	string PortMappedAddress = 48;
+	// Version
+	string version = 49;
 }
 
 // 代理信息列表

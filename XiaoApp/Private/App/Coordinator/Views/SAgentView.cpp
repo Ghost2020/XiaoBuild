@@ -324,6 +324,7 @@ void SAgentView::Construct(const FArguments& InArgs)
 							+ SHeaderRow::Column(S_ColumeIdListenPort).DefaultLabel(LOCTEXT("HelpPort_Text", "代理端口")).DefaultTooltip(LOCTEXT("HelpPort_ToopTip", "代理监听的端口")).FillSized(125.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumeIdListenPort).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdPortMappedAddress).DefaultLabel(LOCTEXT("PortMappedAddress_Text", "服务端口映射")).DefaultTooltip(LOCTEXT("PortMappedAddress_ToopTip", "[Ip:Port]代理服务通过端口映射的地址(或者是公网地址)")).FillSized(125.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdPortMappedAddress).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 						    + SHeaderRow::Column(S_ColumnIdUpDownTime).DefaultLabel(LOCTEXT("UpDownTime_Text", "上/下行时间")).DefaultTooltip(LOCTEXT("UpDownTime_ToopTip", "")).FillSized(150.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdUpDownTime).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
+							+ SHeaderRow::Column(S_ColumnIdVersion).DefaultLabel(LOCTEXT("Version_Text", "版本")).DefaultTooltip(LOCTEXT("Version_ToopTip", "")).FillSized(150.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdVersion).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumeIdResetState).DefaultLabel(LOCTEXT("ResetState_Text", "重置状态")).DefaultTooltip(LOCTEXT("ResetState_ToopTip", "在代理的状态处于不正常时尝试重置")).FillSized(50.0).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center).InitialSortMode(EColumnSortMode::Ascending)
 							// Notworking
 							/*.Visibility_Lambda([this]() 
@@ -803,7 +804,8 @@ void SAgentView::OnTableSort(const EColumnSortPriority::Type InSortPriority, con
 		S_ColumnIdBuildCache, S_ColumnIdBuildPriority, S_ColumnIdCpuInfo, S_ColumnIdCpuArch, S_ColumnIdFreeDiskSpace,
 		S_ColumnIdLogLevel, S_ColumnIdLoggedOnUser, S_ColumnIdAssignmentPriority,
 		S_ColumnIdAvailableMemory, S_ColumnIdLogicCores, S_ColumnIdNetwork, S_ColumnIdOSSystem,
-		S_ColumnIdPhysicalCores, S_ColumnIdRoutingIP, S_ColumeIdListenPort, S_ColumnIdPortMappedAddress, S_ColumnIdUpDownTime
+		S_ColumnIdPhysicalCores, S_ColumnIdRoutingIP, S_ColumeIdListenPort, S_ColumnIdPortMappedAddress, 
+		S_ColumnIdUpDownTime, S_ColumnIdVersion
 	};
 
 	ColumnIdToSort = InName;
@@ -955,7 +957,10 @@ void SAgentView::OnTableSort(const EColumnSortPriority::Type InSortPriority, con
 				// TODO 需要特殊处理
 				CompareResult = (Left->updowntime() == Right->updowntime()) ? 0 : (Left->updowntime() < Right->updowntime() ? -1 : 1);
 			}
-			
+			else if (ColumnId == S_ColumnIdVersion)
+			{
+				CompareResult = (Left->version() == Right->version()) ? 0 : (Left->version() < Right->version() ? -1 : 1);
+			}
 			if (CompareResult != 0)
 			{
 				return InSortMode == EColumnSortMode::Ascending ? CompareResult < 0 : CompareResult > 0;

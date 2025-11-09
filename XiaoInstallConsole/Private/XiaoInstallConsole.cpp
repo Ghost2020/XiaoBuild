@@ -19,7 +19,7 @@ static void PrintHelp()
 {
 	const std::string HelpString =
 "-----------------------------------------------------------------------\n"
-+ std::string(XB_PRODUCT_NAME) + std::string(" ") + std::string(XB_VERSION_STRING) + std::string("\n")
++ std::string(XB_PRODUCT_NAME) + std::string(" ") + TCHAR_TO_UTF8(XB_VERSION_STRING) + std::string("\n")
 + std::string(XB_COPYRIGHT_STRING) + std::string("\n") +
 "-----------------------------------------------------------------------\n"
 "\n "

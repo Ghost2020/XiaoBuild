@@ -607,6 +607,10 @@ TSharedRef<SWidget> SAgentListRow::GenerateWidgetForColumn(const FName& InColumn
 	{
 		return TEXT_BLOCK(updowntime);
 	}
+	if (InColumnName == S_ColumnIdVersion)
+	{
+		return TEXT_BLOCK(version);
+	}
 	if(InColumnName == S_ColumeIdResetState)
 	{
 		return V_CENTER_WIGET(SNew(SSimpleButton)

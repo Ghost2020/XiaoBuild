@@ -200,6 +200,7 @@ class FAgentProto final :
     kMessageFieldNumber = 37,
     kCpuArchFieldNumber = 47,
     kPortMappedAddressFieldNumber = 48,
+    kVersionFieldNumber = 49,
     kStatusFieldNumber = 1,
     kTypeFieldNumber = 3,
     kCpuAvaFieldNumber = 6,
@@ -442,6 +443,20 @@ class FAgentProto final :
   const std::string& _internal_portmappedaddress() const;
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_portmappedaddress(const std::string& value);
   std::string* _internal_mutable_portmappedaddress();
+  public:
+
+  // string version = 49;
+  void clear_version();
+  const std::string& version() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_version(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_version();
+  PROTOBUF_MUST_USE_RESULT std::string* release_version();
+  void set_allocated_version(std::string* version);
+  private:
+  const std::string& _internal_version() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_version(const std::string& value);
+  std::string* _internal_mutable_version();
   public:
 
   // int32 Status = 1;
@@ -763,6 +778,7 @@ class FAgentProto final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr message_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cpuarch_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr portmappedaddress_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr version_;
   ::PROTOBUF_NAMESPACE_ID::int32 status_;
   ::PROTOBUF_NAMESPACE_ID::int32 type_;
   float cpuava_;
@@ -2310,6 +2326,52 @@ inline void FAgentProto::set_allocated_portmappedaddress(std::string* portmapped
   portmappedaddress_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), portmappedaddress,
       GetArenaForAllocation());
   // @@protoc_insertion_point(field_set_allocated:FAgentProto.PortMappedAddress)
+}
+
+// string version = 49;
+inline void FAgentProto::clear_version() {
+  version_.ClearToEmpty();
+}
+inline const std::string& FAgentProto::version() const {
+  // @@protoc_insertion_point(field_get:FAgentProto.version)
+  return _internal_version();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void FAgentProto::set_version(ArgT0&& arg0, ArgT... args) {
+ 
+ version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:FAgentProto.version)
+}
+inline std::string* FAgentProto::mutable_version() {
+  std::string* _s = _internal_mutable_version();
+  // @@protoc_insertion_point(field_mutable:FAgentProto.version)
+  return _s;
+}
+inline const std::string& FAgentProto::_internal_version() const {
+  return version_.Get();
+}
+inline void FAgentProto::_internal_set_version(const std::string& value) {
+  
+  version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* FAgentProto::_internal_mutable_version() {
+  
+  return version_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* FAgentProto::release_version() {
+  // @@protoc_insertion_point(field_release:FAgentProto.version)
+  return version_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void FAgentProto::set_allocated_version(std::string* version) {
+  if (version != nullptr) {
+    
+  } else {
+    
+  }
+  version_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), version,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:FAgentProto.version)
 }
 
 // -------------------------------------------------------------------

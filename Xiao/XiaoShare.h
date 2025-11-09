@@ -20,6 +20,7 @@
 #include "Misc/FileHelper.h"
 #include "XiaoShareField.h"
 #include "XiaoLog.h"
+#include "XiaoVersion.h"
 
 #ifdef WITH_UNREALPNG
 #include "IImageWrapperModule.h"
@@ -938,7 +939,7 @@ static void GetHelp(const FString& InParam)
 
 static FString GetBuildVersion()
 {
-	return TEXT("Version 1.1.0(build 1)");
+	return TEXT("Version ") TEXT(" ") XB_VERSION_STRING;
 }
 
 #ifdef WITH_UNREALPNG
