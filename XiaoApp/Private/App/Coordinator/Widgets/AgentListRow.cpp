@@ -74,12 +74,43 @@
 	]);
 
 
-#define PERCENT_BOX(AVAL, MIN, FORMAT) \
+#define RANGE_BOX(USED, TOTAL, MIN, FORMAT) \
 	V_FILL_WIGET(SNew(SBorder) \
 	.BorderBackgroundColor_Lambda([this]() { \
 		if (AgentProto.IsValid()) \
 		{ \
-			const float Percent = AgentProto.Pin()->AVAL() / GOriginalSystemSettings.MIN(); \
+			const float AvaMemory = AgentProto.Pin()->TOTAL() - AgentProto.Pin()->USED(); \
+			const float Percent = AvaMemory / GOriginalSystemSettings.MIN(); \
+			if (Percent < 1.0f) \
+			{ \
+				const float Alpha = (1.0f - Percent) * 0.5f + 0.5f; \
+				return FLinearColor(1.f, 0, 0, Alpha); \
+			} \
+		} \
+		return FLinearColor::Transparent; \
+	}) \
+	[ \
+		V_CENTER_WIGET(SNew(STextBlock) \
+		.Text_Lambda([this]() { \
+		FText MemoryText = FText::GetEmpty(); \
+		if (this->AgentProto.IsValid()) \
+		{ \
+			const float AvaMemory = AgentProto.Pin()->TOTAL() - AgentProto.Pin()->USED(); \
+			MemoryText = FText::FromString(FString::Printf(TEXT("%.1f/%.1f GB"), AvaMemory, AgentProto.Pin()->TOTAL())); \
+		} \
+		return MemoryText; \
+		}) \
+		.Justification(ETextJustify::Type::Center) \
+		) \
+	]);
+
+
+#define PERCENT_BOX(AVAL, THRESHOLD, FORMAT) \
+	V_FILL_WIGET(SNew(SBorder) \
+	.BorderBackgroundColor_Lambda([this]() { \
+		if (AgentProto.IsValid()) \
+		{ \
+			const float Percent = AgentProto.Pin()->AVAL() / GOriginalSystemSettings.THRESHOLD(); \
 			if (Percent < 1.0f) \
 			{ \
 				const float Alpha = (1.0f - Percent) * 0.5f + 0.5f; \
@@ -94,7 +125,7 @@
 				FText NetText = FText::GetEmpty(); \
 				if (this->AgentProto.IsValid()) \
 				{ \
-					NetText = FText::FromString(FString::Printf(FORMAT, static_cast<int>(AgentProto.Pin()->AVAL()))); \
+					NetText = FText::FromString(FString::Printf(FORMAT, 100 - static_cast<int>(AgentProto.Pin()->AVAL()))); \
 				} \
 				return NetText; \
 			}) \
@@ -273,94 +304,15 @@ TSharedRef<SWidget> SAgentListRow::GenerateWidgetForColumn(const FName& InColumn
 	}
 	if(InColumnName == S_ColumnIdAvaCpu)
 	{
-		return V_FILL_WIGET(SNew(SBorder)
-			.BorderBackgroundColor_Lambda([this]()
-			{
-				if (AgentProto.IsValid())
-				{
-					const float AvaCpu = AgentProto.Pin()->cpuava();
-					const float Percent = AvaCpu / GOriginalSystemSettings.cpuavailableminimal();
-					if (Percent < 1.0f)
-					{
-						const float Alpha = (1.0f - Percent) * 0.5f + 0.5f;
-						return FLinearColor(1.f, 0, 0, Alpha);
-					}
-				}
-				return FLinearColor::Transparent;
-			})
-			[
-				V_CENTER_WIGET(SNew(STextBlock)
-					.Text_Lambda([this]() { return this->AgentProto.IsValid() ? FText::FromString(FString::Printf(TEXT("%d%%"), static_cast<int>(100-AgentProto.Pin()->cpuava()))) : FText::GetEmpty(); })
-					.Justification(ETextJustify::Type::Center)
-				)
-			]);
+		return PERCENT_BOX(cpuava, cpuavailableminimal, TEXT("%d%%"));
 	}
 	if(InColumnName == S_ColumnIdFreeDiskSpace)
 	{
-		return V_FILL_WIGET(SNew(SBorder)
-			.BorderBackgroundColor_Lambda([this]()
-			{
-				if (AgentProto.IsValid())
-				{
-					const auto AgentPtr = AgentProto.Pin();
-					const float AvaHardSpace = AgentPtr->totalhardspace() - AgentPtr->usehardspace();
-					const float Percent = AvaHardSpace / GOriginalSystemSettings.harddiskminimal();
-					if (Percent < 1.0f)
-					{
-						const float Alpha = (1.0f - Percent) * 0.5f + 0.5f;
-						return FLinearColor(1.f, 0, 0, Alpha);
-					}
-				}
-				return FLinearColor::Transparent;
-			})
-			[
-				V_CENTER_WIGET(SNew(STextBlock)
-					.Text_Lambda([this]()
-					{
-						FText DiskText = FText::GetEmpty();
-						if (this->AgentProto.IsValid())
-						{
-							const auto AgentPtr = AgentProto.Pin();
-							DiskText = FText::FromString(FString::Printf(TEXT("%.1f/%.1f GB"), AgentPtr->totalhardspace() - AgentPtr->usehardspace(), AgentPtr->totalhardspace()));
-						}
-						return DiskText;
-					})
-					.Justification(ETextJustify::Type::Center)
-				)
-			]
-		);
+		return RANGE_BOX(usehardspace, totalhardspace, harddiskminimal, TEXT("%.1f/%.1f GB"));
 	}
 	if(InColumnName == S_ColumnIdAvailableMemory)
 	{
-		return V_FILL_WIGET(SNew(SBorder)
-			.BorderBackgroundColor_Lambda([this]()
-				{
-					if (AgentProto.IsValid())
-					{
-						const float AvaMemory = AgentProto.Pin()->totalmemory() - AgentProto.Pin()->usememory();
-						const float Percent = AvaMemory / GOriginalSystemSettings.physicalmemory();
-						if (Percent < 1.0f)
-						{
-							const float Alpha = (1.0f - Percent) * 0.5f + 0.5f;
-							return FLinearColor(1.f, 0, 0, Alpha);
-						}
-					}
-					return FLinearColor::Transparent;
-				})
-			[
-				V_CENTER_WIGET(SNew(STextBlock)
-					.Text_Lambda([this]() {
-						FText MemoryText = FText::GetEmpty();
-						if (this->AgentProto.IsValid())
-						{
-							const float AvaMemory = AgentProto.Pin()->totalmemory() - AgentProto.Pin()->usememory();
-							MemoryText = FText::FromString(FString::Printf(TEXT("%.1f/%.1f GB"), AvaMemory, AgentProto.Pin()->totalmemory()));
-						}
-						return MemoryText;
-						})
-					.Justification(ETextJustify::Type::Center)
-				)
-			]);
+		return RANGE_BOX(usememory, totalmemory, physicalmemory, TEXT("%.1f/%.1f GB"));
 	}
 	if(InColumnName == S_ColumnIdAvaNet)
 	{
@@ -760,6 +712,8 @@ bool SAgentListRow::IsValidAddress(const FString& InAddress)
 #undef TEXT_BLOCK
 #undef NUMEIRC_TEXT_BLOCK
 #undef NUMEIRC_LIMIT_TEXT_BLOCK
+#undef RANGE_BOX
+#undef PERCENT_BOX
 #undef COMBO_BOX
 
 #undef LOCTEXT_NAMESPACE

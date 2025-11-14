@@ -65,7 +65,7 @@ void FWindowsAgentStatsMonitor::Initialize()
 	}
 
 	// \\GPU Engine(*)\\Utilization Percentage
-	CounterName = TEXT("\\GPU Engine(*)\\Utilization Percentage");
+	CounterName = TEXT("\\GPU Engine(*_3D)\\Utilization Percentage");
 	PdhStatus = ::PdhAddEnglishCounter(QueryHandle, *CounterName, 0, &GpuUtilizeHandle);
 	if (PdhStatus != ERROR_SUCCESS)
 	{
@@ -114,6 +114,89 @@ bool FWindowsAgentStatsMonitor::CollectQueryData()
 		XIAO_LOG(Warning, TEXT("Failed to PdhCollectQueryData: %u (%s)"), ErrorCode, ErrorBuffer);
 	}
 	return Rtn;
+}
+
+static bool GetFormattedCounterArray(const PDH_HCOUNTER& InCounter, DWORD dwFormat, PPDH_FMT_COUNTERVALUE pValue)
+{
+	PPDH_FMT_COUNTERVALUE_ITEM pAryValue = NULL;
+	PDH_STATUS status = ERROR_SUCCESS;
+	DWORD dwBufferSize = 0;
+	DWORD dwItemCount = 0;
+
+	do
+	{
+		status = ::PdhGetFormattedCounterArray(
+			InCounter,
+			dwFormat,
+			&dwBufferSize,
+			&dwItemCount,
+			NULL
+		);
+
+		if (PDH_MORE_DATA != status)
+		{
+			break;
+		}
+
+		pAryValue = (PPDH_FMT_COUNTERVALUE_ITEM)::HeapAlloc(::GetProcessHeap(), 0, dwBufferSize);
+		if (NULL == pAryValue)
+		{
+			break;
+		}
+
+		status = ::PdhGetFormattedCounterArray(
+			InCounter,
+			dwFormat,
+			&dwBufferSize,
+			&dwItemCount,
+			pAryValue
+		);
+
+		PDH_FMT_COUNTERVALUE value = { 0 };
+		for (DWORD i = 0; i < dwItemCount; i++)
+		{
+			if (PDH_FMT_DOUBLE == dwFormat)
+			{
+				value.doubleValue += pAryValue[i].FmtValue.doubleValue;
+			}
+			if (PDH_FMT_LARGE == dwFormat)
+			{
+				value.largeValue += pAryValue[i].FmtValue.largeValue;
+			}
+			if (PDH_FMT_LONG == dwFormat)
+			{
+				value.longValue += pAryValue[i].FmtValue.longValue;
+			}
+		}
+
+		if (pValue)
+		{
+			if (PDH_FMT_DOUBLE == dwFormat)
+			{
+				value.doubleValue = value.doubleValue / dwItemCount;
+			}
+
+			if (PDH_FMT_LARGE == dwFormat)
+			{
+				value.largeValue = value.largeValue / dwItemCount;
+			}
+
+			if (PDH_FMT_LONG == dwFormat)
+			{
+				value.longValue = value.longValue / dwItemCount;
+			}
+
+			*pValue = value;
+		}
+
+	} while (false);
+
+	if (pAryValue)
+	{
+		::HeapFree(::GetProcessHeap(), 0, pAryValue);
+	}
+
+	return ERROR_SUCCESS == status;
 }
 
 float FWindowsAgentStatsMonitor::GetCpuUtilization()
@@ -191,25 +274,22 @@ float FWindowsAgentStatsMonitor::GetNetworkUtilization()
 
 float FWindowsAgentStatsMonitor::GetNetworkSpeed()
 {
+	PDH_FMT_COUNTERVALUE RecvValue = { 0 };
+	GetFormattedCounterArray(NetworkRecvHandle, PDH_FMT_DOUBLE, &RecvValue);
+	LastRecvSpeed = RecvValue.doubleValue;
+
+	PDH_FMT_COUNTERVALUE SentValue = { 0 };
+	GetFormattedCounterArray(NetworkRecvHandle, PDH_FMT_DOUBLE, &SentValue);
+	LastSendSpeed = SentValue.doubleValue;
+
 	return (FMath::Abs(LastRecvSpeed) + FMath::Abs(LastSendSpeed)) / 2.0f;
 }
 
 float FWindowsAgentStatsMonitor::GetGpuUtilization()
 {
-	PDH_FMT_COUNTERVALUE CounterSendValue;
-	const PDH_STATUS PdhStatus = ::PdhGetFormattedCounterValue(GpuUtilizeHandle, PDH_FMT_DOUBLE, nullptr, &CounterSendValue);
-	if (PdhStatus != ERROR_SUCCESS)
-	{
-		static bool CallOnce = true;
-		if (CallOnce)
-		{
-			CallOnce = false;
-			XIAO_LOG(Warning, TEXT("PdhGetFormattedCounterValue \"Gpu Utilize\" failed. Error code: %d"), PdhStatus);
-		}
-		return 0.0f;
-	}
-
-	return CounterSendValue.doubleValue;
+	PDH_FMT_COUNTERVALUE Value = { 0 };
+	GetFormattedCounterArray(GpuUtilizeHandle, PDH_FMT_DOUBLE, &Value);
+	return (1.0f-Value.doubleValue)*100.0f;
 }
 
 float FWindowsAgentStatsMonitor::GetGpuTemperature()
