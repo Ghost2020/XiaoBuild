@@ -67,6 +67,11 @@ public:
 		return false;
 	}
 
+	virtual bool GetGpuMemoryUsageUtility(TTuple<float, float>& OutMemoryUsageUtililty)
+	{
+		return false;
+	}
+
 	virtual bool GetHelperCache(TTuple<int16, int16>& OutGpuUtilization)
 	{
 		return false;

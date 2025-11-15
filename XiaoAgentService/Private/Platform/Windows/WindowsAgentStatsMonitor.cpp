@@ -5,6 +5,14 @@
 
 static constexpr float SMegabyteNum = 1024 * 1024;
 
+static FString PERFM_PATH_CPU_UTILITY(TEXT("\\Processor Information(_Total)\\% Processor Utility"));
+static FString PERFM_PATH_NETWORK_BAND_WIDTH(TEXT("\\Network Interface(*)\\Current Bandwidth"));
+static FString PERFM_PATH_NETWORK_RECV_RATE(TEXT("\\Network Interface(*)\\Bytes Received/sec"));
+static FString PERFM_PATH_NETWORK_SENT_RATE(TEXT("\\Network Interface(*)\\Bytes Sent/sec"));
+static FString PERFM_PATH_GPU_3D_UTILITY(TEXT("\\GPU Engine(*_3D)\\Utilization Percentage"));
+static FString PERFM_PATH_GPU_MEMORY_DEDICATED_USAGE_UTILITY(TEXT("\\GPU Adapter Memory(*)\\Dedicated Usage"));
+static FString PERFM_PATH_GPU_MEMORY_SHARE_USAGE_UTILITY(TEXT("\\GPU Adapter Memory(*)\\Shared Usage"));
+
 FWindowsAgentStatsMonitor::FWindowsAgentStatsMonitor()
 {
 	
@@ -29,47 +37,32 @@ void FWindowsAgentStatsMonitor::Initialize()
 	// Processor Time
 	const int32 NumCores = FPlatformMisc::NumberOfCores();
 	CoreCpuUtilization.SetNum(1);
-	const FString TotalCounterName = TEXT("\\Processor(_Total)\\% Processor Time");
-	PdhStatus = ::PdhAddEnglishCounter(QueryHandle, *TotalCounterName, 0, &ProcessorCounterHandle);
-	if (PdhStatus != ERROR_SUCCESS)
+	if (!AddCounter(PERFM_PATH_CPU_UTILITY))
 	{
-		XIAO_LOG(Warning, TEXT("PdhAddEnglishCounter %s failed. Error code: %d"), *TotalCounterName, PdhStatus);
 		return;
 	}
-
-	// \\Network Interface(*)\\Current Bandwidth
-	FString CounterName = TEXT("\\Network Interface(*)\\Current Bandwidth");
-	PdhStatus = ::PdhAddEnglishCounter(QueryHandle, *CounterName, 0, &NetworkBandWidthHandle);
-	if (PdhStatus != ERROR_SUCCESS)
+	if (!AddCounter(PERFM_PATH_NETWORK_BAND_WIDTH))
 	{
-		XIAO_LOG(Warning, TEXT("PdhAddEnglishCounter %s failed. Error code: %d"), *CounterName, PdhStatus);
 		return;
 	}
-
-	// \\Network Interface(*)\\Bytes Received/sec
-	CounterName = TEXT("\\Network Interface(*)\\Bytes Received/sec");
-	PdhStatus = ::PdhAddEnglishCounter(QueryHandle, *CounterName, 0, &NetworkRecvHandle);
-	if (PdhStatus != ERROR_SUCCESS)
+	if (!AddCounter(PERFM_PATH_NETWORK_RECV_RATE))
 	{
-		XIAO_LOG(Warning, TEXT("PdhAddEnglishCounter %s failed. Error code: %d"), *CounterName, PdhStatus);
 		return;
 	}
-
-	// \\Network Interface(*)\\Bytes Sent/sec
-	CounterName = TEXT("\\Network Interface(*)\\Bytes Sent/sec");
-	PdhStatus = ::PdhAddEnglishCounter(QueryHandle, *CounterName, 0, &NetworkSendHandle);
-	if (PdhStatus != ERROR_SUCCESS)
+	if (!AddCounter(PERFM_PATH_NETWORK_SENT_RATE))
 	{
-		XIAO_LOG(Warning, TEXT("PdhAddEnglishCounter %s failed. Error code: %d"), *CounterName, PdhStatus);
 		return;
 	}
-
-	// \\GPU Engine(*)\\Utilization Percentage
-	CounterName = TEXT("\\GPU Engine(*_3D)\\Utilization Percentage");
-	PdhStatus = ::PdhAddEnglishCounter(QueryHandle, *CounterName, 0, &GpuUtilizeHandle);
-	if (PdhStatus != ERROR_SUCCESS)
+	if (!AddCounter(PERFM_PATH_GPU_3D_UTILITY))
 	{
-		XIAO_LOG(Warning, TEXT("PdhAddEnglishCounter %s failed. Error code: %d"), *CounterName, PdhStatus);
+		return;
+	}
+	if (!AddCounter(PERFM_PATH_GPU_MEMORY_DEDICATED_USAGE_UTILITY))
+	{
+		return;
+	}
+	if (!AddCounter(PERFM_PATH_GPU_MEMORY_SHARE_USAGE_UTILITY))
+	{
 		return;
 	}
 
@@ -228,7 +221,7 @@ float FWindowsAgentStatsMonitor::GetCpuTemperature()
 float FWindowsAgentStatsMonitor::GetNetworkUtilization()
 {
 	PDH_FMT_COUNTERVALUE CounterRecvValue;
-	PDH_STATUS PdhStatus = ::PdhGetFormattedCounterValue(NetworkRecvHandle, PDH_FMT_DOUBLE, nullptr, &CounterRecvValue);
+	PDH_STATUS PdhStatus = ::PdhGetFormattedCounterValue(Counter2Handle[PERFM_PATH_NETWORK_BAND_WIDTH], PDH_FMT_DOUBLE, nullptr, &CounterRecvValue);
 	if (PdhStatus != ERROR_SUCCESS)
 	{
 		static bool CallOnce = true;
@@ -241,45 +234,17 @@ float FWindowsAgentStatsMonitor::GetNetworkUtilization()
 	}
 	LastRecvSpeed = CounterRecvValue.doubleValue;
 
-	PDH_FMT_COUNTERVALUE CounterSendValue;
-	PdhStatus = ::PdhGetFormattedCounterValue(NetworkSendHandle, PDH_FMT_DOUBLE, nullptr, &CounterSendValue);
-	if (PdhStatus != ERROR_SUCCESS)
-	{
-		static bool CallOnce = true;
-		if (CallOnce)
-		{
-			CallOnce = false;
-			XIAO_LOG(Warning, TEXT("PdhGetFormattedCounterValue \"Network Send\" failed. Error code: %d"), PdhStatus);
-		}
-		return 100.0f;
-	}
-	LastSendSpeed = CounterSendValue.doubleValue;
-
-	PDH_FMT_COUNTERVALUE CounterBandWidthValue;
-	PdhStatus = ::PdhGetFormattedCounterValue(NetworkBandWidthHandle, PDH_FMT_DOUBLE, nullptr, &CounterBandWidthValue);
-	if (PdhStatus != ERROR_SUCCESS)
-	{
-		static bool CallOnce = true;
-		if (CallOnce)
-		{
-			CallOnce = false;
-			XIAO_LOG(Warning, TEXT("PdhGetFormattedCounterValue \"Network Bandwidth\" failed. Error code: %d"), PdhStatus);
-		}
-		return 0.0f;
-	}
-	LastBandWidth = CounterBandWidthValue.doubleValue;
-
 	return FMath::Abs((FMath::Abs(LastRecvSpeed)+FMath::Abs(LastSendSpeed))/2.0f/LastBandWidth);
 }
 
 float FWindowsAgentStatsMonitor::GetNetworkSpeed()
 {
 	PDH_FMT_COUNTERVALUE RecvValue = { 0 };
-	GetFormattedCounterArray(NetworkRecvHandle, PDH_FMT_DOUBLE, &RecvValue);
+	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_NETWORK_RECV_RATE], PDH_FMT_DOUBLE, &RecvValue);
 	LastRecvSpeed = RecvValue.doubleValue;
 
 	PDH_FMT_COUNTERVALUE SentValue = { 0 };
-	GetFormattedCounterArray(NetworkRecvHandle, PDH_FMT_DOUBLE, &SentValue);
+	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_NETWORK_SENT_RATE], PDH_FMT_DOUBLE, &SentValue);
 	LastSendSpeed = SentValue.doubleValue;
 
 	return (FMath::Abs(LastRecvSpeed) + FMath::Abs(LastSendSpeed)) / 2.0f;
@@ -288,13 +253,23 @@ float FWindowsAgentStatsMonitor::GetNetworkSpeed()
 float FWindowsAgentStatsMonitor::GetGpuUtilization()
 {
 	PDH_FMT_COUNTERVALUE Value = { 0 };
-	GetFormattedCounterArray(GpuUtilizeHandle, PDH_FMT_DOUBLE, &Value);
+	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_GPU_3D_UTILITY], PDH_FMT_DOUBLE, &Value);
 	return (1.0f-Value.doubleValue)*100.0f;
 }
 
 float FWindowsAgentStatsMonitor::GetGpuTemperature()
 {
 	return 0.0f;
+}
+
+bool FWindowsAgentStatsMonitor::GetGpuMemoryUsageUtility(TTuple<float, float>& OutMemoryUsageUtililty)
+{
+	PDH_FMT_COUNTERVALUE Value = { 0 };
+	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_GPU_MEMORY_DEDICATED_USAGE_UTILITY], PDH_FMT_DOUBLE, &Value);
+	OutMemoryUsageUtililty.Key = Value.doubleValue;
+	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_GPU_MEMORY_SHARE_USAGE_UTILITY], PDH_FMT_DOUBLE, &Value);
+	OutMemoryUsageUtililty.Value = Value.doubleValue;
+	return true;
 }
 
 bool FWindowsAgentStatsMonitor::GetHelperCache(TTuple<int16, int16>& OutGpuUtilization)
@@ -310,7 +285,7 @@ bool FWindowsAgentStatsMonitor::GetUpDownTime(TTuple<bool, FString>& OutUpDownTi
 bool FWindowsAgentStatsMonitor::QueryUpdatedUtilization()
 {
 	PDH_FMT_COUNTERVALUE CounterValue;
-	const PDH_STATUS PdhStatus = ::PdhGetFormattedCounterValue(ProcessorCounterHandle, PDH_FMT_DOUBLE, nullptr, &CounterValue);
+	const PDH_STATUS PdhStatus = ::PdhGetFormattedCounterValue(Counter2Handle[PERFM_PATH_CPU_UTILITY], PDH_FMT_DOUBLE, nullptr, &CounterValue);
 	if (PdhStatus != ERROR_SUCCESS)
 	{
 		XIAO_LOG(Warning, TEXT("PdhGetFormattedCounterValue failed. Error code: %d"), PdhStatus);
@@ -319,5 +294,18 @@ bool FWindowsAgentStatsMonitor::QueryUpdatedUtilization()
 	CoreCpuUtilization[0] = FMath::RoundToInt(CounterValue.doubleValue);
 
 	LastQueryTime = FPlatformTime::Seconds();
+	return true;
+}
+
+bool FWindowsAgentStatsMonitor::AddCounter(const FString& InCounterName)
+{
+	PDH_HCOUNTER CounterHandle;
+	const PDH_STATUS PdhStatus = ::PdhAddEnglishCounter(QueryHandle, *InCounterName, 0, &CounterHandle);
+	if (PdhStatus != ERROR_SUCCESS)
+	{
+		XIAO_LOG(Warning, TEXT("PdhAddEnglishCounter %s failed. Error code: %d"), *InCounterName, PdhStatus);
+		return false;
+	}
+	Counter2Handle.Add(InCounterName, CounterHandle);
 	return true;
 }
