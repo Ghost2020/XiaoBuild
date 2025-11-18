@@ -314,6 +314,10 @@ TSharedRef<SWidget> SAgentListRow::GenerateWidgetForColumn(const FName& InColumn
 	{
 		return RANGE_BOX(usememory, totalmemory, physicalmemory, TEXT("%.1f/%.1f GB"));
 	}
+	if(InColumnName == S_ColumnIdAvaDisk)
+	{
+		return PERCENT_BOX(avadisk, diskavamin, TEXT("%d%%"));
+	}
 	if(InColumnName == S_ColumnIdAvaNet)
 	{
 		return PERCENT_BOX(avalnet, networkavamin, TEXT("%d%%"));
@@ -468,6 +472,10 @@ TSharedRef<SWidget> SAgentListRow::GenerateWidgetForColumn(const FName& InColumn
 	if(InColumnName == S_ColumnIdCpuArch)
 	{
 		return TEXT_BLOCK(cpuarch);
+	}
+	if (InColumnName == S_ColumnIdGpuInfo)
+	{
+		return TEXT_BLOCK(gpudesc);
 	}
 	if(InColumnName == S_ColumnIdLoggedOnUser)
 	{

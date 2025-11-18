@@ -201,6 +201,7 @@ class FAgentProto final :
     kCpuArchFieldNumber = 47,
     kPortMappedAddressFieldNumber = 48,
     kVersionFieldNumber = 49,
+    kGpuDescFieldNumber = 51,
     kStatusFieldNumber = 1,
     kTypeFieldNumber = 3,
     kCpuAvaFieldNumber = 6,
@@ -234,6 +235,9 @@ class FAgentProto final :
     kLocalMaxCpuFieldNumber = 44,
     kAvalNetFieldNumber = 45,
     kAvaGpuFieldNumber = 46,
+    kAvaDiskFieldNumber = 50,
+    kTotalGpuMemFieldNumber = 52,
+    kUseGpuMemFieldNumber = 53,
   };
   // string Username = 2;
   void clear_username();
@@ -457,6 +461,20 @@ class FAgentProto final :
   const std::string& _internal_version() const;
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_version(const std::string& value);
   std::string* _internal_mutable_version();
+  public:
+
+  // string GpuDesc = 51;
+  void clear_gpudesc();
+  const std::string& gpudesc() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_gpudesc(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_gpudesc();
+  PROTOBUF_MUST_USE_RESULT std::string* release_gpudesc();
+  void set_allocated_gpudesc(std::string* gpudesc);
+  private:
+  const std::string& _internal_gpudesc() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_gpudesc(const std::string& value);
+  std::string* _internal_mutable_gpudesc();
   public:
 
   // int32 Status = 1;
@@ -756,6 +774,33 @@ class FAgentProto final :
   void _internal_set_avagpu(float value);
   public:
 
+  // float AvaDisk = 50;
+  void clear_avadisk();
+  float avadisk() const;
+  void set_avadisk(float value);
+  private:
+  float _internal_avadisk() const;
+  void _internal_set_avadisk(float value);
+  public:
+
+  // float TotalGpuMem = 52;
+  void clear_totalgpumem();
+  float totalgpumem() const;
+  void set_totalgpumem(float value);
+  private:
+  float _internal_totalgpumem() const;
+  void _internal_set_totalgpumem(float value);
+  public:
+
+  // float UseGpuMem = 53;
+  void clear_usegpumem();
+  float usegpumem() const;
+  void set_usegpumem(float value);
+  private:
+  float _internal_usegpumem() const;
+  void _internal_set_usegpumem(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:FAgentProto)
  private:
   class _Internal;
@@ -779,6 +824,7 @@ class FAgentProto final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cpuarch_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr portmappedaddress_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr version_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr gpudesc_;
   ::PROTOBUF_NAMESPACE_ID::int32 status_;
   ::PROTOBUF_NAMESPACE_ID::int32 type_;
   float cpuava_;
@@ -812,6 +858,9 @@ class FAgentProto final :
   ::PROTOBUF_NAMESPACE_ID::int32 localmaxcpu_;
   float avalnet_;
   float avagpu_;
+  float avadisk_;
+  float totalgpumem_;
+  float usegpumem_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_agent_2eproto;
 };
@@ -2372,6 +2421,112 @@ inline void FAgentProto::set_allocated_version(std::string* version) {
   version_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), version,
       GetArenaForAllocation());
   // @@protoc_insertion_point(field_set_allocated:FAgentProto.version)
+}
+
+// float AvaDisk = 50;
+inline void FAgentProto::clear_avadisk() {
+  avadisk_ = 0;
+}
+inline float FAgentProto::_internal_avadisk() const {
+  return avadisk_;
+}
+inline float FAgentProto::avadisk() const {
+  // @@protoc_insertion_point(field_get:FAgentProto.AvaDisk)
+  return _internal_avadisk();
+}
+inline void FAgentProto::_internal_set_avadisk(float value) {
+  
+  avadisk_ = value;
+}
+inline void FAgentProto::set_avadisk(float value) {
+  _internal_set_avadisk(value);
+  // @@protoc_insertion_point(field_set:FAgentProto.AvaDisk)
+}
+
+// string GpuDesc = 51;
+inline void FAgentProto::clear_gpudesc() {
+  gpudesc_.ClearToEmpty();
+}
+inline const std::string& FAgentProto::gpudesc() const {
+  // @@protoc_insertion_point(field_get:FAgentProto.GpuDesc)
+  return _internal_gpudesc();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void FAgentProto::set_gpudesc(ArgT0&& arg0, ArgT... args) {
+ 
+ gpudesc_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:FAgentProto.GpuDesc)
+}
+inline std::string* FAgentProto::mutable_gpudesc() {
+  std::string* _s = _internal_mutable_gpudesc();
+  // @@protoc_insertion_point(field_mutable:FAgentProto.GpuDesc)
+  return _s;
+}
+inline const std::string& FAgentProto::_internal_gpudesc() const {
+  return gpudesc_.Get();
+}
+inline void FAgentProto::_internal_set_gpudesc(const std::string& value) {
+  
+  gpudesc_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* FAgentProto::_internal_mutable_gpudesc() {
+  
+  return gpudesc_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* FAgentProto::release_gpudesc() {
+  // @@protoc_insertion_point(field_release:FAgentProto.GpuDesc)
+  return gpudesc_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void FAgentProto::set_allocated_gpudesc(std::string* gpudesc) {
+  if (gpudesc != nullptr) {
+    
+  } else {
+    
+  }
+  gpudesc_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), gpudesc,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:FAgentProto.GpuDesc)
+}
+
+// float TotalGpuMem = 52;
+inline void FAgentProto::clear_totalgpumem() {
+  totalgpumem_ = 0;
+}
+inline float FAgentProto::_internal_totalgpumem() const {
+  return totalgpumem_;
+}
+inline float FAgentProto::totalgpumem() const {
+  // @@protoc_insertion_point(field_get:FAgentProto.TotalGpuMem)
+  return _internal_totalgpumem();
+}
+inline void FAgentProto::_internal_set_totalgpumem(float value) {
+  
+  totalgpumem_ = value;
+}
+inline void FAgentProto::set_totalgpumem(float value) {
+  _internal_set_totalgpumem(value);
+  // @@protoc_insertion_point(field_set:FAgentProto.TotalGpuMem)
+}
+
+// float UseGpuMem = 53;
+inline void FAgentProto::clear_usegpumem() {
+  usegpumem_ = 0;
+}
+inline float FAgentProto::_internal_usegpumem() const {
+  return usegpumem_;
+}
+inline float FAgentProto::usegpumem() const {
+  // @@protoc_insertion_point(field_get:FAgentProto.UseGpuMem)
+  return _internal_usegpumem();
+}
+inline void FAgentProto::_internal_set_usegpumem(float value) {
+  
+  usegpumem_ = value;
+}
+inline void FAgentProto::set_usegpumem(float value) {
+  _internal_set_usegpumem(value);
+  // @@protoc_insertion_point(field_set:FAgentProto.UseGpuMem)
 }
 
 // -------------------------------------------------------------------

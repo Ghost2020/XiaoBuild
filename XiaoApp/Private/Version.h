@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "XiaoVersion.h"
+#include "../../Xiao/XiaoVersion.h"
 
 #define XB_PRODUCT_NAME "XiaoApp"
 #define XB_PRODUCT_DESCRIPTION "XiaoBuild App"

@@ -69,6 +69,30 @@
 		] \
 	] \
 
+
+#define ADD_PERCENTBOX_SLOT(DISPLAY_TEXT, TOOLTIP_TEXT, PREDICATE) \
+	+ SHorizontalBox::Slot().Padding(10.0f) \
+	[ \
+		SNew(SHorizontalBox) \
+		+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center) \
+		[ \
+			SNew(STextBlock) \
+			.Text(DISPLAY_TEXT) \
+			.ToolTipText(TOOLTIP_TEXT) \
+		] \
+		+ SHorizontalBox::Slot().AutoWidth() \
+		[ \
+			SNew(SNumericEntryBox<float>) \
+			.MinValue(0.0f).MaxValue(100) \
+			.Value_Lambda([this]() { \
+				return GModifySystemSettings.PREDICATE(); \
+			}) \
+			.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type) { \
+				GModifySystemSettings.set_##PREDICATE(InValue); \
+			}) \
+		] \
+	]
+
 namespace
 {
 	static const FText SSystemUpdate = LOCTEXT("SystemUpdate_Text", "系统设置更新完成");
@@ -340,134 +364,11 @@ void SSettingsView::Construct(const FArguments& InArgs)
 									]
 								]
 							]
-
-							+ SHorizontalBox::Slot().Padding(10.0f)
-							[
-								SNew(SHorizontalBox)
-								+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-								[
-									SNew(STextBlock).Text(LOCTEXT("VirtualMemory_Text", "虚拟内存"))
-								]
-								+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left)
-								[
-									SNew(SConstrainBox).MaxWidth(200.0f).MinWidth(200.0f)
-									[
-										SNew(SHorizontalBox)
-										+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left).MinWidth(10.0f)
-										[
-											SNew(SNumericEntryBox<float>)
-											.MinValue(0.0f).MaxValue(MAX_uint16)
-											.Value_Lambda([this](){
-												TSharedPtr<FText> UnitText = DiskUnitArray[1];
-												if (VirtualMemoryUnitBox.IsValid())
-												{
-													UnitText = VirtualMemoryUnitBox->GetSelectedItem();
-												}
-												return ToShowVal(UnitText, GModifySystemSettings.virtualmemoryminimal());
-											})
-											.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type){
-												GModifySystemSettings.set_virtualmemoryminimal(ToRealVal(VirtualMemoryUnitBox->GetSelectedItem(), InValue));
-											})
-										]
-										+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left)
-										[
-											SAssignNew(VirtualMemoryUnitBox, SComboBox<TSharedPtr<FText>>)
-											.OptionsSource(&DiskUnitArray)
-											.InitiallySelectedItem(DiskUnitArray[1])
-											.OnGenerateWidget_Lambda([](const TSharedPtr<FText> InText){
-												return SNew(STextBlock).Text(*InText);
-											})
-											.OnSelectionChanged_Lambda([this](const TSharedPtr<FText> InText, ESelectInfo::Type){
-												const float ShowVal = ToShowVal(InText, GModifySystemSettings.virtualmemoryminimal());
-												GModifySystemSettings.set_virtualmemoryminimal(ToRealVal(InText, ShowVal));
-											})
-											.Content()
-											[
-												SNew(STextBlock).Text_Lambda([this](){
-													return *this->VirtualMemoryUnitBox->GetSelectedItem();
-												})
-											]
-										]
-									]
-								]
-							]
-											
-							+ SHorizontalBox::Slot().Padding(10.0f)
-							[
-								SNew(SHorizontalBox)
-								+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-								[
-									SNew(STextBlock)
-									.Text(LOCTEXT("AvailableCPUMinimal_Text", "可用CPU(%)"))
-									.ToolTipText(LOCTEXT("AvailableCPUMinimal_ToolTip", "作为协助者必须有至少额外的cpu百分比"))
-								]
-
-								+ SHorizontalBox::Slot().AutoWidth()
-								[
-									SNew(SNumericEntryBox<float>)
-									.MinValue(0.0f).MaxValue(100)
-									.Value_Lambda([this]()
-									{
-										return GModifySystemSettings.cpuavailableminimal();
-									})
-									.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type)
-									{
-										GModifySystemSettings.set_cpuavailableminimal(InValue);
-									})
-								]
-							]
-
-							/*+ SHorizontalBox::Slot().Padding(10.0f)
-							[
-								SNew(SHorizontalBox)
-								+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-								[
-									SNew(STextBlock)
-										.Text(LOCTEXT("AvailableNetMinimal_Text", "网络使用率(%)"))
-										.ToolTipText(LOCTEXT("AvailableCPUMinimal_ToolTip", "作为协助者必须有至少额外的cpu百分比"))
-								]
-
-								+ SHorizontalBox::Slot()
-								[
-									SNew(SConstrainBox).MaxWidth(100.0f).MinWidth(100.0f)
-									[
-										SNew(SNumericEntryBox<float>)
-										.MinValue(0.0f).MaxValue(100.0f)
-										.Value_Lambda([this](){
-											return GModifySystemSettings.networkavamin();
-										})
-										.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type){
-											GModifySystemSettings.set_networkavamin(InValue);
-										})
-									]
-								]
-							]
-
-							+ SHorizontalBox::Slot().Padding(10.0f)
-							[
-								SNew(SHorizontalBox)
-								+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-								[
-									SNew(STextBlock)
-									.Text(LOCTEXT("AvailableGpuMinimal_Text", "Gpu使用率(%)"))
-									.ToolTipText(LOCTEXT("AvailableGpuUMinimal_ToolTip", "作为协助者必须有至少额外的Gpu百分比"))
-								]
-
-								+ SHorizontalBox::Slot()
-								[
-									SNew(SConstrainBox).MaxWidth(100.0f).MinWidth(100.0f)
-									[
-										SNew(SNumericEntryBox<float>)
-										.MinValue(0.0f).MaxValue(100)
-										.Value_Lambda([this](){
-											return GModifySystemSettings.gpuavamin();
-										})
-										.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type){
-											GModifySystemSettings.set_gpuavamin(InValue);
-										})
-									]
-								]
-							]*/
+							
+							ADD_PERCENTBOX_SLOT(LOCTEXT("AvailableCPUMinimal_Text", "可用CPU(%)"), LOCTEXT("AvailableCPUMinimal_ToolTip", "作为协助者必须有至少额外的cpu百分比"), cpuavailableminimal)
+							ADD_PERCENTBOX_SLOT(LOCTEXT("AvailableDiskMinimal_Text", "可用磁盘(%)"), LOCTEXT("AvailableDiskMinimal_ToolTip", "作为协助者必须有至少额外的磁盘百分比"), diskavamin)
+							ADD_PERCENTBOX_SLOT(LOCTEXT("AvailableNetMinimal_Text", "可用网络(%)"), LOCTEXT("AvailableNetMinimal_ToolTip", "作为协助者必须有至少额外的网络百分比"), networkavamin)
+							ADD_PERCENTBOX_SLOT(LOCTEXT("AvailableGpuMinimal_Text", "可用Gpu(%)"), LOCTEXT("AvailableGpuUMinimal_ToolTip", "作为协助者必须有至少额外的Gpu百分比"), gpuavamin)
 						]
 #pragma endregion
 										
@@ -1265,6 +1166,7 @@ float SSettingsView::ToRealVal(const TSharedPtr<FText>& InText, const float& InS
 	return InShowData;
 }
 
+#undef ADD_PERCENTBOX_SLOT
 #undef ADD_CHECKBOX_SLOT
 #undef ADD_PORT_SLOT
 #undef LOCTEXT_NAMESPACE

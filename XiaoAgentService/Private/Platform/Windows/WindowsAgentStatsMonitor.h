@@ -23,8 +23,10 @@ public:
 	virtual bool CollectQueryData() override;
 	virtual float GetCpuUtilization() override;
 	virtual float GetCpuTemperature() override;
+	virtual float GetDiskUtilization() override;
 	virtual float GetNetworkUtilization() override;
 	virtual float GetNetworkSpeed() override;
+	virtual FString GetGPUDesc() override;
 	virtual float GetGpuUtilization() override;
 	virtual float GetGpuTemperature() override;
 	virtual bool GetGpuMemoryUsageUtility(TTuple<float, float>& OutMemoryUsageUtililty) override;
@@ -38,6 +40,7 @@ private:
 	HQUERY QueryHandle = INVALID_HANDLE_VALUE;
 	double LastQueryTime = DBL_MIN;
 
+	SIZE_T GPUSystemMemory = 0;
 	// 网络带宽
 	double LastBandWidth = 0.0f;
 	// 发送速度

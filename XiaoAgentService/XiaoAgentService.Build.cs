@@ -42,7 +42,6 @@ public class XiaoAgentService : ModuleRules
 			{
 				"Core",
 				"Projects",
-				// "Networking",
 				"Protobuf",
 				"Redis"
 			}
@@ -51,6 +50,7 @@ public class XiaoAgentService : ModuleRules
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
 			PublicSystemLibraries.Add("Pdh.lib");
+			PublicSystemLibraries.Add("dxgi.lib");
 		}
 	}
 }

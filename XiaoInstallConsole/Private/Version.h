@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "XiaoVersion.h"
+#include "../../Xiao/XiaoVersion.h"
 
 #define XB_PRODUCT_NAME "XiaoInstalleConsole"
 #define XB_PRODUCT_DESCRIPTION "Xiao Install Console"

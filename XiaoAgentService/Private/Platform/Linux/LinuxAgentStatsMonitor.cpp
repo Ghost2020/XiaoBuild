@@ -3,8 +3,6 @@
 #include "HAL/PlatformTime.h"
 #include "XiaoLog.h"
 
-static float const SMegabyteNum = 1024 * 1024;
-
 FLinuxAgentStatsMonitor::FLinuxAgentStatsMonitor()
 {
 	

@@ -101,6 +101,14 @@ message FAgentProto
 	string PortMappedAddress = 48;
 	// Version
 	string version = 49;
+	// 磁盘利用率
+	float AvaDisk = 50;
+	// Gpu 描述
+	string GpuDesc = 51;
+	// GPU 总内存大小(GB)
+	float TotalGpuMem = 52;
+	// GPU 使用内存大小(GB)
+	float UseGpuMem = 53;
 }
 
 // 代理信息列表

@@ -484,6 +484,7 @@ void FAgentService::UpdateAgentProtobuf(const bool bInit)
 		const std::string CpuArch = GetCpuArchitecture();
 		SAgentProto.set_cpuarch(CpuArch);
 		*SAgentProto.mutable_version() = TCHAR_TO_UTF8(XB_VERSION_STRING);
+		*SAgentProto.mutable_gpudesc() = TCHAR_TO_UTF8(*SAgentStats.GetGPUDesc());
 	}
 
 	// 初始化默认值

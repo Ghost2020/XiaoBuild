@@ -1,11 +1,11 @@
 #include "WindowsAgentStatsMonitor.h"
 #include "HAL/PlatformMisc.h"
 #include "HAL/PlatformTime.h"
+#include <dxgi.h>
 #include "XiaoLog.h"
 
-static constexpr float SMegabyteNum = 1024 * 1024;
-
 static FString PERFM_PATH_CPU_UTILITY(TEXT("\\Processor Information(_Total)\\% Processor Utility"));
+static FString PERFM_PATH_DISK_UTILITY(TEXT("\\PhysicalDisk(_Total)\\% Disk Time"));
 static FString PERFM_PATH_NETWORK_BAND_WIDTH(TEXT("\\Network Interface(*)\\Current Bandwidth"));
 static FString PERFM_PATH_NETWORK_RECV_RATE(TEXT("\\Network Interface(*)\\Bytes Received/sec"));
 static FString PERFM_PATH_NETWORK_SENT_RATE(TEXT("\\Network Interface(*)\\Bytes Sent/sec"));
@@ -38,6 +38,10 @@ void FWindowsAgentStatsMonitor::Initialize()
 	const int32 NumCores = FPlatformMisc::NumberOfCores();
 	CoreCpuUtilization.SetNum(1);
 	if (!AddCounter(PERFM_PATH_CPU_UTILITY))
+	{
+		return;
+	}
+	if (!AddCounter(PERFM_PATH_DISK_UTILITY))
 	{
 		return;
 	}
@@ -218,23 +222,20 @@ float FWindowsAgentStatsMonitor::GetCpuTemperature()
 	return 0.0f;
 }
 
+float FWindowsAgentStatsMonitor::GetDiskUtilization()
+{
+	PDH_FMT_COUNTERVALUE DiskUtilityValue;
+	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_DISK_UTILITY], PDH_FMT_DOUBLE, &DiskUtilityValue);
+	return 100.0f - DiskUtilityValue.doubleValue;
+}
+
 float FWindowsAgentStatsMonitor::GetNetworkUtilization()
 {
-	PDH_FMT_COUNTERVALUE CounterRecvValue;
-	PDH_STATUS PdhStatus = ::PdhGetFormattedCounterValue(Counter2Handle[PERFM_PATH_NETWORK_BAND_WIDTH], PDH_FMT_DOUBLE, nullptr, &CounterRecvValue);
-	if (PdhStatus != ERROR_SUCCESS)
-	{
-		static bool CallOnce = true;
-		if (CallOnce)
-		{
-			CallOnce = false;
-			XIAO_LOG(Warning, TEXT("PdhGetFormattedCounterValue \"Network Recv\" failed. Error code: %d"), PdhStatus);
-		}
-		return 100.0f;
-	}
-	LastRecvSpeed = CounterRecvValue.doubleValue;
+	PDH_FMT_COUNTERVALUE CounterBandWidth;
+	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_NETWORK_BAND_WIDTH], PDH_FMT_DOUBLE, &CounterBandWidth);
+	LastBandWidth = CounterBandWidth.doubleValue;
 
-	return FMath::Abs((FMath::Abs(LastRecvSpeed)+FMath::Abs(LastSendSpeed))/2.0f/LastBandWidth);
+	return (1.0f - (LastRecvSpeed+LastSendSpeed)*8.0f/LastBandWidth)*100.0f;
 }
 
 float FWindowsAgentStatsMonitor::GetNetworkSpeed()
@@ -248,6 +249,38 @@ float FWindowsAgentStatsMonitor::GetNetworkSpeed()
 	LastSendSpeed = SentValue.doubleValue;
 
 	return (FMath::Abs(LastRecvSpeed) + FMath::Abs(LastSendSpeed)) / 2.0f;
+}
+
+FString FWindowsAgentStatsMonitor::GetGPUDesc()
+{
+	TRefCountPtr<IDXGIFactory1> DXGIFactory1;
+	if (CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&DXGIFactory1) != S_OK || !DXGIFactory1)
+	{
+		return {};
+	}
+
+	DXGI_ADAPTER_DESC BestDesc = {};
+	TRefCountPtr<IDXGIAdapter> TempAdapter;
+	for (uint32 AdapterIndex = 0; DXGIFactory1->EnumAdapters(AdapterIndex, TempAdapter.GetInitReference()) != DXGI_ERROR_NOT_FOUND; ++AdapterIndex)
+	{
+		if (TempAdapter)
+		{
+			DXGI_ADAPTER_DESC Desc;
+			TempAdapter->GetDesc(&Desc);
+
+			if (Desc.DedicatedVideoMemory > BestDesc.DedicatedVideoMemory || AdapterIndex == 0)
+			{
+				BestDesc = Desc;
+			}
+		}
+	}
+
+	if (GPUSystemMemory == 0)
+	{
+		GPUSystemMemory = BestDesc.DedicatedVideoMemory;
+		// XIAO_LOG(Log, TEXT("GPUSystemMemory::%f"), GPUSystemMemory / SMegabyteNum);
+	}
+	return BestDesc.Description;
 }
 
 float FWindowsAgentStatsMonitor::GetGpuUtilization()
@@ -266,9 +299,9 @@ bool FWindowsAgentStatsMonitor::GetGpuMemoryUsageUtility(TTuple<float, float>& O
 {
 	PDH_FMT_COUNTERVALUE Value = { 0 };
 	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_GPU_MEMORY_DEDICATED_USAGE_UTILITY], PDH_FMT_DOUBLE, &Value);
-	OutMemoryUsageUtililty.Key = Value.doubleValue;
+	OutMemoryUsageUtililty.Key = Value.doubleValue / SMegabyteNum;
 	GetFormattedCounterArray(Counter2Handle[PERFM_PATH_GPU_MEMORY_SHARE_USAGE_UTILITY], PDH_FMT_DOUBLE, &Value);
-	OutMemoryUsageUtililty.Value = Value.doubleValue;
+	OutMemoryUsageUtililty.Value = Value.doubleValue/ SMegabyteNum;
 	return true;
 }
 

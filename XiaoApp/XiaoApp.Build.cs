@@ -21,7 +21,7 @@ public class XiaoApp : ModuleRules
 			{
 				"Runtime/Launch/Resources",
 				"Runtime/Launch/Public",
-				"Programs/XiaoBuild/Xiao",
+				"Programs/XiaoBuild/Xiao"
 			}
 		);
 		PrivateIncludePaths.AddRange(
@@ -67,7 +67,6 @@ public class XiaoApp : ModuleRules
 				"DesktopPlatform",
 				"SourceCodeAccess",
 				"InputCore",
-				// "HTTP",
 				"Protobuf",
 				"Redis",
 				"Boost",

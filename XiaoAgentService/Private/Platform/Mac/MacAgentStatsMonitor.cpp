@@ -12,7 +12,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-static float const SMegabyteNum = 1024 * 1024;
 
 FMacAgentStatsMonitor::FMacAgentStatsMonitor()
 {

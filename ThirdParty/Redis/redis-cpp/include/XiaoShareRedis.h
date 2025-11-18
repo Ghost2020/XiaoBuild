@@ -378,11 +378,11 @@ namespace XiaoRedis
 		OutSettings.set_virtualmemoryminimal(1.0f);
 		OutSettings.set_physicalmemory(1.0f);
 		OutSettings.set_cpuavailableminimal(40.0f);
+		OutSettings.set_diskavamin(50.0f);
 		OutSettings.set_benablehelper(true);
 		OutSettings.set_helpercoreavailablepercentminimal(30.0f);
-		// #FIXME 未能能让Coordi测试通过暂时设置小于0
-		OutSettings.set_networkavamin(-0.01f);
-		OutSettings.set_gpuavamin(-0.01f);
+		OutSettings.set_networkavamin(10.0f);
+		OutSettings.set_gpuavamin(10.0f);
 
 		OutSettings.set_maxinitiatornum(10);
 		OutSettings.set_maxcorenum(500);
@@ -412,6 +412,7 @@ namespace XiaoRedis
 		|| !FMath::IsNearlyEqual(L.virtualmemoryminimal(), R.virtualmemoryminimal(), 0.01f)
 		|| !FMath::IsNearlyEqual(L.physicalmemory(), R.physicalmemory(), 0.01f)
 		|| !FMath::IsNearlyEqual(L.cpuavailableminimal(), R.cpuavailableminimal(), 0.1f)
+		|| !FMath::IsNearlyEqual(L.diskavamin(), R.diskavamin(), 0.1f)
 		|| L.benablehelper() != R.benablehelper()
 		|| !FMath::IsNearlyEqual(L.helpercoreavailablepercentminimal(), R.helpercoreavailablepercentminimal(), 0.1f)
 		|| !FMath::IsNearlyEqual(L.networkavamin(), R.networkavamin(), 0.1f)
@@ -450,6 +451,7 @@ namespace XiaoRedis
 		Out.set_virtualmemoryminimal(L.virtualmemoryminimal());
 		Out.set_physicalmemory(L.physicalmemory());
 		Out.set_cpuavailableminimal(L.cpuavailableminimal());
+		Out.set_diskavamin(L.diskavamin());
 		Out.set_networkavamin(L.networkavamin());
 		Out.set_gpuavamin(L.gpuavamin());
 

@@ -298,8 +298,9 @@ void SAgentView::Construct(const FArguments& InArgs)
 							+ SHeaderRow::Column(S_ColumnIdAvaCpu).DefaultLabel(LOCTEXT("AvaCpu_Text", "CPU%")).DefaultTooltip(LOCTEXT("AvaCpu_ToopTip", "CPU利用率")).FillSized(80.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdAvaCpu).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdAvailableMemory).DefaultLabel(LOCTEXT("AvailableMemory_Text", "可用内存")).DefaultTooltip(LOCTEXT("AvailableMemory_ToopTip", "当前系统剩余可利用的物理内存")).FillSized(100.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdAvailableMemory).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdFreeDiskSpace).DefaultLabel(LOCTEXT("FreeDiskSpace_Text", "剩余硬盘空间")).DefaultTooltip(LOCTEXT("FreeDiskSpace_ToopTip", "当前系统盘的存储空间使用情况")).FillSized(120.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdFreeDiskSpace).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
-							// + SHeaderRow::Column(S_ColumnIdAvaNet).Visibility(EVisibility::Collapsed).DefaultLabel(LOCTEXT("AvaNet_Text", "Net%")).DefaultTooltip(LOCTEXT("AvaNet_ToopTip", "此时此刻网络利用率")).FillSized(120.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdAvaNet).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
-							+ SHeaderRow::Column(S_ColumnIdAvaGpu).Visibility(EVisibility::Collapsed).DefaultLabel(LOCTEXT("AvaGpu_Text", "GPU%")).DefaultTooltip(LOCTEXT("AvaGpu_ToopTip", "此时此刻GPU利用率")).FillSized(80.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdAvaGpu).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
+							+ SHeaderRow::Column(S_ColumnIdAvaDisk).Visibility(EVisibility::Collapsed).DefaultLabel(LOCTEXT("AvaDisk_Text", "磁盘%")).DefaultTooltip(LOCTEXT("AvaDisk_ToopTip", "所有物理驱动器的总利用率")).FillSized(80.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdAvaDisk).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
+							+ SHeaderRow::Column(S_ColumnIdAvaNet).Visibility(EVisibility::Collapsed).DefaultLabel(LOCTEXT("AvaNet_Text", "网络%")).DefaultTooltip(LOCTEXT("AvaNet_ToopTip", "当前主要网络上的网络利用率")).FillSized(80.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdAvaNet).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
+							+ SHeaderRow::Column(S_ColumnIdAvaGpu).Visibility(EVisibility::Collapsed).DefaultLabel(LOCTEXT("AvaGpu_Text", "GPU%")).DefaultTooltip(LOCTEXT("AvaGpu_ToopTip", "所有GPU引擎的最高利用率")).FillSized(80.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdAvaGpu).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdRegisteredHelperCores).DefaultLabel(LOCTEXT("RegisteredHelperCores_Text", "协助核心数")).DefaultTooltip(LOCTEXT("RegisteredHelperCores_ToopTip", "能够作为协助的Processor数量")).FillSized(100.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdRegisteredHelperCores).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdMaxConnectAgentNum).DefaultLabel(LOCTEXT("MaxAgentCon_Text", "最大代理连接数")).DefaultTooltip(LOCTEXT("MaxAgentCon_ToopTip", "作为发起者时最大能够请求的协助者数量")).FillSized(125.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdMaxConnectAgentNum).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdMaxProcessors).DefaultLabel(LOCTEXT("MaxProcessors_Text", "最大运行进程数")).DefaultTooltip(LOCTEXT("MaxProcessors_ToopTip", "作为发起者时最大能够调动的进程数量")).FillSized(150.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdMaxProcessors).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
@@ -315,6 +316,7 @@ void SAgentView::Construct(const FArguments& InArgs)
 							+ SHeaderRow::Column(S_ColumnIdLogicCores).DefaultLabel(LOCTEXT("LogicCores_Text", "逻辑核心数量")).DefaultTooltip(LOCTEXT("LogicCores_ToopTip", "在支持")).FillSized(100.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdLogicCores).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdCpuInfo).DefaultLabel(LOCTEXT("CpuInfo_Text", "CPU详情")).FillSized(400.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdCpuInfo).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)					
 							+ SHeaderRow::Column(S_ColumnIdCpuArch).DefaultLabel(LOCTEXT("CpuArch_Text", "CPU架构")).FillSized(100.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdCpuArch).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
+							+ SHeaderRow::Column(S_ColumnIdGpuInfo).DefaultLabel(LOCTEXT("GpuArch_Text", "GPU详情")).FillSized(200.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdGpuInfo).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdLastConnected).DefaultLabel(LOCTEXT("LastConnected_Text", "上次连接")).DefaultTooltip(LOCTEXT("LastConnected_ToopTip", "最近一次连接的日期")).FillSized(200.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdLastConnected).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdLoggedOnUser).DefaultLabel(LOCTEXT("LoggedOnUser_Text", "登录用户")).DefaultTooltip(LOCTEXT("LoggedOnUser_ToopTip", "。。。")).FillSized(200.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdLoggedOnUser).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)						
 						    + SHeaderRow::Column(S_ColumnIdMacAddress).DefaultLabel(LOCTEXT("MACAddress_Text", "Mac 地址")).DefaultTooltip(LOCTEXT("MACAddress_ToopTip", "")).FillSized(225.0).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
@@ -326,21 +328,6 @@ void SAgentView::Construct(const FArguments& InArgs)
 						    + SHeaderRow::Column(S_ColumnIdUpDownTime).DefaultLabel(LOCTEXT("UpDownTime_Text", "上/下行时间")).DefaultTooltip(LOCTEXT("UpDownTime_ToopTip", "")).FillSized(150.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdUpDownTime).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumnIdVersion).DefaultLabel(LOCTEXT("Version_Text", "版本")).DefaultTooltip(LOCTEXT("Version_ToopTip", "")).FillSized(150.0).InitialSortMode(EColumnSortMode::Ascending).OnSort_Raw(this, &SAgentView::OnTableSort).SortMode_Raw(this, &SAgentView::GetSortModeForColumn, S_ColumnIdVersion).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center)
 							+ SHeaderRow::Column(S_ColumeIdResetState).DefaultLabel(LOCTEXT("ResetState_Text", "重置状态")).DefaultTooltip(LOCTEXT("ResetState_ToopTip", "在代理的状态处于不正常时尝试重置")).FillSized(50.0).HAlignHeader(HAlign_Center).VAlignHeader(VAlign_Center).InitialSortMode(EColumnSortMode::Ascending)
-							// Notworking
-							/*.Visibility_Lambda([this]() 
-							{
-								for (const auto& Iter : FiltedArray)
-								{
-									if (Iter.IsValid())
-									{
-										if (Iter->status() != 0)
-										{
-											return EVisibility::Visible;
-										}
-									}
-								}
-								return EVisibility::Collapsed;
-							})*/
 						)		
 					]
 					+ SHorizontalBox::Slot().HAlign(HAlign_Right).AutoWidth()
@@ -801,8 +788,9 @@ void SAgentView::OnTableSort(const EColumnSortPriority::Type InSortPriority, con
 		S_ColumnIdAvaCpu, S_ColumnIdAvaNet, S_ColumnIdAvaGpu, 
 		S_ColumnIdLastConnected, S_ColumnIdUsedHelpersCache, S_ColumnIdRegisteredHelperCores,
 		S_ColumnIdMaxConnectAgentNum, S_ColumnIdMaxProcessors, S_ColumnIdMaxLocalProcessors,
-		S_ColumnIdBuildCache, S_ColumnIdBuildPriority, S_ColumnIdCpuInfo, S_ColumnIdCpuArch, S_ColumnIdFreeDiskSpace,
-		S_ColumnIdLogLevel, S_ColumnIdLoggedOnUser, S_ColumnIdAssignmentPriority,
+		S_ColumnIdBuildCache, S_ColumnIdBuildPriority, S_ColumnIdCpuInfo, S_ColumnIdCpuArch, 
+		S_ColumnIdGpuInfo,
+		S_ColumnIdFreeDiskSpace, S_ColumnIdLogLevel, S_ColumnIdLoggedOnUser, S_ColumnIdAssignmentPriority,
 		S_ColumnIdAvailableMemory, S_ColumnIdLogicCores, S_ColumnIdNetwork, S_ColumnIdOSSystem,
 		S_ColumnIdPhysicalCores, S_ColumnIdRoutingIP, S_ColumeIdListenPort, S_ColumnIdPortMappedAddress, 
 		S_ColumnIdUpDownTime, S_ColumnIdVersion
@@ -818,6 +806,12 @@ void SAgentView::OnTableSort(const EColumnSortPriority::Type InSortPriority, con
 		{
 			ColumnIdsBySortOrder.Add(Id);
 		}
+	}
+
+#define COMPARE(ID, PREDICATE) \
+	else if (ColumnId == ID) \
+	{ \
+		CompareResult = (Left->PREDICATE() == Right->PREDICATE()) ? 0 : ((Left->PREDICATE() < Right->PREDICATE()) ? -1 : 1); \
 	}
 	
 	FiltedArray.Sort([ColumnIdsBySortOrder, InSortMode](const TSharedPtr<FAgentProto>& Left, const TSharedPtr<FAgentProto>& Right)
@@ -837,130 +831,56 @@ void SAgentView::OnTableSort(const EColumnSortPriority::Type InSortPriority, con
 					}
 				}
 			}
-			else if (ColumnId == S_ColumnIdDesc)
-			{
-				CompareResult = (Left->desc() == Right->desc()) ? 0 : ((Left->desc() < Right->desc()) ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdGroup)
-			{
-				CompareResult = (Left->group() == Right->group()) ? 0 : ((Left->group() < Right->group()) ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdAvaCpu)
-			{
-				CompareResult = (Left->cpuava() == Right->cpuava()) ? 0 : (Left->cpuava() < Right->cpuava() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdAvaNet)
-			{
-				CompareResult = (Left->avalnet() == Right->avalnet()) ? 0 : (Left->avalnet() < Right->avalnet() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdAvaGpu)
-			{
-				CompareResult = (Left->avagpu() == Right->avagpu()) ? 0 : (Left->avagpu() < Right->avagpu() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdLastConnected)
-			{
-				CompareResult = (Left->lastcon() == Right->lastcon()) ? 0 : (Left->lastcon() < Right->lastcon() ? -1 : 1);
-			}
+			COMPARE(S_ColumnIdDesc, desc)
+			COMPARE(S_ColumnIdGroup, group)
+			COMPARE(S_ColumnIdAvaCpu, cpuava)
+			COMPARE(S_ColumnIdAvaDisk, avadisk)
+			COMPARE(S_ColumnIdAvaNet, avalnet)
+			COMPARE(S_ColumnIdAvaGpu, avagpu)
+			COMPARE(S_ColumnIdLastConnected, lastcon)
 			else if (ColumnId == S_ColumnIdUsedHelpersCache)
 			{
 				const float LeftHelpCache = Left->totalhelpcache() - Left->usehelpcache();
 				const float RightHelpCache = Right->totalhelpcache() - Right->usehelpcache();
 				CompareResult = (LeftHelpCache == RightHelpCache) ? 0 : (LeftHelpCache < RightHelpCache ? -1 : 1);
 			}
-			else if (ColumnId == S_ColumnIdRegisteredHelperCores)
-			{
-				CompareResult = (Left->helpercore() == Right->helpercore()) ? 0 : (Left->helpercore() < Right->helpercore() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdMaxConnectAgentNum)
-			{
-				CompareResult = (Left->maxcon() == Right->maxcon()) ? 0 : (Left->maxcon() < Right->maxcon() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdMaxProcessors)
-			{
-				CompareResult = (Left->maxcpu() == Right->maxcpu()) ? 0 : (Left->maxcpu() < Right->maxcpu() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdMaxLocalProcessors)
-			{
-				CompareResult = (Left->localmaxcpu() == Right->localmaxcpu()) ? 0 : (Left->localmaxcpu() < Right->localmaxcpu() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdBuildCache)
-			{
-				CompareResult = (Left->bbuildcache() == Right->bbuildcache()) ? 0 : (Left->bbuildcache() < Right->bbuildcache() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdBuildPriority)
-			{
-				CompareResult = (Left->buildpriority() == Right->buildpriority()) ? 0 : (Left->buildpriority() < Right->buildpriority() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdCpuInfo)
-			{
-				CompareResult = (Left->cpuinfo() == Right->cpuinfo()) ? 0 : (Left->cpuinfo() < Right->cpuinfo() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdCpuArch)
-			{
-				CompareResult = (Left->cpuarch() == Right->cpuarch()) ? 0 : (Left->cpuarch() < Right->cpuarch() ? -1 : 1);
-			}
+			COMPARE(S_ColumnIdRegisteredHelperCores, helpercore)
+			COMPARE(S_ColumnIdMaxConnectAgentNum, maxcon)
+			COMPARE(S_ColumnIdMaxProcessors, maxcpu)
+			COMPARE(S_ColumnIdMaxLocalProcessors, localmaxcpu)
+			COMPARE(S_ColumnIdBuildCache, bbuildcache)
+			COMPARE(S_ColumnIdBuildPriority, buildpriority)
+			COMPARE(S_ColumnIdCpuInfo, cpuinfo)
+			COMPARE(S_ColumnIdCpuArch, cpuarch)
+			COMPARE(S_ColumnIdGpuInfo, gpudesc)
 			else if (ColumnId == S_ColumnIdFreeDiskSpace)
 			{
 				const float LeftFreeSpace = Left->usehardspace();
 				const float RightFreeSpace = Right->usehardspace();
 				CompareResult = (LeftFreeSpace == RightFreeSpace) ? 0 : (LeftFreeSpace < RightFreeSpace ? -1 : 1);
 			}
-			else if (ColumnId == S_ColumnIdLogLevel)
-			{
-				CompareResult = (Left->loglevel() == Right->loglevel()) ? 0 : (Left->loglevel() < Right->loglevel() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdLoggedOnUser)
-			{
-				CompareResult = (Left->loginuser() == Right->loginuser()) ? 0 : (Left->loginuser() < Right->loginuser() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdAssignmentPriority)
-			{
-				CompareResult = (Left->allocationpriority() == Right->allocationpriority()) ? 0 : (Left->allocationpriority() < Right->allocationpriority() ? -1 : 1);
-			}
+			COMPARE(S_ColumnIdLogLevel, loglevel)
+			COMPARE(S_ColumnIdLoggedOnUser, loginuser)
+			COMPARE(S_ColumnIdAssignmentPriority, allocationpriority)
 			else if (ColumnId == S_ColumnIdAvailableMemory)
 			{
 				const float LeftFreeMem = Left->totalmemory() - Left->usememory();
 				const float RightFreeMem = Right->totalmemory() - Right->usememory();
 				CompareResult = (LeftFreeMem == RightFreeMem) ? 0 : (LeftFreeMem < RightFreeMem ? -1 : 1);
 			}
-			else if (ColumnId == S_ColumnIdLogicCores)
-			{
-				CompareResult = (Left->logiccore() == Right->logiccore()) ? 0 : (Left->logiccore() < Right->logiccore() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdNetwork)
-			{
-				// TODO 需要特殊处理
-				CompareResult = (Left->networkspeed() > Right->networkspeed());
-			}
-			else if (ColumnId == S_ColumnIdOSSystem)
-			{
-				CompareResult = (Left->opsystem() == Right->opsystem()) ? 0 : (Left->opsystem() < Right->opsystem() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdPhysicalCores)
-			{
-				CompareResult = (Left->physicalcore() == Right->physicalcore()) ? 0 : (Left->physicalcore() < Right->physicalcore() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdRoutingIP)
-			{
-				CompareResult = (Left->routerip() == Right->routerip()) ? 0 : (Left->routerip() < Right->routerip() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumeIdListenPort)
-			{
-				CompareResult = (Left->helperport() == Right->helperport()) ? 0 : (Left->helperport() < Right->helperport() ? -1 : 1);
-			}
-			else if (ColumnId == S_ColumnIdPortMappedAddress)
-			{
-				CompareResult = (Left->portmappedaddress() == Right->portmappedaddress()) ? 0 : (Left->portmappedaddress() < Right->portmappedaddress() ? -1 : 1);
-			}
+			COMPARE(S_ColumnIdLogicCores, logiccore)
+			COMPARE(S_ColumnIdNetwork, networkspeed)
+			COMPARE(S_ColumnIdOSSystem, opsystem)
+			COMPARE(S_ColumnIdPhysicalCores, physicalcore)
+			COMPARE(S_ColumnIdRoutingIP, routerip)
+			COMPARE(S_ColumeIdListenPort, helperport)
+			COMPARE(S_ColumnIdPortMappedAddress, portmappedaddress)
 			else if (ColumnId == S_ColumnIdUpDownTime)
 			{
 				// TODO 需要特殊处理
 				CompareResult = (Left->updowntime() == Right->updowntime()) ? 0 : (Left->updowntime() < Right->updowntime() ? -1 : 1);
 			}
-			else if (ColumnId == S_ColumnIdVersion)
-			{
-				CompareResult = (Left->version() == Right->version()) ? 0 : (Left->version() < Right->version() ? -1 : 1);
-			}
+			COMPARE(S_ColumnIdVersion, version)
 			if (CompareResult != 0)
 			{
 				return InSortMode == EColumnSortMode::Ascending ? CompareResult < 0 : CompareResult > 0;
@@ -968,6 +888,8 @@ void SAgentView::OnTableSort(const EColumnSortPriority::Type InSortPriority, con
 		}
 		return InSortMode == EColumnSortMode::Ascending ? true : false;
 	});
+
+#undef COMPARE
 
 	RefreshIndex();
 
@@ -1005,13 +927,13 @@ FReply SAgentView::OnTableSave() const
 		return FReply::Handled();
 	}
 
-	FString Content = TEXT("Index,Status,Desc,Group,AvaCPU,HelpCores,MaxCon,MaxCpu,PhyCoreNum,LogicCoreNum,BuildPriority,AssignPriority,LogLevel,MemDetails,HardDiskSpace,BuildCache,CacheDetails,CPUDetails,LastConnectionTime,LoginUser,MacAddress,NetSpeed,OS,RouterIP,HelperListenPort,UpDownTime\n");
+	FString Content = TEXT("Index,Status,Desc,Group,AvaCPU,HelpCores,MaxCon,MaxCpu,PhyCoreNum,LogicCoreNum,BuildPriority,AssignPriority,LogLevel,MemDetails,HardDiskSpace,BuildCache,CacheDetails,CPUDetails,CPUArch,GPUDesc,LastConnectionTime,LoginUser,MacAddress,NetSpeed,OS,RouterIP,HelperListenPort,UpDownTime\n");
 	int32 Index = 0;
 	for (const auto& Iter : FiltedArray)
 	{
 		if (Iter.IsValid())
 		{
-			Content += FString::Printf(TEXT("%d,%d,\"%s-%s-%s\",%s,%.1f,%d,%d,%d,%d,%d,%s,%s,%s,%.1f/%.1f GB,%.1f/%.1f GB,%s,%.1f/%.1f GB,%s,%s,%s,%s,%f Mbits/sec,%s,%s,%d,\"%s\"\n"),
+			Content += FString::Printf(TEXT("%d,%d,\"%s-%s-%s\",%s,%.1f,%d,%d,%d,%d,%d,%s,%s,%s,%.1f/%.1f GB,%.1f/%.1f GB,%s,%.1f/%.1f GB,%s,%s,%s,%s, %s,%s,%f Mbits/sec,%s,%s,%d,\"%s\"\n"),
 				Index++,
 				Iter->status(),
 				UTF8_TO_TCHAR(Iter->desc().c_str()), Iter->bfixedinitator() ? TEXT("固定发起者") : TEXT("浮动发起者"), Iter->bfixedhelper() ? TEXT("固定协助者") : TEXT("浮动协助者"),
@@ -1030,6 +952,8 @@ FReply SAgentView::OnTableSave() const
 				Iter->bbuildcache() ? TEXT("Y") : TEXT("N"),
 				Iter->usehelpcache(), Iter->totalhelpcache(),
 				UTF8_TO_TCHAR(Iter->cpuinfo().c_str()),
+				UTF8_TO_TCHAR(Iter->cpuarch().c_str()),
+				UTF8_TO_TCHAR(Iter->gpudesc().c_str()),
 				UTF8_TO_TCHAR(Iter->lastcon().c_str()),
 				UTF8_TO_TCHAR(Iter->loginuser().c_str()),
 				UTF8_TO_TCHAR(Iter->macaddress().c_str()),

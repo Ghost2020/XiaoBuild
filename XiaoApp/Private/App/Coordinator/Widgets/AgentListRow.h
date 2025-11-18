@@ -14,6 +14,7 @@ static const FName S_ColumnIdInfor = TEXT("Information");
 static const FName S_ColumnIdDesc = TEXT("AgentDesc");
 static const FName S_ColumnIdGroup = TEXT("Group");
 static const FName S_ColumnIdAvaCpu = TEXT("AvaCpu");
+static const FName S_ColumnIdAvaDisk = TEXT("AvaDisk");
 static const FName S_ColumnIdAvaNet = TEXT("AvaNet");
 static const FName S_ColumnIdAvaGpu = TEXT("AvaGPU");
 static const FName S_ColumnIdLastConnected = TEXT("LastCon");

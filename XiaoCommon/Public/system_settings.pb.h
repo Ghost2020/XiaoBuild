@@ -205,6 +205,7 @@ class FSystemSettings final :
     kBScheduleCleanFieldNumber = 22,
     kBIgnoreArchFieldNumber = 25,
     kScheduleTimeFieldNumber = 24,
+    kDiskAvaMinFieldNumber = 26,
   };
   // float HardDiskMinimal = 1;
   void clear_harddiskminimal();
@@ -422,6 +423,15 @@ class FSystemSettings final :
   void _internal_set_scheduletime(::PROTOBUF_NAMESPACE_ID::uint32 value);
   public:
 
+  // float DiskAvaMin = 26;
+  void clear_diskavamin();
+  float diskavamin() const;
+  void set_diskavamin(float value);
+  private:
+  float _internal_diskavamin() const;
+  void _internal_set_diskavamin(float value);
+  public:
+
   // @@protoc_insertion_point(class_scope:FSystemSettings)
  private:
   class _Internal;
@@ -453,6 +463,7 @@ class FSystemSettings final :
   bool bscheduleclean_;
   bool bignorearch_;
   ::PROTOBUF_NAMESPACE_ID::uint32 scheduletime_;
+  float diskavamin_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_system_5fsettings_2eproto;
 };
@@ -945,6 +956,26 @@ inline void FSystemSettings::_internal_set_bignorearch(bool value) {
 inline void FSystemSettings::set_bignorearch(bool value) {
   _internal_set_bignorearch(value);
   // @@protoc_insertion_point(field_set:FSystemSettings.bIgnoreArch)
+}
+
+// float DiskAvaMin = 26;
+inline void FSystemSettings::clear_diskavamin() {
+  diskavamin_ = 0;
+}
+inline float FSystemSettings::_internal_diskavamin() const {
+  return diskavamin_;
+}
+inline float FSystemSettings::diskavamin() const {
+  // @@protoc_insertion_point(field_get:FSystemSettings.DiskAvaMin)
+  return _internal_diskavamin();
+}
+inline void FSystemSettings::_internal_set_diskavamin(float value) {
+  
+  diskavamin_ = value;
+}
+inline void FSystemSettings::set_diskavamin(float value) {
+  _internal_set_diskavamin(value);
+  // @@protoc_insertion_point(field_set:FSystemSettings.DiskAvaMin)
 }
 
 #ifdef __GNUC__

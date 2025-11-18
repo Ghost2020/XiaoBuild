@@ -45,7 +45,8 @@ constexpr FSystemSettings::FSystemSettings(
   , bhelperenhance_(false)
   , bscheduleclean_(false)
   , bignorearch_(false)
-  , scheduletime_(0u){}
+  , scheduletime_(0u)
+  , diskavamin_(0){}
 struct FSystemSettingsDefaultTypeInternal {
   constexpr FSystemSettingsDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -90,6 +91,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_system_5fsettings_2eproto::off
   PROTOBUF_FIELD_OFFSET(::FSystemSettings, bscheduleclean_),
   PROTOBUF_FIELD_OFFSET(::FSystemSettings, scheduletime_),
   PROTOBUF_FIELD_OFFSET(::FSystemSettings, bignorearch_),
+  PROTOBUF_FIELD_OFFSET(::FSystemSettings, diskavamin_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::FSystemSettings)},
@@ -100,7 +102,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_system_5fsettings_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\025system_settings.proto\"\341\004\n\017FSystemSetti"
+  "\n\025system_settings.proto\"\365\004\n\017FSystemSetti"
   "ngs\022\027\n\017HardDiskMinimal\030\001 \001(\002\022\034\n\024VirtualM"
   "emoryMinimal\030\002 \001(\002\022\026\n\016PhysicalMemory\030\003 \001"
   "(\002\022\033\n\023CpuAvailableMinimal\030\004 \001(\002\022)\n!Helpe"
@@ -115,12 +117,12 @@ const char descriptor_table_protodef_system_5fsettings_2eproto[] PROTOBUF_SECTIO
   "\022\026\n\016bHelperEnhance\030\022 \001(\010\022\022\n\nMaxCoreNum\030\023"
   " \001(\r\022\027\n\017MaxInitiatorNum\030\024 \001(\r\022\021\n\tMaxConN"
   "um\030\025 \001(\r\022\026\n\016bScheduleClean\030\026 \001(\010\022\024\n\014Sche"
-  "duleTime\030\030 \001(\r\022\023\n\013bIgnoreArch\030\031 \001(\010b\006pro"
-  "to3"
+  "duleTime\030\030 \001(\r\022\023\n\013bIgnoreArch\030\031 \001(\010\022\022\n\nD"
+  "iskAvaMin\030\032 \001(\002b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_system_5fsettings_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_system_5fsettings_2eproto = {
-  false, false, 643, descriptor_table_protodef_system_5fsettings_2eproto, "system_settings.proto", 
+  false, false, 663, descriptor_table_protodef_system_5fsettings_2eproto, "system_settings.proto", 
   &descriptor_table_system_5fsettings_2eproto_once, nullptr, 0, 1,
   schemas, file_default_instances, TableStruct_system_5fsettings_2eproto::offsets,
   file_level_metadata_system_5fsettings_2eproto, file_level_enum_descriptors_system_5fsettings_2eproto, file_level_service_descriptors_system_5fsettings_2eproto,
@@ -151,16 +153,16 @@ FSystemSettings::FSystemSettings(const FSystemSettings& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&harddiskminimal_, &from.harddiskminimal_,
-    static_cast<size_t>(reinterpret_cast<char*>(&scheduletime_) -
-    reinterpret_cast<char*>(&harddiskminimal_)) + sizeof(scheduletime_));
+    static_cast<size_t>(reinterpret_cast<char*>(&diskavamin_) -
+    reinterpret_cast<char*>(&harddiskminimal_)) + sizeof(diskavamin_));
   // @@protoc_insertion_point(copy_constructor:FSystemSettings)
 }
 
 void FSystemSettings::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&harddiskminimal_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&scheduletime_) -
-    reinterpret_cast<char*>(&harddiskminimal_)) + sizeof(scheduletime_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&diskavamin_) -
+    reinterpret_cast<char*>(&harddiskminimal_)) + sizeof(diskavamin_));
 }
 
 FSystemSettings::~FSystemSettings() {
@@ -191,8 +193,8 @@ void FSystemSettings::Clear() {
   (void) cached_has_bits;
 
   ::memset(&harddiskminimal_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&scheduletime_) -
-      reinterpret_cast<char*>(&harddiskminimal_)) + sizeof(scheduletime_));
+      reinterpret_cast<char*>(&diskavamin_) -
+      reinterpret_cast<char*>(&harddiskminimal_)) + sizeof(diskavamin_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -394,6 +396,14 @@ const char* FSystemSettings::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         } else
           goto handle_unusual;
         continue;
+      // float DiskAvaMin = 26;
+      case 26:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 213)) {
+          diskavamin_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -567,6 +577,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(25, this->_internal_bignorearch(), target);
   }
 
+  // float DiskAvaMin = 26;
+  if (!(this->_internal_diskavamin() <= 0 && this->_internal_diskavamin() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(26, this->_internal_diskavamin(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -711,6 +727,11 @@ size_t FSystemSettings::ByteSizeLong() const {
         this->_internal_scheduletime());
   }
 
+  // float DiskAvaMin = 26;
+  if (!(this->_internal_diskavamin() <= 0 && this->_internal_diskavamin() >= 0)) {
+    total_size += 2 + 4;
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
@@ -805,6 +826,9 @@ void FSystemSettings::MergeFrom(const FSystemSettings& from) {
   if (from._internal_scheduletime() != 0) {
     _internal_set_scheduletime(from._internal_scheduletime());
   }
+  if (!(from._internal_diskavamin() <= 0 && from._internal_diskavamin() >= 0)) {
+    _internal_set_diskavamin(from._internal_diskavamin());
+  }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -823,8 +847,8 @@ void FSystemSettings::InternalSwap(FSystemSettings* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(FSystemSettings, scheduletime_)
-      + sizeof(FSystemSettings::scheduletime_)
+      PROTOBUF_FIELD_OFFSET(FSystemSettings, diskavamin_)
+      + sizeof(FSystemSettings::diskavamin_)
       - PROTOBUF_FIELD_OFFSET(FSystemSettings, harddiskminimal_)>(
           reinterpret_cast<char*>(&harddiskminimal_),
           reinterpret_cast<char*>(&other->harddiskminimal_));
