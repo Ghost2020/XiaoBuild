@@ -16,13 +16,6 @@
 
 #define JSON_MCI_VALUE(var) JSON_SERIALIZE(#var, var)
 
-static const FString SArc = 
-#if PLATFORM_CPU_ARM_FAMILY
-	TEXT("arm64");
-#else
-	TEXT("x64");
-#endif
-
 
 static FString GetDefaultDataDir(const FString AppName)
 {
@@ -59,7 +52,7 @@ struct FUbaSchedulerSetting : FJsonSerializable
 			bDeletecas = Other.bDeletecas; bGetCas = Other.bGetCas; bSummary = Other.bSummary; bNoCustoMalloc = Other.bNoCustoMalloc;
 			bAllowMemoryMaps = Other.bAllowMemoryMaps; bEnableStdOut = Other.bEnableStdOut; bStoreRaw = Other.bStoreRaw;
 			MaxLocalCore = Other.MaxLocalCore; MaxCpu = Other.MaxCpu; MaxCon = Other.MaxCon; bVisualizer = Other.bVisualizer;
-			Crypto = Other.Crypto;
+			Crypto = Other.Crypto; bUseCache = Other.bUseCache;
 		} 
 		return *this;
 	}
@@ -70,7 +63,8 @@ struct FUbaSchedulerSetting : FJsonSerializable
 			&& Loop == Other.Loop && Capacity == Other.Capacity && bCheckCas == Other.bCheckCas && CheckFileTable == Other.CheckFileTable
 			&& bCheckAws == Other.bCheckAws && bDeletecas == Other.bDeletecas && bGetCas == Other.bGetCas && bSummary == Other.bSummary
 			&& bNoCustoMalloc == Other.bNoCustoMalloc && bAllowMemoryMaps == Other.bAllowMemoryMaps && bEnableStdOut == Other.bEnableStdOut && bStoreRaw == Other.bStoreRaw
-			&& MaxCpu == Other.MaxCpu && MaxLocalCore == Other.MaxLocalCore && MaxCon == Other.MaxCon && bVisualizer == Other.bVisualizer && Crypto == Other.Crypto;
+			&& MaxCpu == Other.MaxCpu && MaxLocalCore == Other.MaxLocalCore && MaxCon == Other.MaxCon && bVisualizer == Other.bVisualizer && Crypto == Other.Crypto
+			&& bUseCache == Other.bUseCache;
 		return bSame;
 	}
 
@@ -98,6 +92,7 @@ struct FUbaSchedulerSetting : FJsonSerializable
 	uint32 MaxCon = 8;				// Max number of Agents can connect help to scheduler
 	bool bVisualizer = false;		// Spawn a visualizer that visualizes progress
 	FString Crypto;					// Will enable crypto on network client/server
+	bool bUseCache = false;
 
 	BEGIN_JSON_SERIALIZER
 		JSON_MCI_VALUE(Dir);
@@ -122,6 +117,7 @@ struct FUbaSchedulerSetting : FJsonSerializable
 		JSON_MCI_VALUE(MaxCpu);
 		JSON_MCI_VALUE(bVisualizer);
 		JSON_MCI_VALUE(Crypto);
+		JSON_MCI_VALUE(bUseCache);
 	END_JSON_SERIALIZER
 };
 
@@ -133,6 +129,7 @@ struct FUbaAgentSetting : FJsonSerializable
 
 	explicit FUbaAgentSetting(const FUbaAgentSetting& InOther)
 		: bEnableAgent(InOther.bEnableAgent), Dir(InOther.Dir)
+		, ListenPort(InOther.ListenPort), MaxCpu(InOther.MaxCpu), MaxCon(InOther.MaxCon)
 		, Mulcpu(InOther.Mulcpu), MaxWorkers(InOther.MaxWorkers), Capacity(InOther.Capacity), Config(InOther.Config), Stats(InOther.Stats)
 		, bVerbose(InOther.bVerbose), bLog(InOther.bLog), bNoCustoMalloc(InOther.bNoCustoMalloc), bStoreRaw(InOther.bStoreRaw), bSendRaw(InOther.bSendRaw)
 		, SendSize(InOther.SendSize), Named(InOther.Named), bNoPoll(InOther.bNoPoll), bNoStore(InOther.bNoStore), bResetStore(InOther.bResetStore)
@@ -148,6 +145,7 @@ struct FUbaAgentSetting : FJsonSerializable
 		if (this != &InOther)
 		{
 			bEnableAgent = InOther.bEnableAgent; Dir = InOther.Dir;
+			ListenPort = InOther.ListenPort;  MaxCpu = InOther.MaxCpu; MaxCon = InOther.MaxCon;
 			Mulcpu = InOther.Mulcpu; MaxWorkers = InOther.MaxWorkers; Capacity = InOther.Capacity; Config = InOther.Config; Stats = InOther.Stats;
 			bVerbose = InOther.bVerbose; bLog = InOther.bLog; bNoCustoMalloc = InOther.bNoCustoMalloc; bStoreRaw = InOther.bStoreRaw; bSendRaw = InOther.bSendRaw;
 			SendSize = InOther.SendSize; Named = InOther.Named; bNoPoll = InOther.bNoPoll; bNoStore = InOther.bNoStore; bResetStore = InOther.bResetStore;

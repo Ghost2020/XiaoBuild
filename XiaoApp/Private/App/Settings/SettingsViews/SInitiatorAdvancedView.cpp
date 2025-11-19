@@ -91,23 +91,24 @@ void SInitiatorAdvancedView::Construct(const FArguments& InArgs)
 					]
 				]
 
-				V_ADD_CHECKBOX(LogCheckBox, SModifiedAgentSettings.UbaScheduler.bLog, LOCTEXT("bLog_Text", "将所有进程detouring信息记录到文件中（仅适用于调试版本）"))
-				V_ADD_CHECKBOX(StandaloneCheckBox, SModifiedAgentSettings.UbaScheduler.bStandalone, LOCTEXT("bStandalone_Text", "是否以单机模式运行，不适用代理进行联合编译"))
-				V_ADD_CHECKBOX(QuietCheckBox, SModifiedAgentSettings.UbaScheduler.bQuiet, LOCTEXT("bQuiet_Text", "除了错误之外，不会在控制台中输出任何日志记录"))
-				V_ADD_CHECKBOX(CheckCasCheckBox, SModifiedAgentSettings.UbaScheduler.bCheckCas, LOCTEXT("bCheckCas_Text", "检查所有 cas 条目是否正确"))
-				V_ADD_CHECKBOX(DeletecasCheckBox, SModifiedAgentSettings.UbaScheduler.bDeletecas, LOCTEXT("bDeletecas_Text", "删除 cas db"))
-				V_ADD_CHECKBOX(GetCasCheckBox, SModifiedAgentSettings.UbaScheduler.bGetCas, LOCTEXT("bGetCas_Text", "将打印应用程序的Hash"))
-				V_ADD_CHECKBOX(SummaryCheckBox, SModifiedAgentSettings.UbaScheduler.bSummary, LOCTEXT("bSummary_Text", "在会话结束时打印摘要"))
-				V_ADD_CHECKBOX(NoCustoMallocCheckBox, SModifiedAgentSettings.UbaScheduler.bNoCustoMalloc, LOCTEXT("bNoCustoMalloc_Text", "禁用进程的自定义分配器。如果您看到奇怪的崩溃，可以进行测试"))
-				V_ADD_CHECKBOX(AllowMemoryMapsCheckBox, SModifiedAgentSettings.UbaScheduler.bAllowMemoryMaps, LOCTEXT("bAllowMemoryMaps_Text", "Allow Memory Maps"))
-				V_ADD_CHECKBOX(EnableStdOutCheckBox, SModifiedAgentSettings.UbaScheduler.bEnableStdOut, LOCTEXT("bEnableStdOut_Text", "启用进程标准输出"))
-				V_ADD_CHECKBOX(StoreRawCheckBox, SModifiedAgentSettings.UbaScheduler.bStoreRaw, LOCTEXT("bStoreRaw_Text", "禁用存储压缩。这将使用更多存储空间并可能提高性能"))
-				V_ADD_CHECKBOX(VisualizerCheckBox, SModifiedAgentSettings.UbaScheduler.bVisualizer, LOCTEXT("bVisualizer_Text", "启动一个可视化进度的可视化工具"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bUseCache, LOCTEXT("bUseCache_Text", "发起协助时,是否连接缓存服务器，从而可以利用缓存数据加速构建"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bLog, LOCTEXT("bLog_Text", "将所有进程detouring信息记录到文件中（仅适用于调试版本）"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bStandalone, LOCTEXT("bStandalone_Text", "是否以单机模式运行，不适用代理进行联合编译"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bQuiet, LOCTEXT("bQuiet_Text", "除了错误之外，不会在控制台中输出任何日志记录"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bCheckCas, LOCTEXT("bCheckCas_Text", "检查所有 cas 条目是否正确"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bDeletecas, LOCTEXT("bDeletecas_Text", "删除 cas db"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bGetCas, LOCTEXT("bGetCas_Text", "将打印应用程序的Hash"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bSummary, LOCTEXT("bSummary_Text", "在会话结束时打印摘要"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bNoCustoMalloc, LOCTEXT("bNoCustoMalloc_Text", "禁用进程的自定义分配器。如果您看到奇怪的崩溃，可以进行测试"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bAllowMemoryMaps, LOCTEXT("bAllowMemoryMaps_Text", "Allow Memory Maps"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bEnableStdOut, LOCTEXT("bEnableStdOut_Text", "启用进程标准输出"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bStoreRaw, LOCTEXT("bStoreRaw_Text", "禁用存储压缩。这将使用更多存储空间并可能提高性能"))
+				V_ADD_CHECKBOX(SModifiedAgentSettings.UbaScheduler.bVisualizer, LOCTEXT("bVisualizer_Text", "启动一个可视化进度的可视化工具"))
 				
-				V_ADD_SPINBOX(CapacitySpinBox, SModifiedAgentSettings.UbaScheduler.Capacity, 10, 1024 * 1024, LOCTEXT("Capacity_Text", "本地存储容量"), LOCTEXT("Capacity_ToolTipText", "..."))
-				V_ADD_SPINBOX(MaxLocalCoreSpinBox, SModifiedAgentSettings.UbaScheduler.MaxLocalCore, 0, FPlatformMisc::NumberOfCoresIncludingHyperthreads(), LOCTEXT("MaxLocalCore_Text", "最大本地Workers数量由运行"), LOCTEXT("MaxLocalCore_ToolTip", "本地发起时，本地最多提供的运行的进程数量，此数值能够调节本机的运行负载"))
-				V_ADD_SPINBOX(MaxConSpinBox, SModifiedAgentSettings.UbaScheduler.MaxCon, 0, 1024, LOCTEXT("MaxCon_Text", "最大可以连接协助的代理数量"), LOCTEXT("MaxCon_ToolTip", "本地发起时，可以向网络请求的最大协助机器数量"))
-				V_ADD_SPINBOX(MaxCpuSpinBox, SModifiedAgentSettings.UbaScheduler.MaxCpu, 1, 65535, LOCTEXT("MaxCpuCore_Text", "可以调动的最大进程数"), LOCTEXT("MaxCpuCore_ToolTip", "本地发起时，最大能够调动的网络计算资源(逻辑核心数量)"))
+				V_ADD_SPINBOX(SModifiedAgentSettings.UbaScheduler.Capacity, 10, 1024 * 1024, LOCTEXT("Capacity_Text", "本地存储容量"), LOCTEXT("Capacity_ToolTipText", "..."))
+				V_ADD_SPINBOX(SModifiedAgentSettings.UbaScheduler.MaxLocalCore, 0, FPlatformMisc::NumberOfCoresIncludingHyperthreads(), LOCTEXT("MaxLocalCore_Text", "最大本地Workers数量由运行"), LOCTEXT("MaxLocalCore_ToolTip", "本地发起时，本地最多提供的运行的进程数量，此数值能够调节本机的运行负载"))
+				V_ADD_SPINBOX(SModifiedAgentSettings.UbaScheduler.MaxCon, 0, 1024, LOCTEXT("MaxCon_Text", "最大可以连接协助的代理数量"), LOCTEXT("MaxCon_ToolTip", "本地发起时，可以向网络请求的最大协助机器数量"))
+				V_ADD_SPINBOX(SModifiedAgentSettings.UbaScheduler.MaxCpu, 1, 65535, LOCTEXT("MaxCpuCore_Text", "可以调动的最大进程数"), LOCTEXT("MaxCpuCore_ToolTip", "本地发起时，最大能够调动的网络计算资源(逻辑核心数量)"))
 
 				+ SVerticalBox::Slot().SEC_PADDING
 				[
@@ -140,12 +141,6 @@ void SInitiatorAdvancedView::Construct(const FArguments& InArgs)
 								return FText::FromString(SModifiedAgentSettings.UbaScheduler.Crypto);
 							})
 					]
-				]
-
-				+ SVerticalBox::Slot().FIR_PADDING
-				[
-					SNew(STextBlock)
-						.Text(LOCTEXT("BuildHistory_Text", "构建历史"))
 				]
 			]
 		]

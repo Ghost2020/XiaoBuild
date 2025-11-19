@@ -149,7 +149,7 @@ static void RegistApp(const FString& InAppName)
 		XIAO_LOG(Error, TEXT("Failed to RegSetValueEx for Publisher ErrorCode::%d"), Result);
 	}
 
-	const FString DisplayVersion = SVersion;
+	const FString DisplayVersion = XB_VERSION_STRING;
 	Len = wcslen(*DisplayVersion) * sizeof(wchar_t);
 	Result = RegSetValueEx(AppInfoKey, TEXT("DisplayVersion"), NULL, REG_SZ, (BYTE*)*DisplayVersion, Len);
 	if (Result != ERROR_SUCCESS)
@@ -404,14 +404,7 @@ static bool RegistService()
 		RunXiaoApp(SBuildAgentService, *Params);
 		UpdateMessage(0.45f, FString::Printf(TEXT("Install \"%s\" service finish..."), *SBuildAgentService));
 
-		// 缓存文件夹设置为可写
-		/*const FString BuildHistoryDir = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), TEXT("../../Saved/History/Local")));
-		if (!FPaths::DirectoryExists(BuildHistoryDir))
-		{
-			IFileManager::Get().MakeDirectory(*BuildHistoryDir, true);
-		}
-		FPlatformFileManager::Get().GetPlatformFile().SetReadOnly(*BuildHistoryDir, false);
-
+		/*
 		int32 RtnCode = -1;
 #if PLATFORM_WINDOWS
 		FPlatformProcess::ExecElevatedProcess(TEXT("icacls"), *FString::Printf(TEXT("\"%s\" /grant Users:F"), *BuildHistoryDir), &RtnCode);

@@ -26,22 +26,18 @@ public:
 protected:
 	bool CheckCoordiPort() const;
 	void OnCheckButtonClicked();
+	bool PortIsSafe() const;
 
 private:
 	TSharedPtr<SErrorText> ErrorText = nullptr;
-	TSharedPtr<SNumericEntryBox<uint16>> CoordiServerPort = nullptr;
-	TSharedPtr<SNumericEntryBox<uint16>> XiaobuildManagerPort = nullptr;
-	TSharedPtr<SNumericEntryBox<uint16>> MessageTransportPort = nullptr;
-	TSharedPtr<SNumericEntryBox<uint16>> AgentCommunicationPort = nullptr;
-	// TSharedPtr<SNumericEntryBox<uint16>> LicenseServicePort = nullptr;
 	TSharedPtr<SCheckBox> AutomaticallyOpenCheckBox = nullptr;
 	bool bPass = true;
 
 	TSharedPtr<class SInstallationFolderView> InstallationFolderView = nullptr;
 
 	bool bCoordiServerPort = false;
-	// bool bUIManagerPort = false;
-	bool bMessageTransPort = false;
 	bool bAgentCommunicatePort = false;
-	// bool bLicenseServicePort = false;
+	bool bCacheServicePort = false;
+
+	TArray<uint32> Ports;
 };

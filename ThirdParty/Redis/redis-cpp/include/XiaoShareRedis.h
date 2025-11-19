@@ -404,6 +404,7 @@ namespace XiaoRedis
 		OutSettings.set_scheduletime(3);
 
 		OutSettings.set_bignorearch(true);
+		OutSettings.set_bcacheservice(false);
 	}
 
 	static bool IsEqual(const FSystemSettings& L, const FSystemSettings& R)
@@ -414,6 +415,7 @@ namespace XiaoRedis
 		|| !FMath::IsNearlyEqual(L.cpuavailableminimal(), R.cpuavailableminimal(), 0.1f)
 		|| !FMath::IsNearlyEqual(L.diskavamin(), R.diskavamin(), 0.1f)
 		|| L.benablehelper() != R.benablehelper()
+		|| L.bcacheservice() != R.bcacheservice()
 		|| !FMath::IsNearlyEqual(L.helpercoreavailablepercentminimal(), R.helpercoreavailablepercentminimal(), 0.1f)
 		|| !FMath::IsNearlyEqual(L.networkavamin(), R.networkavamin(), 0.1f)
 		|| !FMath::IsNearlyEqual(L.gpuavamin(), R.gpuavamin(), 0.1f)
@@ -471,6 +473,7 @@ namespace XiaoRedis
 		Out.set_scheduletime(L.scheduletime());
 
 		Out.set_bignorearch(L.bignorearch());
+		Out.set_bcacheservice(L.bcacheservice());
 	}
 
 	static bool IsConnected()

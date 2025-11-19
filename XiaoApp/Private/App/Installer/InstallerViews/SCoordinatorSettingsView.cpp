@@ -14,10 +14,49 @@
 
 #define LOCTEXT_NAMESPACE "SCoordinatorSettingsView"
 
-BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
+#define ADD_PORT_BOX(DISPLAY_TEXT, PORT, PORT_FLAG) \
+	+ SVerticalBox::Slot().THR_PADDING \
+	[ \
+		SNew(SHorizontalBox) \
+		+ SHorizontalBox::Slot().MaxWidth(100.0f) \
+		[ \
+			SNew(STextBlock) \
+			.Text(DISPLAY_TEXT) \
+		] \
+		+ SHorizontalBox::Slot().AutoWidth() \
+		[ \
+			SNew(SNumericEntryBox<uint16>).MinDesiredValueWidth(45.0f) \
+			.Value_Lambda([](){ \
+				return GInstallSettings.PORT; \
+			}) \
+			.MinValue(1024).MaxValue(49151) \
+			.OnValueChanged_Lambda([this](const uint16 InPort){ \
+				GInstallSettings.PORT = InPort; \
+				PORT_FLAG = XiaoNetwork::IsPortAvailable(GInstallSettings.PORT); \
+				if (PORT_FLAG) \
+				{ \
+					PORT_FLAG = PortIsSafe(); \
+				} \
+				ErrorText->SetError(PORT_FLAG ? FText::GetEmpty() : Xiao::SSamePortError); \
+			}) \
+		] \
+		+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).HAlign(HAlign_Center) \
+		[ \
+			SNew(SImage) \
+			.Image_Lambda([this]() { \
+				return GetBrush(PORT_FLAG); \
+			}) \
+		] \
+	]
+
+
+
+BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SCoordinatorSettingsView::Construct(const FArguments& InArgs)
 {
+	Ports = { GInstallSettings.CoordiListenPort, GInstallSettings.AgentListenPort, GInstallSettings.CacheServicePort };
+
 	ChildSlot
 	[
 		SNew(SVerticalBox)
@@ -43,167 +82,10 @@ void SCoordinatorSettingsView::Construct(const FArguments& InArgs)
 			SNew(SBorder)
 		]
 
-		+SVerticalBox::Slot().THR_PADDING
-		[
-			SNew(SHorizontalBox)
-			+SHorizontalBox::Slot().MaxWidth(100.0f)
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("CoordinatorServicePort_Text", "调度器服务端口"))
-			]
-			+SHorizontalBox::Slot().AutoWidth()
-			[
-				SAssignNew(CoordiServerPort, SNumericEntryBox<uint16>).MinDesiredValueWidth(45.0f)
-				.Value_Lambda([]()
-				{
-					return GInstallSettings.CoordiListenPort;
-				})
-				.MinValue(1024).MaxValue(49151)
-				.OnValueChanged_Lambda([this](const uint16 InPort)
-				{
-					GInstallSettings.CoordiListenPort = InPort;
-					bCoordiServerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.CoordiListenPort);
-					if(bCoordiServerPort)
-					{
-						bCoordiServerPort = 
-						/*GInstallSettings.CoordiListenPort != GInstallSettings.UIListenPort
-						&&*/ GInstallSettings.CoordiListenPort != GInstallSettings.PerfTransport
-						&& GInstallSettings.CoordiListenPort != GInstallSettings.AgentListenPort
-						/*&& GInstallSettings.CoordiListenPort != GInstallSettings.LicenseListenPort*/
-						&& GInstallSettings.CoordiListenPort != GInstallSettings.CacheListenPort;
-					}
-					ErrorText->SetError(bCoordiServerPort ? FText::GetEmpty() : Xiao::SSamePortError);
-				})
-			]
-			+SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).HAlign(HAlign_Center)
-			[
-				SNew(SImage)
-				.Image_Lambda([this]() 
-				{
-					return GetBrush(bCoordiServerPort);
-				})
-			]
-		]
-		/*+SVerticalBox::Slot().THR_PADDING
-		[
-			SNew(SHorizontalBox)
-			+SHorizontalBox::Slot().MaxWidth(100.0f)
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("XiaoUIManagerPort_Text", "前端管理端口"))
-			]
-			+SHorizontalBox::Slot().AutoWidth()
-			[
-				SAssignNew(XiaobuildManagerPort, SNumericEntryBox<uint16>).MinDesiredValueWidth(45.0f)
-				.Value_Lambda([]()
-				{
-					return GInstallSettings.UIListenPort;
-				})
-				.MinValue(1024).MaxValue(49151)
-				.OnValueChanged_Lambda([this](const uint16 InPort)
-				{
-						GInstallSettings.UIListenPort = InPort;
-					bUIManagerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.UIListenPort);
-					if(bUIManagerPort)
-					{
-						bUIManagerPort = GInstallSettings.UIListenPort != GInstallSettings.CoordiListenPort
-						&& GInstallSettings.UIListenPort != GInstallSettings.PerfTransport
-						&& GInstallSettings.UIListenPort != GInstallSettings.AgentListenPort
-						&& GInstallSettings.UIListenPort != GInstallSettings.LicenseListenPort
-						&& GInstallSettings.UIListenPort != GInstallSettings.CacheListenPort;
-					}
-					ErrorText->SetError(bUIManagerPort ? FText::GetEmpty() : Xiao::SSamePortError);
-				})
-			]
-			+SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).HAlign(HAlign_Center)
-			[
-				SNew(SImage)
-				.Image_Lambda([this]()
-				{
-					return GetBrush(bUIManagerPort);
-				})
-			]
-		]*/
-		+SVerticalBox::Slot().THR_PADDING
-		[
-			SNew(SHorizontalBox)
-			+SHorizontalBox::Slot().MaxWidth(100.0f)
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("AgentCommunicationPort_Text", "代理传输端口"))
-			]
-			+SHorizontalBox::Slot().AutoWidth()
-			[
-				SAssignNew(AgentCommunicationPort, SNumericEntryBox<uint16>).MinDesiredValueWidth(45.0f)
-				.MinValue(1024).MaxValue(49151)
-				.Value_Lambda([]()
-				{
-					return GInstallSettings.AgentListenPort;
-				})
-				.OnValueChanged_Lambda([this](const uint16 InPort)
-				{
-						GInstallSettings.AgentListenPort = InPort;
-					bAgentCommunicatePort = XiaoNetwork::IsPortAvailable(GInstallSettings.AgentListenPort);
-					if(bAgentCommunicatePort)
-					{
-						bAgentCommunicatePort = GInstallSettings.AgentListenPort != GInstallSettings.CoordiListenPort
-						/*&& GInstallSettings.AgentListenPort != GInstallSettings.UIListenPort*/
-						&& GInstallSettings.AgentListenPort != GInstallSettings.PerfTransport
-						/*&& GInstallSettings.AgentListenPort != GInstallSettings.LicenseListenPort*/
-						&& GInstallSettings.AgentListenPort != GInstallSettings.CacheListenPort;
-					}
-					ErrorText->SetError(bAgentCommunicatePort ? FText::GetEmpty() : Xiao::SSamePortError);
-				})
-			]
-			+SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).HAlign(HAlign_Center)
-			[
-				SNew(SImage)
-				.Image_Lambda([this]()
-				{
-					return GetBrush(bAgentCommunicatePort);
-				})
-			]
-		]
-		/*+SVerticalBox::Slot().THR_PADDING
-		[
-			SNew(SHorizontalBox)
-			+SHorizontalBox::Slot().MaxWidth(100.0f)
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("LicenseServicePort_Text", "许可服务端口"))
-			]
-			+SHorizontalBox::Slot().AutoWidth()
-			[
-				SAssignNew(LicenseServicePort, SNumericEntryBox<uint16>).MinDesiredValueWidth(45.0f)
-				.MinValue(1024).MaxValue(49151)
-				.Value_Lambda([]()
-				{
-					return GInstallSettings.LicenseListenPort;
-				})
-				.OnValueChanged_Lambda([this](const uint16 InPort)
-				{
-						GInstallSettings.LicenseListenPort = InPort;
-					bLicenseServicePort = XiaoNetwork::IsPortAvailable(GInstallSettings.LicenseListenPort);
-					if(bLicenseServicePort)
-					{
-						bLicenseServicePort = GInstallSettings.LicenseListenPort != GInstallSettings.CoordiListenPort
-						&& GInstallSettings.LicenseListenPort != GInstallSettings.UIListenPort
-						&& GInstallSettings.LicenseListenPort != GInstallSettings.PerfTransport
-						&& GInstallSettings.LicenseListenPort != GInstallSettings.AgentListenPort
-						&& GInstallSettings.LicenseListenPort != GInstallSettings.CacheListenPort;
-					}
-					ErrorText->SetError(bLicenseServicePort ? FText::GetEmpty() : Xiao::SSamePortError);
-				})
-			]
-			+SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).HAlign(HAlign_Center)
-			[
-				SNew(SImage)
-				.Image_Lambda([this]()
-				{
-					return GetBrush(bLicenseServicePort);
-				})
-			]
-		]*/
+		ADD_PORT_BOX(LOCTEXT("CoordinatorServicePort_Text", "调度服务端口"), CoordiListenPort, bCoordiServerPort)
+		ADD_PORT_BOX(LOCTEXT("AgentCommunicationPort_Text", "代理传输端口"), AgentListenPort, bAgentCommunicatePort)
+		ADD_PORT_BOX(LOCTEXT("CacheServicePort_Text", "缓存服务端口"), CacheServicePort, bCacheServicePort)
+		
 		+SVerticalBox::Slot().THR_PADDING
 		[
 			SNew(SHorizontalBox)
@@ -247,16 +129,31 @@ bool SCoordinatorSettingsView::OnCanNext()
 
 bool SCoordinatorSettingsView::CheckCoordiPort() const
 {
-	return bCoordiServerPort /*&& bUIManagerPort && bMessageTransPort*/ && bAgentCommunicatePort/* && bLicenseServicePort*/;
+	return bCoordiServerPort && bAgentCommunicatePort && bCacheServicePort;
 }
 
 void SCoordinatorSettingsView::OnCheckButtonClicked()
 {
 	bCoordiServerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.CoordiListenPort);
-	// bUIManagerPort = XiaoNetwork::IsPortAvailable(GInstallSettings.UIListenPort);
-	// bMessageTransPort = XiaoNetwork::IsPortAvailable(GInstallSettings.PerfTransport);
 	bAgentCommunicatePort = XiaoNetwork::IsPortAvailable(GInstallSettings.AgentListenPort);
-	// bLicenseServicePort = XiaoNetwork::IsPortAvailable(GInstallSettings.LicenseListenPort);
+	bCacheServicePort = XiaoNetwork::IsPortAvailable(GInstallSettings.CacheServicePort);
 }
 
+bool SCoordinatorSettingsView::PortIsSafe() const
+{
+	for (int i = 0; i < Ports.Num(); ++i)
+	{
+		for (int j = i + 1; j < Ports.Num(); j++)
+		{
+			if (Ports[i] == Ports[j])
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+#undef ADD_PORT_BOX
 #undef LOCTEXT_NAMESPACE

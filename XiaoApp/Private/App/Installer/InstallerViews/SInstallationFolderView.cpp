@@ -200,7 +200,8 @@ void SInstallationFolderView::Construct(const FArguments& InArgs, const bool InT
 			SNew(SVerticalBox)
 			TOP_WIDGET
 
-			V_ADD_CHECKBOX(AutoRunTrayCheckBox, GInstallSettings.bEnableAutoTray, LOCTEXT("AutoRunTray_Text", "启动时是否自动运行Tray"))
+			V_ADD_CHECKBOX(GInstallSettings.bEnableAutoTray, LOCTEXT("AutoRunTray_Text", "启动时是否自动运行Tray"))
+			V_ADD_CHECKBOX(GInstallSettings.bEnableCacheService, LOCTEXT("UseCacheService_Text", "是否使用缓存服务"))
 		
 			+SVerticalBox::Slot().AutoHeight()
 			[
@@ -402,10 +403,11 @@ void SInstallationFolderView::ValidationFolder(const FString& InFolder)
 	uint64 TotalNumberOfBytes, NumberOfFreeBytes;
 	if (FPlatformMisc::GetDiskTotalAndFreeSpace(InFolder, TotalNumberOfBytes, NumberOfFreeBytes))
 	{
-		const auto FreeBytes = static_cast<uint32>(NumberOfFreeBytes / static_cast<uint64>(1024 * 1024 * 1024));
-		if (FreeBytes < 10)
+		const auto FreeSpace = static_cast<uint32>(NumberOfFreeBytes / static_cast<uint64>(1024 * 1024 * 1024));
+		const uint32 MinimalFreeSpace = GInstallSettings.InstallType & EComponentTye::CT_Coordinator ? 500 : 10;
+		if (FreeSpace < MinimalFreeSpace)
 		{
-			InstallFolderBox->SetError(LOCTEXT("NotAvalibaleSpace_Text", "空余空间少于10GB,建议清理一下！"));
+			InstallFolderBox->SetError(LOCTEXT("NotAvalibaleSpace_Text", "建议清理一下,空余空间少于").ToString() + FString::Printf(TEXT("%d GB"), MinimalFreeSpace));
 		}
 	}
 

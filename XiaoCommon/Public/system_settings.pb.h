@@ -204,6 +204,7 @@ class FSystemSettings final :
     kBHelperEnhanceFieldNumber = 18,
     kBScheduleCleanFieldNumber = 22,
     kBIgnoreArchFieldNumber = 25,
+    kBCacheServiceFieldNumber = 27,
     kScheduleTimeFieldNumber = 24,
     kDiskAvaMinFieldNumber = 26,
   };
@@ -414,6 +415,15 @@ class FSystemSettings final :
   void _internal_set_bignorearch(bool value);
   public:
 
+  // bool bCacheService = 27;
+  void clear_bcacheservice();
+  bool bcacheservice() const;
+  void set_bcacheservice(bool value);
+  private:
+  bool _internal_bcacheservice() const;
+  void _internal_set_bcacheservice(bool value);
+  public:
+
   // uint32 ScheduleTime = 24;
   void clear_scheduletime();
   ::PROTOBUF_NAMESPACE_ID::uint32 scheduletime() const;
@@ -462,6 +472,7 @@ class FSystemSettings final :
   bool bhelperenhance_;
   bool bscheduleclean_;
   bool bignorearch_;
+  bool bcacheservice_;
   ::PROTOBUF_NAMESPACE_ID::uint32 scheduletime_;
   float diskavamin_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -976,6 +987,26 @@ inline void FSystemSettings::_internal_set_diskavamin(float value) {
 inline void FSystemSettings::set_diskavamin(float value) {
   _internal_set_diskavamin(value);
   // @@protoc_insertion_point(field_set:FSystemSettings.DiskAvaMin)
+}
+
+// bool bCacheService = 27;
+inline void FSystemSettings::clear_bcacheservice() {
+  bcacheservice_ = false;
+}
+inline bool FSystemSettings::_internal_bcacheservice() const {
+  return bcacheservice_;
+}
+inline bool FSystemSettings::bcacheservice() const {
+  // @@protoc_insertion_point(field_get:FSystemSettings.bCacheService)
+  return _internal_bcacheservice();
+}
+inline void FSystemSettings::_internal_set_bcacheservice(bool value) {
+  
+  bcacheservice_ = value;
+}
+inline void FSystemSettings::set_bcacheservice(bool value) {
+  _internal_set_bcacheservice(value);
+  // @@protoc_insertion_point(field_set:FSystemSettings.bCacheService)
 }
 
 #ifdef __GNUC__

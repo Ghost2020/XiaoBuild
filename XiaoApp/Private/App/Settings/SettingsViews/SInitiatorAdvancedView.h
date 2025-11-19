@@ -31,26 +31,7 @@ private:
 
 	TSharedPtr<SEditableTextBox> SaveDirFolderText = nullptr;
 
-	TSharedPtr<SCheckBox> LogCheckBox = nullptr;
-	TSharedPtr<SCheckBox> StandaloneCheckBox = nullptr;
-	TSharedPtr<SCheckBox> QuietCheckBox = nullptr;
-	TSharedPtr<SSpinBox<uint32>> CapacitySpinBox = nullptr;
-	TSharedPtr<SCheckBox> CheckCasCheckBox = nullptr;
-	TSharedPtr<SCheckBox> DeletecasCheckBox = nullptr;
-	TSharedPtr<SCheckBox> GetCasCheckBox = nullptr;
-	TSharedPtr<SCheckBox> SummaryCheckBox = nullptr;
-	TSharedPtr<SCheckBox> NoCustoMallocCheckBox = nullptr;
-	TSharedPtr<SCheckBox> AllowMemoryMapsCheckBox = nullptr;
-	TSharedPtr<SCheckBox> EnableStdOutCheckBox = nullptr;
-	TSharedPtr<SCheckBox> StoreRawCheckBox = nullptr;
-
-	TSharedPtr<SSpinBox<uint32>> MaxLocalCoreSpinBox = nullptr;
-	TSharedPtr<SSpinBox<uint32>> MaxCpuSpinBox = nullptr;
-	TSharedPtr<SSpinBox<uint32>> MaxConSpinBox = nullptr;
-
-	TSharedPtr<SCheckBox> VisualizerCheckBox = nullptr;
 	TSharedPtr<SEditableTextBox> CryptoText = nullptr;
 
 	TArray<TSharedPtr<FString>> LevelArray;
-	TSharedPtr<SSpinBox<int32>> KeepBox = nullptr;
 };

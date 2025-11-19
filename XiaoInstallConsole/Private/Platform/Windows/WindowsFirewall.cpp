@@ -129,30 +129,22 @@ bool FWindowsFirewall::BuildFirewall()
 		return false;
     }
 
-	static FString TCPIn = TEXT("(Tcp-In)");
-	static FString TCpOut = TEXT("(Tcp-Out)");
-
-	FString MiddlePath;
-#if PLATFORM_CPU_ARM_FAMILY
-	MiddlePath = TEXT("UBAC/arm64/");
-#else
-	MiddlePath = TEXT("UBAC/x64/");
-#endif
+	static const FString TCPIn = TEXT("(Tcp-In)");
+	static const FString TCpOut = TEXT("(Tcp-Out)");
 
 	// 代理类型
 	if (GInstallSettings.InstallType & CT_Agent)
 	{
 		// 入栈规则
-		AddFwRule(XiaoAppName::SUbaAgent + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SUbaAgent, MiddlePath));
-		AddFwRule(XiaoAppName::SXiaoScheduler + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SXiaoScheduler, MiddlePath));
+		AddFwRule(XiaoAppName::SUbaAgent + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SUbaAgent, SMiddlePath));
+		AddFwRule(XiaoAppName::SXiaoScheduler + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SXiaoScheduler, SMiddlePath));
 		AddFwRule(XiaoAppName::SBuildPerfService + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SIperfServer));
 
 		// 出站规则
 		AddFwRule(XiaoAppName::SBuildApp + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SBuildApp), false);
 		AddFwRule(XiaoAppName::SBuildTray + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SBuildTray), false);
-		AddFwRule(XiaoAppName::SXiaoScheduler + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SXiaoScheduler, MiddlePath), false);
+		AddFwRule(XiaoAppName::SXiaoScheduler + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SXiaoScheduler, SMiddlePath), false);
 		AddFwRule(XiaoAppName::SBuildPerfService + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SIperfServer), false);
-		// AddFwRule(XiaoAppName::SBuildLicenseService + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SBuildLicenseService, TEXT(""), false));
 	}
 
 	// 调度器类型
@@ -160,20 +152,19 @@ bool FWindowsFirewall::BuildFirewall()
 	{
 		// 入站规则
 		AddFwRule(XiaoAppName::SCacheServer + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SCacheServer));
+		AddFwRule(XiaoAppName::SUbaCacheService + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SUbaCacheService, SMiddlePath));
 
 		// 出站规则
 		AddFwRule(XiaoAppName::SCacheServer + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SCacheServer), false);
 		AddFwRule(XiaoAppName::SBuildPerfService + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SIperfServer), false);
+		AddFwRule(XiaoAppName::SUbaCacheService + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SUbaCacheService, SMiddlePath), false);
 	}
 
 	// 验证服务器
 	if (GInstallSettings.InstallType == CT_AgentCoordiVisulizer)
 	{
-		// 入站规则
-		// AddFwRule(XiaoAppName::SBuildLicenseService + TCPIn, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SBuildLicenseService));
-
 		// 出站规则
-		AddFwRule(XiaoAppName::SXiaoScheduler + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SXiaoScheduler, MiddlePath));
+		AddFwRule(XiaoAppName::SXiaoScheduler + TCpOut, SXiaoBuild, GetXiaoAppPath(XiaoAppName::SXiaoScheduler, SMiddlePath), false);
 	}
 
 	return true;

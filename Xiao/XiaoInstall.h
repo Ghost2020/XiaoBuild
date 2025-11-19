@@ -184,6 +184,7 @@ struct FInstallSettings : FJsonSerializable
 	uint32 InstallType = EComponentTye::CT_AgentVisualer;
 
 	bool bEnableAutoTray = true;
+	bool bEnableCacheService = false;
 
 	//~ Begin Coordinator
 	bool bSilentInstall = false;
@@ -197,7 +198,7 @@ struct FInstallSettings : FJsonSerializable
 	uint32 AgentListenPort = XiaoNetwork::SAgentServicePort;
 	uint32 SchedulerServerPort = XiaoNetwork::SSchedulerServerPort;
 	uint32 LicenseListenPort = XiaoNetwork::SLicenseServicePort;
-	uint32 CacheListenPort = XiaoNetwork::SCacheServicePort;
+	uint32 CacheServicePort = XiaoNetwork::SCacheServicePort;
 	bool bAutoOpenFirewall = true;
 
 	FString InstallFolder;
@@ -240,6 +241,7 @@ struct FInstallSettings : FJsonSerializable
 		JSON_MCI_VALUE(SetupUpType);
 		JSON_MCI_VALUE(InstallType);
 		JSON_MCI_VALUE(bEnableAutoTray);
+		JSON_MCI_VALUE(bEnableCacheService);
 		JSON_MCI_VALUE(bSilentInstall);
 		JSON_MCI_VALUE(bHasLicense);
 		JSON_MCI_VALUE(LicenseKey);
@@ -249,7 +251,7 @@ struct FInstallSettings : FJsonSerializable
 		JSON_MCI_VALUE(AgentListenPort);
 		JSON_MCI_VALUE(SchedulerServerPort);
 		JSON_MCI_VALUE(LicenseListenPort);
-		JSON_MCI_VALUE(CacheListenPort);
+		JSON_MCI_VALUE(CacheServicePort);
 		JSON_MCI_VALUE(bAutoOpenFirewall);
 		JSON_MCI_VALUE(InstallFolder);
 		JSON_MCI_VALUE(CacheFolder);
@@ -366,25 +368,27 @@ static bool CheckEnvRuning(FString& OutError, const uint32 InIgnore = 0)
 		}
 	}
 	
-	if ((GInstallSettings.InstallType & CT_Coordinator) && IsAppRunning(XiaoAppName::SBuildCoordiService))
+	if ((GInstallSettings.InstallType & CT_Coordinator))
 	{
-		OutError = TEXT("XiaoCoordiService 正在运行，安装前请停止运行！");
-		return false;
-	}
-	
-	if ((GInstallSettings.InstallType & CT_Cache) && IsAppRunning(XiaoAppName::SCacheServer))
-	{
-		OutError = TEXT("cache-server 正在运行，安装前请停止运行！");
-		return false;
+		if (IsAppRunning(XiaoAppName::SBuildCoordiService))
+		{
+			OutError = TEXT("XiaoCoordiService 正在运行，安装前请停止运行！");
+			return false;
+		}
+		if (IsAppRunning(XiaoAppName::SCacheServer))
+		{
+			OutError = TEXT("cache-server 正在运行，安装前请停止运行！");
+			return false;
+		}
+		if (IsAppRunning(XiaoAppName::SUbaCacheService))
+		{
+			OutError = TEXT("UbaCacheService 正在运行，安装前请停止运行！");
+			return false;
+		}
 	}
 
 	if (GInstallSettings.InstallType & CT_AgentCoordiVisulizer)
 	{
-		/*if (IsAppRunning(XiaoAppName::SBuildLicenseService))
-		{
-			OutError = TEXT("XiaoLicenseService 正在运行，安装前请停止运行！");
-			return false;
-		}*/
 		if (IsAppRunning(XiaoAppName::SBuildApp, InIgnore))
 		{
 			OutError = TEXT("XiaoApp 正在运行，安装前请停止运行！");
@@ -402,6 +406,11 @@ static bool CheckEnvRuning(FString& OutError, const uint32 InIgnore = 0)
 			return false;
 		}
 #endif
+		if (IsAppRunning(XiaoAppName::SRider))
+		{
+			OutError = TEXT("Rider 正在运行，安装前请停止运行！");
+			return false;
+		}
 	}
 
 	if (GInstallSettings.InstallFolder.IsEmpty() || !(GInstallSettings.InstallFolder.Len() > 0 && FPaths::DirectoryExists(GInstallSettings.InstallFolder)))

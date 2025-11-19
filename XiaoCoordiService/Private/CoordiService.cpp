@@ -32,6 +32,9 @@ static std::string SLocalAddress;
 static FProcHandle SRedisProcHandle;
 static void* SRedisPipeReadChild = nullptr;
 static void* SRedisPipeWriteChild = nullptr;
+static FProcHandle SCacheProcHandle;
+static void* SCachePipeReadChild = nullptr;
+static void* SCachePipeWriteChild = nullptr;
 static std::unordered_map<std::string, std::string> AgentStats;
 static std::vector<std::string> EnableHelperIds;
 static std::set<std::string> Initiators;
@@ -196,11 +199,22 @@ void FCoordiService::OnDeinitialize()
 		SRedisPipeReadChild = nullptr;
 		SRedisPipeWriteChild = nullptr;
 	}
-
 	if (SRedisProcHandle.IsValid())
 	{
 		FPlatformProcess::TerminateProc(SRedisProcHandle);
 		FPlatformProcess::CloseProc(SRedisProcHandle);
+	}
+
+	if (SCachePipeReadChild != nullptr || SCachePipeWriteChild != nullptr)
+	{
+		FPlatformProcess::ClosePipe(SCachePipeReadChild, SCachePipeWriteChild);
+		SCachePipeReadChild = nullptr;
+		SCachePipeWriteChild = nullptr;
+	}
+	if (SCacheProcHandle.IsValid())
+	{
+		FPlatformProcess::TerminateProc(SCacheProcHandle);
+		FPlatformProcess::CloseProc(SCacheProcHandle);
 	}
 
 	XIAO_LOG(Log, TEXT("OnDeinitialize::Finish!"));
@@ -316,7 +330,7 @@ void FCoordiService::UpdateRedisCluster()
 	CATCH_REDIS_EXCEPTRION();
 }
 
-void FCoordiService::UpdateAgentStatus()
+void FCoordiService::UpdateCoordiStatus()
 {
 	if (SRedisClient)
 	{
@@ -348,6 +362,28 @@ void FCoordiService::UpdateAgentStatus()
 						XIAO_LOG(Error, TEXT("SystemSettings ParseFromString failed!"));
 					}
 				}
+			}
+
+			// 调控缓存服务
+			const bool bUseCache = GModifySystemSettings.bcacheservice();
+			const bool bCacheActive = SCacheProcHandle.IsValid();
+			if (bUseCache)
+			{
+				if (!bCacheActive)
+				{
+					const FString CacheServiceName = XiaoAppName::SUbaCacheService / SMiddlePath
+#if PLATFORM_WINDOWS
+						+ TEXT(".exe")
+#endif
+						;
+					const FString CacheServiceParam = FString::Printf(TEXT("-port=127.0.0.1:%u"), GModifySystemSettings.cacheserviceport());
+					TryRunServer(CacheServiceName, CacheServiceParam, SCacheProcHandle, SCachePipeReadChild, SCachePipeWriteChild);
+				}
+			}
+			else if (bCacheActive)
+			{
+				FPlatformProcess::TerminateProc(SCacheProcHandle);
+				FPlatformProcess::CloseProc(SCacheProcHandle);
 			}
 
 			// 获取所有的代理数据
@@ -394,11 +430,6 @@ void FCoordiService::UpdateAgentStatus()
 				if (SAgentNetworkMap.contains(AgentId))
 				{
 					auto& NetDesc = SAgentNetworkMap[AgentId];
-					
-					Proto.set_networkspeed(NetDesc.Performance);
-					const std::string NetRoundStr = std::string("Sender ") + std::to_string(NetDesc.SendPerfor) + std::string(" Gbits/sec\n") +  
-													std::string("Receiver ") + std::to_string(NetDesc.ReceivePerfor) + std::string(" Gbits/sec");
-					Proto.set_updowntime(NetRoundStr);
 
 					// 是否活跃
 					NetDesc.LastUpdate = Proto.lastupdate();
@@ -474,19 +505,26 @@ void FCoordiService::UpdateAgentStatus()
 					continue;
 				}
 
-				// 网络利用率
-				//if ((Proto.avalnet()+1.0f) < GModifySystemSettings.networkavamin())
-				//{
-				//	XIAO_LOG(Verbose, TEXT("Current Network utilization over the system limit %.1f%% > %.1f%%"), Proto.avalnet(), GModifySystemSettings.networkavamin());
-				//	continue;
-				//}
+				// 磁盘利用率
+				if ((Proto.avadisk()) < GModifySystemSettings.diskavamin())
+				{
+					XIAO_LOG(Verbose, TEXT("Current disk utilization over the system limit %.1f%% > %.1f%%"), Proto.avadisk(), GModifySystemSettings.diskavamin());
+					continue;
+				}
 
-				//// Gpu利用率
-				//if ((Proto.avagpu() + 1.0f) < GModifySystemSettings.gpuavamin())
-				//{
-				//	XIAO_LOG(Verbose, TEXT("Current GPU utilization over the system limit %.1f%% > %.1f%%"), Proto.avagpu(), GModifySystemSettings.gpuavamin());
-				//	continue;
-				//}
+				// 网络利用率
+				if ((Proto.avalnet()) < GModifySystemSettings.networkavamin())
+				{
+					XIAO_LOG(Verbose, TEXT("Current Network utilization over the system limit %.1f%% > %.1f%%"), Proto.avalnet(), GModifySystemSettings.networkavamin());
+					continue;
+				}
+
+				// Gpu利用率
+				if ((Proto.avagpu()) < GModifySystemSettings.gpuavamin())
+				{
+					XIAO_LOG(Verbose, TEXT("Current GPU utilization over the system limit %.1f%% > %.1f%%"), Proto.avagpu(), GModifySystemSettings.gpuavamin());
+					continue;
+				}
 
 				Id2Proto.insert_or_assign(AgentId, Proto);
 				EnableHelperIds.push_back(AgentId);
@@ -609,28 +647,6 @@ void FCoordiService::UpdateAgentStatus()
 
 void FCoordiService::UpdateNetworkStatus()
 {
-	for (auto& AgentDesc : SAgentNetworkMap)
-	{
-		auto& Desc = AgentDesc.second;
-
-		if (!AgentStats.contains(AgentDesc.first))
-		{
-			continue;
-		}
-
-		if ((FPlatformTime::Seconds() - Desc.LastActiveTestTime) > FNetworkConnectivity::SActive)
-		{
-			Desc.LastActiveTestTime = FPlatformTime::Seconds();
-			if (Desc.bWorking && Desc.ProcHandle.IsValid())
-			{
-				FPlatformProcess::CloseProc(Desc.ProcHandle);
-			}
-
-			XIAO_LOG(Verbose, TEXT("Network test::Remote Agent ip::%s"), *Desc.RemoteConnection);
-			Desc.OnNetworkTest();
-		}
-	}
-
 	// 尝试重置状态
 	std::set<std::string> NeedReset;
 	for (const auto& Iter : Id2Proto)
@@ -816,8 +832,8 @@ void FCoordiService::OnTick()
 		// 更新Cluster状态
 		UpdateRedisCluster();
 
-		// 更新代理状态
-		UpdateAgentStatus();
+		// 更新调度状态
+		UpdateCoordiStatus();
 
 		// 更新代理网络
 		UpdateNetworkStatus();

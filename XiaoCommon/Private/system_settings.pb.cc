@@ -45,6 +45,7 @@ constexpr FSystemSettings::FSystemSettings(
   , bhelperenhance_(false)
   , bscheduleclean_(false)
   , bignorearch_(false)
+  , bcacheservice_(false)
   , scheduletime_(0u)
   , diskavamin_(0){}
 struct FSystemSettingsDefaultTypeInternal {
@@ -92,6 +93,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_system_5fsettings_2eproto::off
   PROTOBUF_FIELD_OFFSET(::FSystemSettings, scheduletime_),
   PROTOBUF_FIELD_OFFSET(::FSystemSettings, bignorearch_),
   PROTOBUF_FIELD_OFFSET(::FSystemSettings, diskavamin_),
+  PROTOBUF_FIELD_OFFSET(::FSystemSettings, bcacheservice_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::FSystemSettings)},
@@ -102,7 +104,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_system_5fsettings_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\025system_settings.proto\"\365\004\n\017FSystemSetti"
+  "\n\025system_settings.proto\"\214\005\n\017FSystemSetti"
   "ngs\022\027\n\017HardDiskMinimal\030\001 \001(\002\022\034\n\024VirtualM"
   "emoryMinimal\030\002 \001(\002\022\026\n\016PhysicalMemory\030\003 \001"
   "(\002\022\033\n\023CpuAvailableMinimal\030\004 \001(\002\022)\n!Helpe"
@@ -118,11 +120,12 @@ const char descriptor_table_protodef_system_5fsettings_2eproto[] PROTOBUF_SECTIO
   " \001(\r\022\027\n\017MaxInitiatorNum\030\024 \001(\r\022\021\n\tMaxConN"
   "um\030\025 \001(\r\022\026\n\016bScheduleClean\030\026 \001(\010\022\024\n\014Sche"
   "duleTime\030\030 \001(\r\022\023\n\013bIgnoreArch\030\031 \001(\010\022\022\n\nD"
-  "iskAvaMin\030\032 \001(\002b\006proto3"
+  "iskAvaMin\030\032 \001(\002\022\025\n\rbCacheService\030\033 \001(\010b\006"
+  "proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_system_5fsettings_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_system_5fsettings_2eproto = {
-  false, false, 663, descriptor_table_protodef_system_5fsettings_2eproto, "system_settings.proto", 
+  false, false, 686, descriptor_table_protodef_system_5fsettings_2eproto, "system_settings.proto", 
   &descriptor_table_system_5fsettings_2eproto_once, nullptr, 0, 1,
   schemas, file_default_instances, TableStruct_system_5fsettings_2eproto::offsets,
   file_level_metadata_system_5fsettings_2eproto, file_level_enum_descriptors_system_5fsettings_2eproto, file_level_service_descriptors_system_5fsettings_2eproto,
@@ -404,6 +407,14 @@ const char* FSystemSettings::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         } else
           goto handle_unusual;
         continue;
+      // bool bCacheService = 27;
+      case 27:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 216)) {
+          bcacheservice_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -583,6 +594,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(26, this->_internal_diskavamin(), target);
   }
 
+  // bool bCacheService = 27;
+  if (this->_internal_bcacheservice() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(27, this->_internal_bcacheservice(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -720,6 +737,11 @@ size_t FSystemSettings::ByteSizeLong() const {
     total_size += 2 + 1;
   }
 
+  // bool bCacheService = 27;
+  if (this->_internal_bcacheservice() != 0) {
+    total_size += 2 + 1;
+  }
+
   // uint32 ScheduleTime = 24;
   if (this->_internal_scheduletime() != 0) {
     total_size += 2 +
@@ -822,6 +844,9 @@ void FSystemSettings::MergeFrom(const FSystemSettings& from) {
   }
   if (from._internal_bignorearch() != 0) {
     _internal_set_bignorearch(from._internal_bignorearch());
+  }
+  if (from._internal_bcacheservice() != 0) {
+    _internal_set_bcacheservice(from._internal_bcacheservice());
   }
   if (from._internal_scheduletime() != 0) {
     _internal_set_scheduletime(from._internal_scheduletime());

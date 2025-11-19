@@ -556,7 +556,7 @@ bool FAgentService::TryRunUbaAgent()
 	XiaoAgentName += TEXT(".exe");
 #endif
 
-	const FString XiaoAgentExePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), TEXT("UBAC"), SArc, XiaoAgentName));
+	const FString XiaoAgentExePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::GetPath(FPlatformProcess::ExecutablePath()), SMiddlePath, XiaoAgentName));
 	if (!FPaths::FileExists(XiaoAgentExePath))
 	{
 		XIAO_LOG(Error, TEXT("XiaoAgent executable file not exist::%s!"), *XiaoAgentExePath);
@@ -578,7 +578,7 @@ bool FAgentService::TryRunUbaAgent()
 	}
 
 	uint32 MaxCon = SOriginalAgentSettings.UbaAgent.MaxCon;
-	if (SAgentProto.maxcon() > 0)							// 必须大于0
+	if (SAgentProto.maxcon() > 0)							
 	{
 		MaxCon = SAgentProto.maxcon();
 		SAgentCoreParams.MaxCon = MaxCon;

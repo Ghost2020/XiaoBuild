@@ -26,7 +26,7 @@
 
 #define LOCTEXT_NAMESPACE "SettingsView"
 
-#define ADD_PORT_SLOT(DISPLAY_TEXT, MIN_VAL, MAX_VAL, PREDICATE, ENABLE) \
+#define ADD_RANGE_SLOT(DISPLAY_TEXT, TOOLTIP_TEXT, MIN_VAL, MAX_VAL, PREDICATE, ENABLE) \
 	+ SHorizontalBox::Slot().Padding(20.0f) \
 	[ \
 		SNew(SHorizontalBox) \
@@ -34,6 +34,7 @@
 		[ \
 			SNew(STextBlock) \
 			.Text(DISPLAY_TEXT) \
+			.ToolTipText(TOOLTIP_TEXT) \
 		] \
 		+ SHorizontalBox::Slot().HAlign(HAlign_Left).AutoWidth() \
 		[ \
@@ -51,7 +52,7 @@
 	] \
 
 
-#define ADD_CHECKBOX_SLOT(DISPLAY_TEXT, PREDICATE) \
+#define ADD_CHECKBOX_SLOT(DISPLAY_TEXT, TOOLTIP_TEXT, PREDICATE) \
 	+ SVerticalBox::Slot().AutoHeight().Padding(10.0f) \
 	[ \
 		SNew(SCheckBox) \
@@ -65,7 +66,9 @@
 			}) \
 		.Content() \
 		[ \
-			SNew(STextBlock).Text(DISPLAY_TEXT) \
+			SNew(STextBlock) \
+			.Text(DISPLAY_TEXT) \
+			.ToolTipText(TOOLTIP_TEXT) \
 		] \
 	] \
 
@@ -90,6 +93,61 @@
 			.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type) { \
 				GModifySystemSettings.set_##PREDICATE(InValue); \
 			}) \
+		] \
+	]
+
+#define ADD_CAPACITY_SLOT(DISPLAY_TEXT, CAPACITY_WIDGET, PREDICATE) \
+	+ SHorizontalBox::Slot().Padding(10.0f) \
+	[ \
+		SNew(SHorizontalBox) \
+		+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center) \
+		[ \
+			SNew(STextBlock).Text(DISPLAY_TEXT) \
+		] \
+		+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left) \
+		[ \
+			SNew(SConstrainBox).MaxWidth(200.0f).MinWidth(200.0f) \
+			[ \
+				SNew(SHorizontalBox) \
+				+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left).MinWidth(10.0f) \
+				[ \
+					SNew(SNumericEntryBox<float>) \
+					.MinValue(0.0f).MaxValue(MAX_uint16) \
+					.Value_Lambda([this](){ \
+						TSharedPtr<FText> UnitText = DiskUnitArray[1]; \
+						if (CAPACITY_WIDGET.IsValid()) \
+						{ \
+							UnitText = CAPACITY_WIDGET->GetSelectedItem(); \
+						} \
+						return ToShowVal(UnitText, GModifySystemSettings.PREDICATE()); \
+					}) \
+					.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type){ \
+						GModifySystemSettings.set_##PREDICATE(ToRealVal(CAPACITY_WIDGET->GetSelectedItem(), InValue)); \
+					}) \
+				] \
+				+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left) \
+				[ \
+					SAssignNew(CAPACITY_WIDGET, SComboBox<TSharedPtr<FText>>) \
+					.OptionsSource(&DiskUnitArray) \
+					.InitiallySelectedItem(DiskUnitArray[1]) \
+					.OnGenerateWidget_Lambda([](const TSharedPtr<FText> InText) \
+					{ \
+						return SNew(STextBlock).Text(*InText); \
+					}) \
+					.OnSelectionChanged_Lambda([this](const TSharedPtr<FText> InText, ESelectInfo::Type) \
+					{ \
+						const float ShowVal = ToShowVal(InText, GModifySystemSettings.PREDICATE()); \
+						GModifySystemSettings.set_##PREDICATE(ToRealVal(InText, ShowVal)); \
+					}) \
+					.Content() \
+					[ \
+						SNew(STextBlock).Text_Lambda([this]() \
+						{ \
+							return *this->CAPACITY_WIDGET->GetSelectedItem(); \
+						}) \
+					] \
+				] \
+			] \
 		] \
 	]
 
@@ -159,8 +217,7 @@ void SSettingsView::Construct(const FArguments& InArgs)
 						SNew(SVerticalBox)
 						+ SVerticalBox::Slot().AutoHeight().Padding(10.0f)
 						[
-							SNew(STextBlock)
-								.Text(LOCTEXT("Network_Text", "网络设置")).TextStyle(&XiaoH3TextStyle)
+							SNew(STextBlock).Text(LOCTEXT("Network_Text", "网络设置")).TextStyle(&XiaoH3TextStyle)
 						]
 
 						/*+ SVerticalBox::Slot().AutoHeight().Padding(10.0f)
@@ -172,10 +229,9 @@ void SSettingsView::Construct(const FArguments& InArgs)
 						+ SVerticalBox::Slot().AutoHeight().Padding(10.0f)
 						[
 							SNew(SHorizontalBox)
-								ADD_PORT_SLOT(LOCTEXT("AgentPort_Text", "代理连接端口"), 1024, 49151, agentserviceport, false)
-								// ADD_PORT_SLOT(LOCTEXT("CoordiUI_Text", "管理UI端口"), 1024, 49151, webuiport)
-								ADD_PORT_SLOT(LOCTEXT("CoordiServerPort_Text", "调度服务端口"), 1024, 49151, coordiserviceport, false)
-								// ADD_PORT_SLOT(LOCTEXT("LicensePort_Text", "许可端口"), 1024, 49151, licenseserviceport, false)
+							ADD_RANGE_SLOT(LOCTEXT("AgentPort_Text", "代理连接端口"), LOCTEXT("AgentPort_ToolTipText", ""), 1024, 49151, agentserviceport, false)
+							ADD_RANGE_SLOT(LOCTEXT("CoordiServerPort_Text", "调度服务端口"), LOCTEXT("CoordiServerPort_ToolTipText", ""), 1024, 49151, coordiserviceport, false)
+							ADD_RANGE_SLOT(LOCTEXT("CacheServicePort_Text", "缓存服务端口"), LOCTEXT("CacheServicePort_ToolTipText", ""), 1024, 49151, cacheserviceport, false)
 						]
 									
 #pragma endregion
@@ -208,7 +264,8 @@ void SSettingsView::Construct(const FArguments& InArgs)
 							]
 						]
 
-						ADD_CHECKBOX_SLOT(LOCTEXT("EncryptCom_Text", "是否加密传输内容"), bencypttransport)		
+						ADD_CHECKBOX_SLOT(LOCTEXT("bEncryptCom_Text", "是否加密传输内容"), LOCTEXT("bEncryptCom_ToolTipText", "网络上传输的数据是否进行加密，保证数据传输的安全性"), bencypttransport)
+						ADD_CHECKBOX_SLOT(LOCTEXT("bCacheService_Text", "是否启动缓存服务"), LOCTEXT("bCacheService_ToolTipText", "专为UE5构建流程设计的高速分布式缓存系统\n可显著减少重复编译和重复生成\n提高多人团队的构建速度"), bcacheservice)
 					]
 				]
 #pragma endregion		
@@ -227,9 +284,9 @@ void SSettingsView::Construct(const FArguments& InArgs)
 						+ SVerticalBox::Slot().AutoHeight()
 						[
 							SNew(SHorizontalBox)
-							ADD_PORT_SLOT(LOCTEXT("MaxInitiator_Text", "同时允许多少发起者"), 1, MAX_uint32, maxinitiatornum, true)
-							ADD_PORT_SLOT(LOCTEXT("MaximumCores_Text", "构建允许最多的核心"), 1, MAX_uint32, maxcorenum, true)
-							ADD_PORT_SLOT(LOCTEXT("MaxHelpNum_Text", "构建允许最多的协助"), 1, MAX_uint32, maxconnum, true)
+							ADD_RANGE_SLOT(LOCTEXT("MaxInitiator_Text", "同时允许多少发起者"), LOCTEXT("MaxInitiator_ToolTipText", "系统在同一时刻当中最多允许多少个发起者"), 1, MAX_uint32, maxinitiatornum, true)
+							ADD_RANGE_SLOT(LOCTEXT("MaximumCores_Text", "构建允许最多的核心"), LOCTEXT("MaximumCores_ToolTipText", "发起者最多可以使用多少个核心"), 1, MAX_uint32, maxcorenum, true)
+							ADD_RANGE_SLOT(LOCTEXT("MaxHelpNum_Text", "构建允许最多的协助"), LOCTEXT("MaxHelpNum_ToolTipText", "发起者最多可以请求多少个协助者进行分布式计算"), 1, MAX_uint32, maxconnum, true)
 						]
 					]
 				]
@@ -257,114 +314,8 @@ void SSettingsView::Construct(const FArguments& InArgs)
 						+ SVerticalBox::Slot().AutoHeight().Padding(10.0f)
 						[
 							SNew(SHorizontalBox)
-							+ SHorizontalBox::Slot().Padding(10.0f)
-							[
-								SNew(SHorizontalBox)
-								+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-								[
-									SNew(STextBlock).Text(LOCTEXT("DiskSpace_Text", "硬盘空间"))
-								]
-								+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left)
-								[
-									SNew(SConstrainBox).MaxWidth(200.0f).MinWidth(200.0f)
-									[
-										SNew(SHorizontalBox)
-										+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left).MinWidth(10.0f)
-										[
-											SNew(SNumericEntryBox<float>)
-											.MinValue(0.0f).MaxValue(MAX_uint16)
-											.Value_Lambda([this]()
-											{
-												TSharedPtr<FText> UnitText = DiskUnitArray[1];
-												if (DiskSpaceUnitBox.IsValid())
-												{
-													UnitText = DiskSpaceUnitBox->GetSelectedItem();
-												}
-												return ToShowVal(UnitText, GModifySystemSettings.harddiskminimal());
-											})
-											.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type)
-											{
-												GModifySystemSettings.set_harddiskminimal(ToRealVal(DiskSpaceUnitBox->GetSelectedItem(), InValue));
-											})
-										]
-										+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left)
-										[
-											SAssignNew(DiskSpaceUnitBox, SComboBox<TSharedPtr<FText>>)
-											.OptionsSource(&DiskUnitArray)
-											.InitiallySelectedItem(DiskUnitArray[1])
-											.OnGenerateWidget_Lambda([](const TSharedPtr<FText> InText)
-											{
-												return SNew(STextBlock).Text(*InText);
-											})
-											.OnSelectionChanged_Lambda([this](const TSharedPtr<FText> InText, ESelectInfo::Type)
-											{
-												const float ShowVal = ToShowVal(InText, GModifySystemSettings.harddiskminimal());
-												GModifySystemSettings.set_harddiskminimal(ToRealVal(InText, ShowVal));
-											})
-											.Content()
-											[
-												SNew(STextBlock).Text_Lambda([this]()
-												{
-													return *this->DiskSpaceUnitBox->GetSelectedItem();
-												})
-											]
-										]
-									]
-								]
-							]
-
-							+ SHorizontalBox::Slot().Padding(10.0f)
-							[
-								SNew(SHorizontalBox)
-								+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-								[
-									SNew(STextBlock).Text(LOCTEXT("PhysicalMemory_Text", "物理内存"))
-								]
-								+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left)
-								[
-									SNew(SConstrainBox).MaxWidth(200.0f).MinWidth(200.0f)
-									[
-										SNew(SHorizontalBox)
-										+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left).MinWidth(10.0f)
-										[
-											SNew(SNumericEntryBox<float>)
-											.MinValue(0.0f).MaxValue(MAX_uint16)
-											.Value_Lambda([this](){
-												TSharedPtr<FText> UnitText = DiskUnitArray[1];
-												if (PhysicalMemoryUnitBox.IsValid())
-												{
-													UnitText = PhysicalMemoryUnitBox->GetSelectedItem();
-												}
-												return ToShowVal(UnitText, GModifySystemSettings.physicalmemory());
-											})
-											.OnValueCommitted_Lambda([this](const float InValue, const ETextCommit::Type){
-												GModifySystemSettings.set_physicalmemory(ToRealVal(PhysicalMemoryUnitBox->GetSelectedItem(), InValue));
-											})
-										]
-										+ SHorizontalBox::Slot().AutoWidth().HAlign(HAlign_Left)
-										[
-											SAssignNew(PhysicalMemoryUnitBox, SComboBox<TSharedPtr<FText>>)
-											.OptionsSource(&DiskUnitArray)
-											.InitiallySelectedItem(DiskUnitArray[1])
-											.OnGenerateWidget_Lambda([](const TSharedPtr<FText> InText){
-												return SNew(STextBlock).Text(*InText);
-											})
-											.OnSelectionChanged_Lambda([this](const TSharedPtr<FText> InText, ESelectInfo::Type){
-												const float ShowVal = ToShowVal(InText, GModifySystemSettings.physicalmemory());
-												GModifySystemSettings.set_physicalmemory(ToRealVal(InText, ShowVal));
-											})
-											.Content()
-											[
-												SNew(STextBlock).Text_Lambda([this]()
-												{
-													return *this->PhysicalMemoryUnitBox->GetSelectedItem();
-												})
-											]
-										]
-									]
-								]
-							]
-							
+							ADD_CAPACITY_SLOT(LOCTEXT("DiskSpace_Text", "硬盘空间"), DiskSpaceUnitBox, harddiskminimal)
+							ADD_CAPACITY_SLOT(LOCTEXT("PhysicalMemory_Text", "物理内存"), PhysicalMemoryUnitBox, physicalmemory)
 							ADD_PERCENTBOX_SLOT(LOCTEXT("AvailableCPUMinimal_Text", "可用CPU(%)"), LOCTEXT("AvailableCPUMinimal_ToolTip", "作为协助者必须有至少额外的cpu百分比"), cpuavailableminimal)
 							ADD_PERCENTBOX_SLOT(LOCTEXT("AvailableDiskMinimal_Text", "可用磁盘(%)"), LOCTEXT("AvailableDiskMinimal_ToolTip", "作为协助者必须有至少额外的磁盘百分比"), diskavamin)
 							ADD_PERCENTBOX_SLOT(LOCTEXT("AvailableNetMinimal_Text", "可用网络(%)"), LOCTEXT("AvailableNetMinimal_ToolTip", "作为协助者必须有至少额外的网络百分比"), networkavamin)
@@ -375,12 +326,11 @@ void SSettingsView::Construct(const FArguments& InArgs)
 #pragma region AgentSettings
 						+ SVerticalBox::Slot().AutoHeight().Padding(10.0f)
 						[
-							SNew(STextBlock)
-								.Text(LOCTEXT("AgentSet_Text", "代理设置")).TextStyle(&XiaoH3TextStyle)
+							SNew(STextBlock).Text(LOCTEXT("AgentSet_Text", "代理设置")).TextStyle(&XiaoH3TextStyle)
 						]
 
-						ADD_CHECKBOX_SLOT(LOCTEXT("AllowDiffArch_Text", "是否允许CPU架构不同"), bignorearch)
-						ADD_CHECKBOX_SLOT(LOCTEXT("AllowAgents_Text", "是否允许代理设置作为协助者"), benablehelper)
+						ADD_CHECKBOX_SLOT(LOCTEXT("bAllowDiffArch_Text", "是否允许CPU架构不同"), LOCTEXT("bAllowDiffArch_ToolTip", "对于像\"源码编译\"和\"材质编译\"生成的中间文件,\n在不同的架构上的指令集也不同，因此不能混用"), bignorearch)
+						ADD_CHECKBOX_SLOT(LOCTEXT("bAllowAgents_Text", "是否允许代理设置是否作为协助者"), LOCTEXT("bAllowAgents_ToolTip", "是否授予普通代理机器设置可以作为协助者的权力"), benablehelper)
 
 						+ SVerticalBox::Slot().AutoHeight().Padding(10.0f)
 						[
@@ -522,7 +472,6 @@ void SSettingsView::Construct(const FArguments& InArgs)
 							.Orientation(Orient_Vertical)
 							.SelectionMode(ESelectionMode::Type::Single)
 							.EnableAnimatedScrolling(true)
-							// .ItemHeight(50.0f)
 							.AllowOverscroll(EAllowOverscroll::Yes)
 							.OnGenerateRow_Raw(this, &SSettingsView::OnGenerateBackRow)
 							.OnContextMenuOpening_Raw(this, &SSettingsView::OnContextMenuOpening)
@@ -1166,7 +1115,8 @@ float SSettingsView::ToRealVal(const TSharedPtr<FText>& InText, const float& InS
 	return InShowData;
 }
 
+#undef ADD_CAPACITY_SLOT
 #undef ADD_PERCENTBOX_SLOT
 #undef ADD_CHECKBOX_SLOT
-#undef ADD_PORT_SLOT
+#undef ADD_RANGE_SLOT
 #undef LOCTEXT_NAMESPACE

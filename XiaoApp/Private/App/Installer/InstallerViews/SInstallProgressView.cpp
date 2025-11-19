@@ -209,6 +209,7 @@ bool SInstallProgressView::OnInstall() const
 	AgentSettings.NetworkCoordinate.Port = GInstallSettings.CoordiPort;
 	AgentSettings.UbaAgent.Dir = FPaths::ConvertRelativePathToFull(FPaths::Combine(GInstallSettings.CacheFolder, XiaoAppName::SUbaAgent));
 	AgentSettings.UbaScheduler.Dir = FPaths::ConvertRelativePathToFull(FPaths::Combine(GInstallSettings.CacheFolder, XiaoAppName::SXiaoScheduler));
+	AgentSettings.UbaScheduler.bUseCache = GInstallSettings.bEnableCacheService;
 	SaveAgentSettings(AgentSettings);
 
 	const FString SaveInstallSettingPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(

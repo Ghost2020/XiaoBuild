@@ -118,19 +118,6 @@ static void PrintHelp()
     std::cout << HelpString << std::endl;
 }
 
-const TArray<FString> GValidVersion = { "WIN_XP", "WIN_2003", "WIN_Vista", "WIN_2008", "WIN_7", "WIN_8", "WIN_8.1", "WIN_10", "WIN_11" };
-
-static bool IsValidWinVer(const FString& InString, EWinVersion& OutVersion)
-{
-	if (const auto Index = GValidVersion.Find(InString); Index != INDEX_NONE)
-	{
-		OutVersion = static_cast<EWinVersion>(Index);
-		return true;
-	}
-	OutVersion = EWinVersion::Win_None;
-	return false;
-}
-
 static bool ParseCommandLine(const int32 ArgC, TCHAR* ArgV[])
 {
 	const FString CmdLine = FCommandLine::BuildFromArgV(nullptr, ArgC, ArgV, nullptr);
@@ -375,7 +362,7 @@ static bool ParseCommandLine(const int32 ArgC, TCHAR* ArgV[])
 			Out = Out.RightChop(1);
 			if (!Out.IsEmpty() && Out.IsNumeric())
 			{
-				GInstallSettings.CacheListenPort = FCString::Atoi(*Out);
+				GInstallSettings.CacheServicePort = FCString::Atoi(*Out);
 			}
 		}
 

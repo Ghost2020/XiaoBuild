@@ -59,10 +59,10 @@
 	V_WIDGET(WDIGET, EVerticalAlignment::VAlign_Fill, EHorizontalAlignment::HAlign_Fill)
 
 
-#define V_ADD_CHECKBOX(CHECKBOX, PREDIATE, DISPLAY) \
+#define V_ADD_CHECKBOX(PREDIATE, DISPLAY) \
 	+ SVerticalBox::Slot().SEC_PADDING \
 	[ \
-		SAssignNew(CHECKBOX, SCheckBox) \
+		SNew(SCheckBox) \
 		.IsChecked_Lambda([]() { \
 			return PREDIATE ? ECheckBoxState::Checked : ECheckBoxState::Unchecked; \
 		}) \
@@ -76,7 +76,7 @@
 		] \
 	] \
 
-#define V_ADD_SPINBOX(SPIN, PREDIATE, MIN, MAX, DISPLAY, TOOLTIP_TEXT) \
+#define V_ADD_SPINBOX(PREDIATE, MIN, MAX, DISPLAY, TOOLTIP_TEXT) \
 	+ SVerticalBox::Slot().SEC_PADDING \
 	[ \
 		SNew(SHorizontalBox) \
@@ -88,7 +88,7 @@
 		] \
 		+ SHorizontalBox::Slot() \
 		[ \
-			SAssignNew(SPIN, SSpinBox<uint32>).MinValue(MIN).MaxValue(MAX) \
+			SNew(SSpinBox<uint32>).MinValue(MIN).MaxValue(MAX) \
 			.OnValueChanged_Lambda([](const uint32 InValue) { \
 				PREDIATE = InValue; \
 			}) \

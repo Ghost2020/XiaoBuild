@@ -36,8 +36,6 @@ private:
 	FString DefualtCASDir;
 	
 	TSharedPtr<class SEditableTextBox> InstallFolderBox = nullptr;
-	TSharedPtr<class SCheckBox> AutoRunTrayCheckBox = nullptr;
-	TSharedPtr<class SCheckBox> AddPathCheckBox = nullptr;
 	TSharedPtr<class SSSLSettingsView> SSLSettingsView = nullptr;
 	TSharedPtr<class SInstallProgressView> InStallView = nullptr;
 

@@ -60,4 +60,7 @@ message FSystemSettings
 
 	// 磁盘读取可用百分比
 	float DiskAvaMin = 26;
+
+	// 是否运行缓存服务程序
+	bool bCacheService = 27;
 }

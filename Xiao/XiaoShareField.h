@@ -9,8 +9,6 @@
 
 #define LOCTEXT_NAMESPACE "XiaoShareField"
 
-static const FString SVersion(TEXT("V1.0.6"));
-
 static const FString SXiaoBuild(TEXT("XiaoBuild"));
 
 static const FString SSepetator(TEXT(";"));
@@ -91,6 +89,13 @@ static const FString SWarningNum(TEXT("war_num"));
 static const FString SSystemErrorNum(TEXT("sys_err_num"));
 static const FString SSystemWarningNum(TEXT("sys_war_num"));
 
+static const FString SMiddlePath =
+#if PLATFORM_CPU_ARM_FAMILY
+	TEXT("UBAC/arm64/");
+#else
+	TEXT("UBAC/x64/");
+#endif
+
 namespace XiaoConfig
 {
 	static const FString SService(TEXT("service"));
@@ -130,9 +135,11 @@ namespace XiaoAppName
 	static const FString SCacheServer(TEXT("CacheServer"));
 	static const FString SIperfServer(TEXT("iperf3"));
 	static const FString SUbaAgent(TEXT("UbaAgent"));
+	static const FString SUbaCacheService(TEXT("UbaCacheService"));
 	static const FString SXiaoScheduler(TEXT("XiaoScheduler"));
 
 	static const FString SVisualStudio(TEXT("devenv"));
+	static const FString SRider(TEXT("rider64"));
 
 	static const TSet<FString> SXiaoAppSet = {
 		SInstallConsole,
@@ -142,6 +149,7 @@ namespace XiaoAppName
 		SBuildApp,
 		SBuildTray,
 		SUbaAgent,
+		SUbaCacheService,
 		SXiaoScheduler,
 		// SBuildSystem,
 		SBuildAgentService,

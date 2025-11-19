@@ -84,7 +84,6 @@ INT32_MAIN_INT32_ARGC_TCHAR_ARGV()
 			Code = Service->OnStart();
 #endif
 		}
-		// FWindowsCoordiService::MainProc(ArgC, ArgV);
 	}
 	
 	XIAO_LOG(Log, TEXT("XiaoCoordiService::Finish::Code::%d!"), Code);

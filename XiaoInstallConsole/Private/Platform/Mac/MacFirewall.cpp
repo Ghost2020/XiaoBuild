@@ -43,21 +43,14 @@ bool FMacFirewall::BuildFirewall()
 	static FString TCPIn = TEXT("(Tcp-In)");
 	static FString TCpOut = TEXT("(Tcp-Out)");
 
-	FString MiddlePath;
-#if PLATFORM_CPU_ARM_FAMILY
-	MiddlePath = TEXT("UBAC/arm64/");
-#else
-	MiddlePath = TEXT("UBAC/x64/");
-#endif
-
 	// 代理类型
 	if (GInstallSettings.InstallType & CT_Agent)
 	{
 		AddAppToFirewall(GetXiaoAppPath(XiaoAppName::SBuildApp));
 		AddAppToFirewall(GetXiaoAppPath(XiaoAppName::SBuildTray));
 		AddAppToFirewall(GetXiaoAppPath(XiaoAppName::SIperfServer));
-		AddAppToFirewall(GetXiaoAppPath(XiaoAppName::SUbaAgent, MiddlePath));
-		AddAppToFirewall(GetXiaoAppPath(XiaoAppName::SXiaoScheduler, MiddlePath));
+		AddAppToFirewall(GetXiaoAppPath(XiaoAppName::SUbaAgent, SMiddlePath));
+		AddAppToFirewall(GetXiaoAppPath(XiaoAppName::SXiaoScheduler, SMiddlePath));
 	}
 
 	// 调度器类型

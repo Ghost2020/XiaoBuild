@@ -22,7 +22,7 @@ private:
 	static void TryBecomeMaster();
 	static void BecomeSlave();
 	static void UpdateRedisCluster();
-	static void UpdateAgentStatus();
+	static void UpdateCoordiStatus();
 	static void UpdateNetworkStatus();
 
 public:
