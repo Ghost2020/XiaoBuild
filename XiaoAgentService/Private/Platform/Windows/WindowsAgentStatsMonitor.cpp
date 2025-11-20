@@ -324,7 +324,7 @@ bool FWindowsAgentStatsMonitor::QueryUpdatedUtilization()
 		XIAO_LOG(Warning, TEXT("PdhGetFormattedCounterValue failed. Error code: %d"), PdhStatus);
 	}
 
-	CoreCpuUtilization[0] = FMath::RoundToInt(CounterValue.doubleValue);
+	CoreCpuUtilization[0] = FMath::Clamp(FMath::RoundToInt(CounterValue.doubleValue), 0, 100);
 
 	LastQueryTime = FPlatformTime::Seconds();
 	return true;
