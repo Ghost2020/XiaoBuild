@@ -72,7 +72,7 @@ struct FAgentCoreParams
 }; FAgentCoreParams SAgentCoreParams;
 
 static bool SbNeedRestart = false;
-static double SLastCleanTime = 0;
+static FDateTime SLastCleanTime = FDateTime::MinValue();
 static double SbNeedClean = false;
 
 
@@ -134,7 +134,6 @@ static FORCEINLINE bool TryGetPublicIp()
 bool FAgentService::OnInitialize(const FString& InParams)
 {
 	GNeedFlush = true;
-	SLastCleanTime = FPlatformTime::Seconds();
 	XIAO_LOG(Display, TEXT("OnInitialize::Begin!"));
 
 	TSharedPtr<FJsonObject> ConfigObj = nullptr;
@@ -161,6 +160,14 @@ bool FAgentService::OnInitialize(const FString& InParams)
 		GMasterConnection.keep_alive = true;
 		TryConnectRedis(true);
 	}
+	const FString CASDir = SOriginalAgentSettings.UbaAgent.Dir;
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	if (!PlatformFile.DirectoryExists(*CASDir))
+	{
+		PlatformFile.CreateDirectoryTree(*CASDir);
+	}
+	const auto StatData = PlatformFile.GetStatData(*CASDir);
+	SLastCleanTime = StatData.CreationTime;
 
 	SAgentStats.Initialize();
 
@@ -305,15 +312,16 @@ void FAgentService::OnTick(const float InDeltaTime)
 		ShutdownUbaAgent();
 		if (SbNeedClean)
 		{
-			SLastCleanTime = FPlatformTime::Seconds();
+			SLastCleanTime = FDateTime::Now();
 			SbNeedClean = false;
 			const FString CASDir = SOriginalAgentSettings.UbaAgent.Dir;
-			if (FPaths::DirectoryExists(CASDir))
+			IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+			if (PlatformFile.DirectoryExists(*CASDir))
 			{
-				IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 				PlatformFile.DeleteDirectoryRecursively(*CASDir);
 				XIAO_LOG(Log, TEXT("Schdule Clean agent CAS Content::%s"), *CASDir);
 			}
+			PlatformFile.CreateDirectoryTree(*CASDir);
 		}
 		TryRunUbaAgent();
 	}
@@ -398,7 +406,7 @@ bool FAgentService::UpdateAgentStats(const bool bInit)
 			{
 				// 是否需要定时清理
 				const uint32 ScheduleTime = SSystemSettings.scheduletime() > 1 ? SSystemSettings.scheduletime() : 3;
-				if (SSystemSettings.bscheduleclean() && (FPlatformTime::Seconds() - SLastCleanTime) > (ScheduleTime * SOneDaySeconds))
+				if (SSystemSettings.bscheduleclean() && (FDateTime::Now() - SLastCleanTime).GetTotalSeconds() > (ScheduleTime * SOneDaySeconds))
 				{
 					SbNeedClean = true;
 				}
