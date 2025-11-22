@@ -434,7 +434,7 @@ void FXiaoTray::RunApp()
 		{
 			if (InReason == QSystemTrayIcon::ActivationReason::Context)
 			{
-				SyncAction->setVisible(OnCheckUpdate());
+				SyncAction->setVisible(bCanSyncUpdate);
 
 				if (LoadAgentSettings(SModifiedAgentSettings, true))
 				{

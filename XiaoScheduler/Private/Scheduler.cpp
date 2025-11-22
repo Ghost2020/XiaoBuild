@@ -151,39 +151,17 @@ namespace uba
 				logger.Error(TC("CreateDirectoryTree %s failed!"), *UbaScheduler.Dir);
 			}
 		}
-		if (FParse::Param(*InCmdLine, TEXT("visualizer")))
-		{
-			UbaScheduler.bVisualizer = true;
-		}
-
-		if (FParse::Param(*InCmdLine, TEXT("quiet")))
-		{
-			UbaScheduler.bQuiet = true;
-		}
-		if (FParse::Param(*InCmdLine, TEXT("nocustomalloc")))
-		{
-			UbaScheduler.bNoCustoMalloc = true;
-		}
+		FParse::Bool(*InCmdLine, TEXT("visualizer"), UbaScheduler.bVisualizer);
+		FParse::Bool(*InCmdLine, TEXT("quiet"), UbaScheduler.bQuiet);
+		FParse::Bool(*InCmdLine, TEXT("nocustomalloc"), UbaScheduler.bNoCustoMalloc);
 		if (FParse::Param(*InCmdLine, TEXT("nostdout")))
 		{
 			UbaScheduler.bEnableStdOut = false;
 		}
-		if (FParse::Param(*InCmdLine, TEXT("getcas")))
-		{
-			UbaScheduler.bGetCas = true;
-		}
-		if (FParse::Param(*InCmdLine, TEXT("summary")))
-		{
-			UbaScheduler.bSummary = true;
-		}
-		if (FParse::Param(*InCmdLine, TEXT("storeraw")))
-		{
-			UbaScheduler.bStoreRaw = true;
-		}
-		if (FParse::Param(*InCmdLine, TEXT("exclusive")))
-		{
-			InInfo.bExclusive = true;
-		}
+		FParse::Bool(*InCmdLine, TEXT("getcas"), UbaScheduler.bGetCas);
+		FParse::Bool(*InCmdLine, TEXT("summary"), UbaScheduler.bSummary);
+		FParse::Bool(*InCmdLine, TEXT("storeraw"), UbaScheduler.bStoreRaw);
+		FParse::Bool(*InCmdLine, TEXT("exclusive"), InInfo.bExclusive);
 		if (FParse::Param(*InCmdLine, TEXT("?")) || FParse::Param(*InCmdLine, TEXT("help")) || FParse::Param(*InCmdLine, TEXT("h")))
 		{
 			return PrintHelp(TC(""), logger) == 0;
@@ -206,6 +184,7 @@ namespace uba
 				checkf(false, TEXT("%s"), text);
 			});
 
+		// Logger
 		LoadAgentSettings(SOriginalAgentSettings);
 		auto& UbaScheduler = SOriginalAgentSettings.UbaScheduler;
 		LoggerWriter = std::make_unique<FilteredLogWriter>(g_consoleLogWriter, UbaScheduler.bQuiet ? LogEntryType_Info : LogEntryType_Detail);
@@ -215,8 +194,9 @@ namespace uba
 			return false;
 		}
 
-		GMasterConnection.host = TCHAR_TO_UTF8(*SOriginalAgentSettings.NetworkCoordinate.IP);
-		GMasterConnection.port = SOriginalAgentSettings.NetworkCoordinate.Port;
+		const auto& CoordinateParam = SOriginalAgentSettings.NetworkCoordinate;
+		GMasterConnection.host = TCHAR_TO_UTF8(*CoordinateParam.IP);
+		GMasterConnection.port = CoordinateParam.Port;
 		GMasterConnection.keep_alive = true;
 		if (!XiaoRedis::TryConnectRedis())
 		{
@@ -225,14 +205,30 @@ namespace uba
 				Logger->Error(TC("%s"), UTF8_TO_TCHAR(SRedisMessage.c_str()));
 			}
 		}
+		try
+		{
+			const auto Optional = SRedisClient->get(String::SSystemSettings);
+			if (Optional.has_value())
+			{
+				const std::string SystemSettingsStr = Optional.value();
+				if (SystemSettingsStr.length() > 0)
+				{
+					if (!GModifySystemSettings.ParseFromString(SystemSettingsStr))
+					{
+						Logger->Error(TC("SystemSettings ParseFromString failed!"));
+					}
+				}
+			}
+		}
+		CATCH_REDIS_EXCEPTRION()
 
 		CleanHistory(FPaths::GetPath(UbaScheduler.Dir));
 
 		const tchar* dbgStr = TC("");
 		Logger->Info(TC("XiaoScheduler v%s%s (RootDir: \"%s\", StoreCapacity: %uGb)\n"), Version, dbgStr, *UbaScheduler.Dir, UbaScheduler.Capacity);
 
+		// Network Server
 		const u64 storageCapacity = u64(UbaScheduler.Capacity) * 1000 * 1000 * 1000;
-
 		NetworkBackend = std::make_unique<uba::NetworkBackendTcp>(*LoggerWriter);
 		NetworkServerCreateInfo nsci(*LoggerWriter);
 		bool ctorSuccess = true;
@@ -242,6 +238,7 @@ namespace uba
 			return false;
 		}
 
+		// Storage Server
 		StorageServerCreateInfo storageInfo(*NetworkServer, TCHAR_TO_UBASTRING(*UbaScheduler.Dir), *LoggerWriter);
 		storageInfo.casCapacityBytes = storageCapacity;
 		storageInfo.storeCompressed = !UbaScheduler.bStoreRaw;
@@ -253,6 +250,7 @@ namespace uba
 		}
 		TraceFile = FPaths::Combine(DefaultTraceDir, FString::Printf(TEXT("%s.uba"), *FDateTime::Now().ToString()));
 
+		// Session Server
 		SessionServerCreateInfo ServerInfo(*StorageServer, *NetworkServer);
 		ServerInfo.useUniqueId = true;
 		ServerInfo.traceEnabled = true;
@@ -265,7 +263,7 @@ namespace uba
 		ServerInfo.remoteLogEnabled = true;
 		ServerInfo.deleteSessionsOlderThanSeconds = 1;
 		ServerInfo.logToFile = UbaScheduler.bLog;
-		// ServerInfo.exclusive = GInfo.bExclusive;
+		ServerInfo.exclusive = GInfo.bExclusive;
 #if (ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 6)
 		// ServerInfo.allowLocalDetour = false;
 		ServerInfo.readIntermediateFilesCompressed = true;
@@ -278,6 +276,7 @@ namespace uba
 			return false;
 		}
 
+		// Scheduler
 		uint16 OutPort = static_cast<uint16>(UbaScheduler.Port);
 		const bool bRtn = XiaoNetwork::GetUsablePort(static_cast<uint16>(UbaScheduler.Port), OutPort);
 		if (bRtn && OutPort != UbaScheduler.Port)
@@ -285,11 +284,24 @@ namespace uba
 			UbaScheduler.Port = OutPort;
 			Logger->Warning(TC("Warning::use new listen port::%u"), OutPort);
 		}
-
 		SchedulerCreateInfo CreateInfo(*SessionServer);
 		CreateInfo.maxLocalProcessors = GInfo.bExclusive ? 1 : UbaScheduler.MaxLocalCore;
-		GInfo.Backend = &(*NetworkBackend);
-
+		// Cache Client
+		if (!UbaScheduler.bStandalone && UbaScheduler.bUseCache)
+		{
+			ctorSuccess = false;
+			NetworkClient = std::make_unique<uba::NetworkClient>(ctorSuccess, *LoggerWriter);
+			if (ctorSuccess && NetworkClient)
+			{
+				CacheClient = std::make_unique<uba::CacheClient>(CacheClientCreateInfo{ *LoggerWriter, *StorageServer, *NetworkClient, *SessionServer });
+				if (NetworkClient->Connect(*NetworkBackend, *CoordinateParam.IP, static_cast<u16>(GModifySystemSettings.cacheserviceport())))
+				{
+					CreateInfo.cacheClient = CacheClient.get();
+					CreateInfo.writeToCache = true;
+				}
+			}
+		}
+		GInfo.Backend = NetworkBackend.get();
 		Scheduler = std::make_unique<uba::FDynamicScheduler>(CreateInfo, GInfo, *Logger);
 		return Scheduler->Init() && Scheduler->Run();
 	}
@@ -308,6 +320,14 @@ namespace uba
 #else
 			Session.StopTrace(TCHAR_TO_UBASTRING(*TraceFile));
 #endif
+		}
+		if (NetworkClient)
+		{
+			NetworkClient->Disconnect();
+			if (CacheClient)
+			{
+				CacheClient = nullptr;
+			}
 		}
 		if (StorageServer)
 		{
@@ -481,9 +501,7 @@ namespace uba
 			return true;
 		}
 
-		uint32 CurInitiatorNum;
-		UpdateSystemSettings(CurInitiatorNum);
-		if (CurInitiatorNum == 0)
+		if (!CanBeInitiator())
 		{
 			logger.Warning(TC("Can't be as initiator, current system is full!"));
 			return true;
@@ -1171,34 +1189,19 @@ namespace uba
 		}
 	}
 
-	void FDynamicScheduler::UpdateSystemSettings(uint32& OutCurInitAvaNum) const
+	bool FDynamicScheduler::CanBeInitiator() const
 	{
-		OutCurInitAvaNum = 0;
-
 		if (!IsConnected())
 		{
-			return;
+			return false;
 		}
 
+		uint32 CurInitAvaNum = 0;
 		std::unordered_map<std::string, std::string> AgentStats;
 		bool Rtn = false;
 
 		try
 		{
-			const auto Optional = SRedisClient->get(String::SSystemSettings);
-			if (Optional.has_value())
-			{
-				const std::string SystemSettingsStr = Optional.value();
-				if (SystemSettingsStr.length() > 0)
-				{
-					if (!GModifySystemSettings.ParseFromString(SystemSettingsStr))
-					{
-						logger.Error(TC("SystemSettings ParseFromString failed!"));
-						return;
-					}
-				}
-			}
-
 			SRedisClient->hgetall(Hash::SAgentStats, std::inserter(AgentStats, AgentStats.begin()));
 			Rtn = true;
 		}
@@ -1227,8 +1230,10 @@ namespace uba
 					++CurInitiatorNum;
 				}
 			}
-			OutCurInitAvaNum = GModifySystemSettings.maxinitiatornum() - CurInitiatorNum;
+			CurInitAvaNum = GModifySystemSettings.maxinitiatornum() - CurInitiatorNum;
 		}
+
+		return CurInitAvaNum >= 1;
 	}
 
 	void FDynamicScheduler::UpdateAgents(const int InLocalStatus, const int InAgentStatus, const bool bImmediate)
@@ -1581,14 +1586,13 @@ namespace uba
 
 	void FDynamicScheduler::TryReleaseAgents()
 	{
-		// 独占式发起者
-		if (InitiatorProto.bfixedinitator())
+		if (Info.bDynamic)
 		{
 			return;
 		}
 
-		// 动态的等所有的任务都完成时才进行后续判断
-		if (Info.bDynamic && GBuildStats.RemainJobNum > 0)
+		// 独占式发起者
+		if (InitiatorProto.bfixedinitator())
 		{
 			return;
 		}
@@ -1836,5 +1840,4 @@ namespace uba
 			OutKnownInputsBuffer.Add('\0');
 		}
 	}
-
 }

@@ -13,6 +13,8 @@
 #include "UbaSessionServer.h"
 #include "UbaNetworkServer.h"
 #include "UbaStorageServer.h"
+#include "UbaNetworkClient.h"
+#include "UbaCacheClient.h"
 #include <mutex>
 #include "agent.pb.h"
 #include "build_progress.pb.h"
@@ -116,6 +118,8 @@ namespace uba
 		std::unique_ptr<uba::StorageServer> StorageServer = nullptr;
 		std::unique_ptr<uba::NetworkServer> NetworkServer = nullptr;
 		std::unique_ptr<uba::SessionServer> SessionServer = nullptr;
+		std::unique_ptr<uba::NetworkClient> NetworkClient = nullptr;
+		std::unique_ptr<uba::CacheClient> CacheClient = nullptr;
 		std::unique_ptr<uba::FilteredLogWriter> LoggerWriter = nullptr;
 		std::unique_ptr<uba::LoggerWithWriter> Logger = nullptr;
 		std::unique_ptr<FDynamicScheduler> Scheduler = nullptr;
@@ -161,7 +165,7 @@ namespace uba
 
 		static void FillKnownInputsBuffer(const TArray<FString>& InKnownInputs, TArray<uba::tchar>& OutKnownInputsBuffer, uint32& OutKnownInputCount, const bool bContainEndSymbol);
 
-		void UpdateSystemSettings(uint32& OutCurInitAvaNum) const;
+		bool CanBeInitiator() const;
 		void UpdateAgents(const int InLocalStatus, const int InAgentStatus, const bool bImmediate);
 		void UpdateProgress(const int InStatus, const float InProgress, const bool bImmediate = false);
 		static void UpdateBuildStats();

@@ -371,7 +371,7 @@ void FCoordiService::UpdateCoordiStatus()
 			{
 				if (!bCacheActive)
 				{
-					const FString CacheServiceName = XiaoAppName::SUbaCacheService / SMiddlePath
+					const FString CacheServiceName = SMiddlePath / XiaoAppName::SUbaCacheService
 #if PLATFORM_WINDOWS
 						+ TEXT(".exe")
 #endif

@@ -92,7 +92,7 @@ struct FUbaSchedulerSetting : FJsonSerializable
 	uint32 MaxCon = 8;				// Max number of Agents can connect help to scheduler
 	bool bVisualizer = false;		// Spawn a visualizer that visualizes progress
 	FString Crypto;					// Will enable crypto on network client/server
-	bool bUseCache = false;
+	bool bUseCache = false;			// Connect to cache server
 
 	BEGIN_JSON_SERIALIZER
 		JSON_MCI_VALUE(Dir);

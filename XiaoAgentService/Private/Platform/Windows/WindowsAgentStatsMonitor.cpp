@@ -4,14 +4,14 @@
 #include <dxgi.h>
 #include "XiaoLog.h"
 
-static FString PERFM_PATH_CPU_UTILITY(TEXT("\\Processor Information(_Total)\\% Processor Utility"));
-static FString PERFM_PATH_DISK_UTILITY(TEXT("\\PhysicalDisk(_Total)\\% Disk Time"));
-static FString PERFM_PATH_NETWORK_BAND_WIDTH(TEXT("\\Network Interface(*)\\Current Bandwidth"));
-static FString PERFM_PATH_NETWORK_RECV_RATE(TEXT("\\Network Interface(*)\\Bytes Received/sec"));
-static FString PERFM_PATH_NETWORK_SENT_RATE(TEXT("\\Network Interface(*)\\Bytes Sent/sec"));
-static FString PERFM_PATH_GPU_3D_UTILITY(TEXT("\\GPU Engine(*_3D)\\Utilization Percentage"));
-static FString PERFM_PATH_GPU_MEMORY_DEDICATED_USAGE_UTILITY(TEXT("\\GPU Adapter Memory(*)\\Dedicated Usage"));
-static FString PERFM_PATH_GPU_MEMORY_SHARE_USAGE_UTILITY(TEXT("\\GPU Adapter Memory(*)\\Shared Usage"));
+static const FString PERFM_PATH_CPU_UTILITY(TEXT("\\Processor Information(_Total)\\% Processor Utility"));
+static const FString PERFM_PATH_DISK_UTILITY(TEXT("\\PhysicalDisk(_Total)\\% Disk Time"));
+static const FString PERFM_PATH_NETWORK_BAND_WIDTH(TEXT("\\Network Interface(*)\\Current Bandwidth"));
+static const FString PERFM_PATH_NETWORK_RECV_RATE(TEXT("\\Network Interface(*)\\Bytes Received/sec"));
+static const FString PERFM_PATH_NETWORK_SENT_RATE(TEXT("\\Network Interface(*)\\Bytes Sent/sec"));
+static const FString PERFM_PATH_GPU_3D_UTILITY(TEXT("\\GPU Engine(*_3D)\\Utilization Percentage"));
+static const FString PERFM_PATH_GPU_MEMORY_DEDICATED_USAGE_UTILITY(TEXT("\\GPU Adapter Memory(*)\\Dedicated Usage"));
+static const FString PERFM_PATH_GPU_MEMORY_SHARE_USAGE_UTILITY(TEXT("\\GPU Adapter Memory(*)\\Shared Usage"));
 
 FWindowsAgentStatsMonitor::FWindowsAgentStatsMonitor()
 {
