@@ -10,8 +10,8 @@
 
 ## Version Information
 
-Current Version：v1.1.1
-Release Date: ：2025-10-12
+Current Version：v1.1.2
+Release Date: ：2025-11-22
 
 ---
 
@@ -56,7 +56,7 @@ Description of the software's runtime environment and hardware requirements:
   
 - **Hardware Requirements**：
 
-  - CPU: i5
+  - CPU: i5 6500
   - Memory：4GB
   - Storage: Recommended 10GB+ SSD
 
@@ -64,16 +64,6 @@ Description of the software's runtime environment and hardware requirements:
   XiaoBuild consists of two machine types: Agent and Coordinator.
 
 ![architecture](./documents/resource/architecture.png)
-
----
-
-## Changelog
-
-Documenting software version updates:
-
-### v1.1.1
-
-- Basic functionality equivalent to IncrediBuild
 
 ---
 
