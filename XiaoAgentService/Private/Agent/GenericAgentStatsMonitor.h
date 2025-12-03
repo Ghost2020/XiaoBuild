@@ -112,7 +112,7 @@ public:
 			return;
 		}
 
-		OutAgentProto.set_cpuava(100 - GetCpuUtilization());
+		OutAgentProto.set_cpuava(FMath::Clamp(100.0f - GetCpuUtilization(), 0.0f, 100.0f));
 		TTuple<uint64, uint32> AvaMem;
 		if (GetAvailableMemory(AvaMem))
 		{
@@ -144,10 +144,10 @@ public:
 			// XIAO_LOG(Warning, TEXT("GetHelperCache Failed!"));
 		}
 
-		OutAgentProto.set_avadisk(GetDiskUtilization());
-		OutAgentProto.set_avalnet(GetNetworkUtilization());
+		OutAgentProto.set_avadisk(FMath::Clamp(GetDiskUtilization(),0.0f, 100.0f));
+		OutAgentProto.set_avalnet(FMath::Clamp(GetNetworkUtilization(), 0.0f, 100.0f));
 		OutAgentProto.set_networkspeed(GetNetworkSpeed());
-		OutAgentProto.set_avagpu(GetGpuUtilization());
+		OutAgentProto.set_avagpu(FMath::Clamp(GetGpuUtilization(), 0.0f, 100.0f));
 	}
 
 protected:
