@@ -538,11 +538,11 @@ void FAgentService::UpdateAgentProtobuf(const bool bInit)
 	{
 		LastCheckIp = FPlatformTime::Seconds();
 		SIpv4Address = TCHAR_TO_UTF8(*GetLANV4());
-		if (SIpv4Address != "")
+		if (!SIpv4Address.empty())
 		{
 			// 无效IP地址
-			const FString RouterIpStr = UTF8_TO_TCHAR(SAgentProto.routerip().c_str());
-			if (RouterIpStr.IsEmpty())
+			const std::string LANIP = SAgentProto.routerip();
+			if (LANIP.empty() || SIpv4Address != LANIP)
 			{
 				*SAgentProto.mutable_routerip() = SIpv4Address;
 			}
