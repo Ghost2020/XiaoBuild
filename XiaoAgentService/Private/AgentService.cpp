@@ -461,8 +461,6 @@ void FAgentService::UpdateAgentProtobuf(const bool bInit)
 		SAgentProto.set_helperport(XiaoNetwork::SAgentServicePort);
 		SAgentProto.set_logiccore(LogicCoreNum);
 		SAgentProto.set_physicalcore(FPlatformMisc::NumberOfCores());
-		SAgentProto.set_benableinitator(true);
-		SAgentProto.set_benablehelper(true);
 #if PLATFORM_MAC
 		uid_t uid = geteuid();  // 获取当前用户 ID
 		struct passwd* pw = getpwuid(uid);
