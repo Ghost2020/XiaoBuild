@@ -344,6 +344,7 @@ void SLoginWindow::OnLogin()
 	Auth.LastLogin = FDateTime::Now().ToString();
 	Auth.bCompleVerifi = true;
 	
+	FText ErrorMsg;
 	try
 	{
 		if (IsConnected())
@@ -357,8 +358,7 @@ void SLoginWindow::OnLogin()
 				return;
 #endif
 			}
-
-			if (const auto Optional = SRedisClient->hget(Hash::SUserDetail, Username))
+			else if (const auto Optional = SRedisClient->hget(Hash::SUserDetail, Username))
 			{
 				const FString EncrypedStr = UTF8_TO_TCHAR(Optional.value().c_str());
 				FString DecrypedStr;
@@ -387,27 +387,31 @@ void SLoginWindow::OnLogin()
 							RequestDestroyWindow();
 							App->ShowMainWindow();
 						}
+						return;
 					}
 				}
 				else
 				{
-					ErrorText->SetVisibility(EVisibility::Visible);
-					ErrorText->SetError(LOCTEXT("CantDecypt_TEXT", "解码数据失败"));
+					ErrorMsg = LOCTEXT("CantDecypt_TEXT", "解码数据失败");
 				}
 			}
 			else
 			{
-				ErrorText->SetVisibility(EVisibility::Visible);
-				ErrorText->SetError(LOCTEXT("CantFind_TEXT", "找不到对应的用户"));
+				ErrorMsg = LOCTEXT("CantFind_TEXT", "找不到对应的用户");
 			}
 		}
 		else
 		{
-			ErrorText->SetVisibility(EVisibility::Visible);
-			ErrorText->SetError(LOCTEXT("CantConnect_Text", "无法连接到服务,是否开启了调度服务器"));
+			ErrorMsg = LOCTEXT("CantConnect_Text", "无法连接到服务,是否开启了调度服务器");
 		}
 	}
 	CATCH_REDIS_EXCEPTRION();
+
+	if (!ErrorMsg.IsEmpty())
+	{
+		ErrorText->SetError(ErrorMsg);
+		ErrorText->SetVisibility(EVisibility::Visible);
+	}
 }
 
 bool SLoginWindow::CheckUsername(const FString& InUsername) const

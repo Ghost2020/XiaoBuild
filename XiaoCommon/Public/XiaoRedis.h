@@ -183,7 +183,7 @@ namespace Xiao
 
 		bool keep_alive = false;
 
-		std::chrono::milliseconds connect_timeout{ 0 };
+		std::chrono::milliseconds connect_timeout{ 1000 };
 
 		std::chrono::milliseconds socket_timeout{ 0 };
 
