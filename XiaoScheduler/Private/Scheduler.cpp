@@ -202,25 +202,28 @@ namespace uba
 		{
 			if (!SRedisMessage.empty())
 			{
-				Logger->Error(TC("%s"), UTF8_TO_TCHAR(SRedisMessage.c_str()));
+				Logger->Warning(TC("%s"), UTF8_TO_TCHAR(SRedisMessage.c_str()));
 			}
 		}
-		try
+		else
 		{
-			const auto Optional = SRedisClient->get(String::SSystemSettings);
-			if (Optional.has_value())
+			try
 			{
-				const std::string SystemSettingsStr = Optional.value();
-				if (SystemSettingsStr.length() > 0)
+				const auto Optional = SRedisClient->get(String::SSystemSettings);
+				if (Optional.has_value())
 				{
-					if (!GModifySystemSettings.ParseFromString(SystemSettingsStr))
+					const std::string SystemSettingsStr = Optional.value();
+					if (SystemSettingsStr.length() > 0)
 					{
-						Logger->Error(TC("SystemSettings ParseFromString failed!"));
+						if (!GModifySystemSettings.ParseFromString(SystemSettingsStr))
+						{
+							Logger->Error(TC("SystemSettings ParseFromString failed!"));
+						}
 					}
 				}
 			}
+			CATCH_REDIS_EXCEPTRION()
 		}
-		CATCH_REDIS_EXCEPTRION()
 
 		CleanHistory(FPaths::GetPath(UbaScheduler.Dir));
 
