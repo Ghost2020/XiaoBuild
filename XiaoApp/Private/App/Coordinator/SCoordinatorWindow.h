@@ -37,6 +37,7 @@ protected:
 	void ResetNavState() const;
 	void ConstructWidgets();
 	void OnQueueNotification(int8 InStatus, const FText& InText);
+	void OnExitLogin();
 	
 private:
 	bool bFullScreen = false;

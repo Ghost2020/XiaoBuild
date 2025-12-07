@@ -16,11 +16,14 @@ namespace XiaoDB
 } using namespace XiaoDB;
 
 
-class SUsersView final : public SBaseView
+class SUsersView final : public	SBaseView
 {
 public:
+	DECLARE_DELEGATE(FOnExitLogin);
+
 	SLATE_BEGIN_ARGS(SUsersView){}
-		SLATE_EVENT(FOnQueueNotification, OnQueueNotification)
+		SLATE_EVENT(FOnQueueNotification, OnQueueNotification);
+		SLATE_EVENT(FOnExitLogin, OnExitLogin)
 	SLATE_END_ARGS()
 	
 	void Construct(const FArguments& InArgs);
@@ -39,6 +42,7 @@ private:
 	void OnDeleteUser(const TWeakPtr<FUserDesc>& InUser) const;
 
 private:
+	FOnExitLogin OnExitLogin;
 	mutable TArray<TSharedPtr<FUserDesc>> UserArray;
 	TSharedPtr<SListView<TSharedPtr<FUserDesc>>> UserListView = nullptr;
 	mutable TMap<FString, TWeakPtr<FUserDesc>> User2Desc;

@@ -19,7 +19,6 @@
 #include "ShareDefine.h"
 #include "CoordiManagerApp.h"
 
-
 #define LOCTEXT_NAMESPACE "SCoordinatorWindow"
 
 
@@ -324,13 +323,7 @@ void SCoordinatorWindow::Tick(const FGeometry& InAllottedGeometry, const double 
 		static constexpr double SCheckTime = 3600.0f * 6;
 		if (PassTime > SCheckTime)
 		{
-			SetCanTick(false);
-			LastLoginTime = FPlatformTime::Seconds();
-			if (FCoordiManagerApp* App = static_cast<FCoordiManagerApp*>(FXiaoAppBase::GApp))
-			{
-				App->ShowLoginWindow();
-				return;
-			}
+			OnExitLogin();
 		}
 	}
 
@@ -510,7 +503,8 @@ void SCoordinatorWindow::ConstructWidgets()
 	if (!UsersView.IsValid())
 	{
 		UsersView = SNew(SUsersView)
-		.OnQueueNotification_Raw(this, &SCoordinatorWindow::OnQueueNotification);
+		.OnQueueNotification_Raw(this, &SCoordinatorWindow::OnQueueNotification)
+		.OnExitLogin_Raw(this, &SCoordinatorWindow::OnExitLogin);
 	}
 
 	if (!LogsView.IsValid())
@@ -536,6 +530,27 @@ void SCoordinatorWindow::OnQueueNotification(const int8 InStatus, const FText& I
 	Info.bFireAndForget = true;
 	Info.ForWindow = FSlateApplication::Get().FindWidgetWindow(SharedThis(this));
 	NotificationList->AddNotification(Info);
+}
+
+void SCoordinatorWindow::OnExitLogin()
+{
+	if (!IsConnected())
+	{
+		return;
+	}
+
+	SetCanTick(false);
+	LastLoginTime = FPlatformTime::Seconds();
+
+	try
+	{
+		SRedisClient->hdel(Hash::SLoginCache, GAgentUID);
+		if (FCoordiManagerApp* App = static_cast<FCoordiManagerApp*>(FXiaoAppBase::GApp))
+		{
+			App->ShowLoginWindow();
+		}
+	}
+	CATCH_REDIS_EXCEPTRION();
 }
 
 #undef REDIS_INFO_WIDGET

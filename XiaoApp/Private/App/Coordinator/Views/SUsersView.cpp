@@ -11,16 +11,15 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Misc/MessageDialog.h"
 #include "XiaoLog.h"
+#include "XiaoStyle.h"
 #include "XiaoShare.h"
 #include "XiaoShareField.h"
 #include "XiaoShareRedis.h"
 #include "ShareDefine.h"
-
 #include "Database/Users.h"
 
 #define LOCTEXT_NAMESPACE "SUsersView"
 
-// using namespace XiaoHttp;
 using namespace XiaoUserParam;
 
 static FText SCantConnect = LOCTEXT("ConnectFailed_Text", "无法连接");
@@ -34,6 +33,7 @@ void SUsersView::Construct(const FArguments& InArgs)
 	GLog->Flush();
 
 	OnQueueNotification = InArgs._OnQueueNotification;
+	OnExitLogin = InArgs._OnExitLogin;
 	
 	ChildSlot
 	[
@@ -41,11 +41,15 @@ void SUsersView::Construct(const FArguments& InArgs)
 #pragma region Top
 		+ SVerticalBox::Slot().VAlign(VAlign_Top).AutoHeight().Padding(50.0f, 10.0f)
 		[
-			SNew(SHorizontalBox).Visibility(GCurrentUser.Role != 2 ? EVisibility::Visible : EVisibility::Collapsed)
-
-			+SHorizontalBox::Slot().HAlign(HAlign_Right).Padding(10.0f)
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot().HAlign(HAlign_Fill)
 			[
-				SNew(SPrimaryButton).Text(LOCTEXT("AddUser_Text", "添加用户"))
+				SNullWidget::NullWidget
+			]
+			+SHorizontalBox::Slot().HAlign(HAlign_Right).VAlign(VAlign_Center).Padding(10.0f, 10.0f, 0.0f, 10.0f).AutoWidth()
+			[
+				SNew(SPrimaryButton)
+				.Text(LOCTEXT("AddUser_Text", "添加用户"))
 				.Visibility(GCurrentUser.Role != 2 ? EVisibility::Visible : EVisibility::Collapsed)
 				.OnClicked_Lambda([this]()
 				{
@@ -60,6 +64,33 @@ void SUsersView::Construct(const FArguments& InArgs)
 						AddUserWindow.Pin()->BringToFront();
 					}
 					
+					return FReply::Handled();
+				})
+			]
+			+ SHorizontalBox::Slot().HAlign(HAlign_Right).VAlign(VAlign_Center).Padding(0.0f, 10.0f, 10.0f, 10.0f).AutoWidth()
+			[
+				SNew(SButton).Text(LOCTEXT("ExitLogin_Text", "退出登录"))
+				.ButtonStyle(FXiaoStyle::Get(), "FlatButton.Warning")
+				.TextStyle(FXiaoStyle::Get(), "FlatButton.DefaultTextStyle")
+				.OnClicked_Lambda([this]()
+				{
+					const TSharedRef<SMessageDialog> Dialog = SNew(SMessageDialog)
+						.Title(LOCTEXT("ConfirmTitle", "确定"))
+						.Icon(FAppStyle::Get().GetBrush("Icons.WarningWithColor.Large"))
+						.Message(LOCTEXT("ConfirmExit_Message", "确定退出当前的账号?"))
+						.UseScrollBox(false)
+						.AutoCloseOnButtonPress(true)
+						.Buttons(
+							{
+								SMessageDialog::FButton(LOCTEXT("ConfirmButton", "确定"))
+									.SetOnClicked(FSimpleDelegate::CreateLambda([this]() {
+										OnExitLogin.Execute();
+								})),
+								SMessageDialog::FButton(LOCTEXT("CancelButton", "取消"))
+									.SetPrimary(true)
+									.SetFocus()
+							});
+					Dialog->ShowModal();
 					return FReply::Handled();
 				})
 			]
