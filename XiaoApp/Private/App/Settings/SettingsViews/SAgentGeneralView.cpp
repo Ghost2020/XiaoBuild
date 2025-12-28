@@ -561,6 +561,43 @@ FReply SAgentGeneralView::OnCommit()
 			}
 
 			FSlateApplication::Get().DestroyWindowImmediately(Window);
+
+			const FString& InstallFilePath = FInstallSettings::SInstallFilePath;
+			if (!FPaths::FileExists(InstallFilePath))
+			{
+				XIAO_LOG(Error, TEXT("SAgentGeneralView::OnCommit::install_system.json[%s] not exist!"), *InstallFilePath);
+				return FReply::Handled();
+			}
+			
+			FString Content;
+			if (!FFileHelper::LoadFileToString(Content, *InstallFilePath))
+			{
+				XIAO_LOG(Error, TEXT("SAgentGeneralView::OnCommit::install_system.json[%s] LoadFileToString failed!"), *InstallFilePath);
+				return FReply::Handled();
+			}
+				
+			FInstallSettings InstallSettings;
+			if (!InstallSettings.FromJson(Content))
+			{
+				XIAO_LOG(Error, TEXT("SAgentGeneralView::OnCommit::install_system.json[%s] FromJson failed!"), *InstallFilePath);
+				return FReply::Handled();
+			}
+
+			InstallSettings.EngineFolders.Reset();
+			InstallSettings.EngineTypes.Reset();
+			InstallSettings.EngineVersions.Reset();
+			for (const auto& Iter : ModiefyFolderArray)
+			{
+				InstallSettings.EngineFolders.Add(Iter->Folder);
+				InstallSettings.EngineTypes.Add(Iter->Type);
+				InstallSettings.EngineVersions.Add(Iter->EngineVersion);
+			}
+
+			Content = InstallSettings.ToJson();
+			if (FFileHelper::SaveStringToFile(Content, *InstallFilePath))
+			{
+				XIAO_LOG(Error, TEXT("SAgentGeneralView::OnCommit::install_system.json[%s] SaveStringToFile failed!"), *InstallFilePath);
+			}
 		}
 	}
 	return FReply::Handled();

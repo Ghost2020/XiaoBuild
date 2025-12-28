@@ -212,15 +212,7 @@ bool SInstallProgressView::OnInstall() const
 	AgentSettings.UbaScheduler.bUseCache = GInstallSettings.bEnableCacheService;
 	SaveAgentSettings(AgentSettings);
 
-	const FString SaveInstallSettingPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(
-#if PLATFORM_MAC
-		TEXT("/Library/Application Support/XiaoBuild")
-#else
-		FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir())
-#endif
-		, TEXT("install_setting.json"))
-	);
-	if(!FFileHelper::SaveStringToFile(GInstallSettings.ToJson(true), *SaveInstallSettingPath, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), FILEWRITE_EvenIfReadOnly))
+	if(!FFileHelper::SaveStringToFile(GInstallSettings.ToJson(true), *FInstallSettings::SInstallFilePath, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), FILEWRITE_EvenIfReadOnly))
 	{
 		const FText ErrorMessage = LOCTEXT("SaveString_Text", "保存安装参数文件失败");
 		ErrorText->SetError(ErrorMessage);
@@ -228,7 +220,7 @@ bool SInstallProgressView::OnInstall() const
 		return false;
 	}
 	
-	const FString Params = FString::Printf(TEXT("-install -install_setting=\"%s\" -ppid=%d -LOG=%s.log"), *SaveInstallSettingPath, FPlatformProcess::GetCurrentProcessId(), *XiaoAppName::SInstallConsole);
+	const FString Params = FString::Printf(TEXT("-install -install_setting=\"%s\" -ppid=%d -LOG=%s.log"), *FInstallSettings::SInstallFilePath, FPlatformProcess::GetCurrentProcessId(), *XiaoAppName::SInstallConsole);
 	RunXiaoApp(XiaoAppName::SInstallConsole, Params);
 	XIAO_LOG(Log, TEXT("Execute Intall Begin!"));
 	return true;

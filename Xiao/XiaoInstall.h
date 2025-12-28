@@ -236,6 +236,15 @@ struct FInstallSettings : FJsonSerializable
 	TArray<FString> EngineVersions;
 	//~ End AgentSettings
 
+	static inline const FString SInstallFilePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(
+#if PLATFORM_MAC
+		TEXT("/Library/Application Support/XiaoBuild")
+#else
+		FPaths::GetPath(FPlatformProcess::ApplicationSettingsDir())
+#endif
+		, TEXT("install_setting.json"))
+	);
+
 	BEGIN_JSON_SERIALIZER
 		JSON_MCI_VALUE(Localization);
 		JSON_MCI_VALUE(SetupUpType);
