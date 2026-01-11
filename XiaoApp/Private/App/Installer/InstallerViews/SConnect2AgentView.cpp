@@ -71,7 +71,8 @@ void SConnect2AgentView::Construct(const FArguments& InArgs)
 							const FString IPV4Str = InText.ToString();
 							NetworkIpText->SetError(FText::GetEmpty());
 							FIPv4Address IPV4;
-							if (!FIPv4Address::Parse(IPV4Str, IPV4))
+							std::string Error;
+							if (!FIPv4Address::Parse(IPV4Str, IPV4) && !IsReachability(TCHAR_TO_UTF8(*IPV4Str), GInstallSettings.CoordiPort, Error))
 							{
 								NetworkIpText->SetError(LOCTEXT("NoValidIPV4Address_Text", "不是有效的IPV4地址"));
 								GInstallSettings.CoordiIp = TEXT("");

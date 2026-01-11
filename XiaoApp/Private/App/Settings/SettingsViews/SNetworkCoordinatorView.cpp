@@ -16,7 +16,7 @@
 #include "Widgets/Input/SEditableText.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Images/SThrobber.h"
-
+#include "Interfaces/IPv4/IPv4Address.h"
 #include "XiaoAgent.h"
 #include "XiaoStyle.h"
 #include "XiaoAppBase.h"
@@ -59,18 +59,18 @@ void SNetworkCoordinatorView::Construct(const FArguments& InArgs, FNetworkCoordi
 					[
 						SAssignNew(IPBox, SEditableTextBox)
 						.Text(FText::FromString(this->Settings->IP))
-						.OnTextCommitted_Lambda([this](const FText& InText, ETextCommit::Type)
+						.OnTextCommitted_Lambda([this](const FText& InText, ETextCommit::Type InCommitType)
 						{
+							IPBox->SetError(FText::GetEmpty());
+
 							const FString IPString = InText.ToString();
-							TArray<FString> Sections;
-							if(IPString.ParseIntoArray(Sections, TEXT(".")) == 4)
+							FIPv4Address IPV4;
+							std::string Error;
+							if(!FIPv4Address::Parse(IPString, IPV4) && !IsReachability(TCHAR_TO_UTF8(*IPString), this->Settings->Port, Error))
 							{
-								if(Sections[0].IsNumeric() && Sections[1].IsNumeric() && Sections[2].IsNumeric() && Sections[3].IsNumeric())
-								{
-									this->Settings->IP = IPString;
-								}
+								IPBox->SetError(LOCTEXT("NoValidIPV4Address_Text", "不是有效的IPV4地址"));
 							}
-							else if (IPString == TEXT("localhost"))
+							else
 							{
 								this->Settings->IP = IPString;
 							}

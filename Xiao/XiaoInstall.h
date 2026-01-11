@@ -7,7 +7,7 @@
 #include "Templates/UniquePtr.h"
 #include "Runtime/Launch/Resources/Version.h"
 #include "Serialization/JsonSerializerMacros.h"
-#include "XmlFile.h"
+
 #include "HAL/PlatformFileManager.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -17,10 +17,12 @@
 #include "XiaoShareNetwork.h"
 #include "XiaoShare.h"
 #include "XiaoShareRedis.h"
-#include "XiaoCompressor.h"
 #include "XiaoAgent.h"
 
-
+#ifndef USE_XIAO_AGENT
+#include "XiaoCompressor.h"
+#include "XmlFile.h"
+#endif
 #if PLATFORM_WINDOWS
 	#include "Windows/AllowWindowsPlatformTypes.h"
 	#include <ShlObj.h>
@@ -106,11 +108,11 @@ enum EHelperType : uint8
 	ET_Floating
 };
 
+#define JSON_MCI_VALUE(var) JSON_SERIALIZE(#var, var)
 
+#ifndef USE_XIAO_AGENT
 #include "XiaoInterprocess.h"
 using namespace boost::interprocess;
-
-#define JSON_MCI_VALUE(var) JSON_SERIALIZE(#var, var)
 
 inline TSharedPtr<shared_memory_object> GProgressShm = nullptr;
 inline TSharedPtr<mapped_region> GProgressRegion = nullptr;
@@ -144,6 +146,56 @@ bool static TryCreateIPC()
 	}
 }
 
+struct FInstallProgress : FJsonSerializable
+{
+	float Progress = 0.0f;
+	int Status = 0;
+	FString Message;
+
+	BEGIN_JSON_SERIALIZER
+		JSON_MCI_VALUE(Progress);
+	JSON_MCI_VALUE(Status);
+	JSON_MCI_VALUE(Message);
+	END_JSON_SERIALIZER
+}; inline FInstallProgress GProgress;
+
+static void UpdateProgress(const float InSleepTime = 0.5f)
+{
+	try
+	{
+		if (GProgressRegion.IsValid())
+		{
+			FPlatformProcess::Sleep(InSleepTime);
+			const std::string ProgressString = TCHAR_TO_UTF8(*GProgress.ToJson());
+			strcpy_s(static_cast<char*>(GProgressRegion->get_address()), ProgressString.size() + 1, ProgressString.c_str());
+		}
+	}
+	catch (interprocess_exception& Ex)
+	{
+		XIAO_LOG(Error, TEXT("Interprocee Exception::%s!"), UTF8_TO_TCHAR(Ex.what()));
+	}
+}
+
+static void UpdateMessage(const float InProgress, const FString InMessage = TEXT(""))
+{
+	GProgress.Progress = InProgress;
+	if (!InMessage.IsEmpty())
+	{
+		GProgress.Message = InMessage;
+	}
+	UpdateProgress();
+	XIAO_LOG(Log, TEXT("Progress::%s"), *InMessage);
+}
+
+static void UpdateError(const FString InError)
+{
+	GProgress.Message = InError;
+	GProgress.Status = -1;
+	XIAO_LOG(Error, TEXT("%s"), *InError);
+	UpdateProgress(2.0f);
+}
+#endif
+
 #if PLATFORM_WINDOWS
 static FString GetWindowsKnownDir(REFKNOWNFOLDERID InFolderType)
 {
@@ -161,19 +213,6 @@ static FString GetWindowsKnownDir(REFKNOWNFOLDERID InFolderType)
 	return KnownDir;
 }
 #endif
-
-struct FInstallProgress : FJsonSerializable
-{
-	float Progress = 0.0f;
-	int Status = 0;
-	FString Message;
-
-	BEGIN_JSON_SERIALIZER
-		JSON_MCI_VALUE(Progress);
-		JSON_MCI_VALUE(Status);
-		JSON_MCI_VALUE(Message);
-	END_JSON_SERIALIZER
-}; inline FInstallProgress GProgress;
 
 struct FInstallSettings : FJsonSerializable
 {
@@ -283,6 +322,7 @@ struct FInstallSettings : FJsonSerializable
 	END_JSON_SERIALIZER
 }; inline FInstallSettings GInstallSettings;
 
+#undef JSON_MCI_VALUE
 
 struct FInstallFolder
 {
@@ -311,35 +351,6 @@ struct FInstallFolder
 		return *this;
 	}
 };
-
-static void UpdateProgress(const float InSleepTime = 0.5f)
-{
-	try
-	{
-		if(GProgressRegion.IsValid())
-		{
-			FPlatformProcess::Sleep(InSleepTime);
-			const std::string ProgressString = TCHAR_TO_UTF8(*GProgress.ToJson());
-			strcpy_s(static_cast<char*>(GProgressRegion->get_address()), ProgressString.size()+1, ProgressString.c_str());
-		}
-	}
-	catch (interprocess_exception& Ex)
-	{
-		XIAO_LOG(Error, TEXT("Interprocee Exception::%s!"), UTF8_TO_TCHAR(Ex.what()));
-	}
-}
-
-static void UpdateMessage(const float InProgress, const FString InMessage=TEXT(""))
-{
-	GProgress.Progress = InProgress;
-	if(!InMessage.IsEmpty())
-	{
-		GProgress.Message = InMessage;
-	}
-	UpdateProgress();
-	XIAO_LOG(Log, TEXT("Progress::%s"), *InMessage);
-}
-
 
 static bool IsUnrealEditorRuning()
 {
@@ -444,14 +455,7 @@ static bool CheckEnvRuning(FString& OutError, const uint32 InIgnore = 0)
 	return true;
 }
 
-static void UpdateError(const FString InError)
-{
-	GProgress.Message = InError;
-	GProgress.Status = -1;
-	XIAO_LOG(Error, TEXT("%s"), *InError);
-	UpdateProgress(2.0f);
-}
-
+#ifndef USE_XIAO_AGENT
 static bool GetCanSyncUpdate(std::string& OutData)
 {
 	if (!XiaoRedis::SRedisClient->exists(XiaoRedis::String::SSystemSync))
@@ -547,6 +551,7 @@ static void EditConfigXml(const FString& InXmlPath, const bool bInEnableUBAC)
 		}
 	}
 }
+#endif
 
 static FString GetEnghineVersion(const FString& InEngineVersion)
 {
@@ -918,6 +923,7 @@ static bool RemovePluginFromUProject(const FString& InProjectFilePath, const FSt
 	return true;
 }
 
+#ifndef USE_XIAO_AGENT
 static bool InstallComponent(const FInstallFolder& InDesc)
 {
 	static const FString SUBTStr = TEXT("UnrealBuildTool");
@@ -1225,3 +1231,4 @@ static bool InstallUBT(const bool bInstallOrUninstall = true, const TFunction<vo
 	}
 	return true;
 }
+#endif

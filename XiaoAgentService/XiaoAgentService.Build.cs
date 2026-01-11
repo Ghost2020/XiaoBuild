@@ -26,6 +26,8 @@ public class XiaoAgentService : ModuleRules
 
 		PrivateIncludePaths.Add("Runtime/Launch/Private");
 
+		PrivateDefinitions.Add("USE_XIAO_AGENT=1");
+
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{

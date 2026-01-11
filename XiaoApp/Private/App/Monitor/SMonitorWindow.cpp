@@ -338,7 +338,16 @@ void SMonitorWindow::FillFileMenu(FMenuBuilder& MenuBuilder)
 		LOCTEXT("Open_ToolTip", "选择构建文件，显示构建的过程."),
 		FSlateIcon(FXiaoStyle::Get().GetStyleSetName(), "LoadBuild"),
 		FUIAction(
-			FExecuteAction::CreateSP(this, &SMonitorWindow::OnLoadBuildFile)
+			FExecuteAction::CreateSP(this, &SMonitorWindow::OnLoadBuildFile),
+			FCanExecuteAction(),
+			FGetActionCheckState(),
+			FIsActionButtonVisible::CreateLambda([this]() {
+				if (BuildView.IsValid())
+				{
+					return BuildView->GetRealtime() ? false : true;
+				}
+				return true;
+			})
 		),
 		NAME_None,
 		EUserInterfaceActionType::Button
