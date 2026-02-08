@@ -1366,6 +1366,17 @@ namespace uba
 		}
 		LastTry = FPlatformTime::Seconds();
 
+		static double LastClearCantConnect = 0.0f;
+		if (FPlatformTime::Seconds() - LastClearCantConnect > 120.0f)
+		{
+			LastClearCantConnect = FPlatformTime::Seconds();
+			if (!CantConnectSet.empty())
+			{
+				logger.Info(TC("Clearing CantConnectSet to retry failed agents, count: %d"), CantConnectSet.size());
+				CantConnectSet.clear();
+			}
+		}
+
 		try
 		{
 			std::vector<std::string> AgentHelpers;
