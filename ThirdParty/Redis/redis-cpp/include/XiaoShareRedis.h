@@ -382,7 +382,7 @@ namespace XiaoRedis
 		OutSettings.set_benablehelper(true);
 		OutSettings.set_helpercoreavailablepercentminimal(30.0f);
 		OutSettings.set_networkavamin(10.0f);
-		OutSettings.set_gpuavamin(10.0f);
+		OutSettings.set_gpuavamin(-0.01f);
 
 		OutSettings.set_maxinitiatornum(10);
 		OutSettings.set_maxcorenum(500);

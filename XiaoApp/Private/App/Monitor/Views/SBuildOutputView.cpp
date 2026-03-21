@@ -251,11 +251,18 @@ TArray<TSharedRef<FTokenizedMessage>> SBuildOutputView::ParseLog(const FName InI
 		// @todo Handle errors reported by Clang
 		FString LeftStr, RightStr;
 		FString FullPath, LineNumberString;
+		FString LeftLineNumberString, RightLineNumberString;
 		if (Line.Split(TEXT(")"), &LeftStr, &RightStr, ESearchCase::CaseSensitive) &&
+			RightStr.Contains(TEXT("error")) &&
 			LeftStr.Split(TEXT("("), &FullPath, &LineNumberString, ESearchCase::CaseSensitive) &&
-			LineNumberString.IsNumeric() && (FCString::Strtoi(*LineNumberString, nullptr, 10) > 0) &&
-			RightStr.Contains(TEXT(": error")))
+			( LineNumberString.IsNumeric() && (FCString::Strtoi(*LineNumberString, nullptr, 10) > 0)) || 
+			  LineNumberString.Split(TEXT(","), &LeftLineNumberString, &RightLineNumberString) && LeftLineNumberString.IsNumeric() && RightLineNumberString.IsNumeric()
+			)
 		{
+			if (LeftLineNumberString.IsNumeric())
+			{
+				LineNumberString = LeftLineNumberString;
+			}
 			EMessageSeverity::Type Severity = EMessageSeverity::Error;
 			FString FullPathTrimmed = FullPath;
 			FullPathTrimmed.TrimStartInline();
@@ -275,7 +282,7 @@ TArray<TSharedRef<FTokenizedMessage>> SBuildOutputView::ParseLog(const FName InI
 			FString Link = FullPath + TEXT("(") + LineNumberString + TEXT(")");
 			Message->AddToken(FTextToken::Create(FText::FromString(Link))->OnMessageTokenActivated(FOnMessageTokenActivated::CreateStatic(&SBuildOutputView::OnGotoError)));
 			Message->AddToken(FTextToken::Create(FText::FromString(RightStr)));
-			
+
 			Messages.Add(Message);
 
 			if (Severity == EMessageSeverity::Error)

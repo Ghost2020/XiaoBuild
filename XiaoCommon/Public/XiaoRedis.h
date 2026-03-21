@@ -228,6 +228,7 @@ namespace Xiao
 		redisReply* command(const std::vector<std::string>& InArgs, const bool bDiscardReply = false);
 
 	protected:
+		redisReply* _command(const std::vector<std::string>& InArgs);
 		bool CheckReply(redisReply* InReply);
 
 	private:

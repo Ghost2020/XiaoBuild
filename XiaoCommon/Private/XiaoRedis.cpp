@@ -8,20 +8,6 @@
 
 namespace Xiao
 {
-	redisReply* _RedisCommand(redisContext* InContext, const std::vector<std::string>& InArgs)
-	{
-		std::vector<const char*> Argv;
-		std::vector<size_t> ArgvLen;
-
-		for (const auto& Arg : InArgs) 
-		{
-			Argv.push_back(Arg.c_str());
-			ArgvLen.push_back(Arg.size());
-		}
-
-		return static_cast<redisReply*>(redisCommandArgv(InContext, static_cast<int>(Argv.size()), Argv.data(), ArgvLen.data()));
-	}					
-
 	Redis::Redis(const ConnectionOptions& InOptions)
 		: Context(nullptr)
 	{
@@ -72,7 +58,7 @@ namespace Xiao
 
 		if (!InOptions.user.empty() && !InOptions.password.empty())
 		{
-			redisReply* reply = _RedisCommand(Context, {"AUTH", InOptions.user, InOptions.password });
+			redisReply* reply = _command({"AUTH", InOptions.user, InOptions.password });
 			ON_SCOPE_EXIT{ freeReplyObject(reply); };
 			if (!CheckReply(reply))
 			{
@@ -99,7 +85,7 @@ namespace Xiao
 
 	std::string Redis::ping()
 	{
-		redisReply* reply = _RedisCommand(Context, { "PING" });
+		redisReply* reply = _command({ "PING" });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -120,7 +106,7 @@ namespace Xiao
 	int64_t Redis::exists(const std::string& InKey)
 	{
 		int64_t Num = -1;
-		redisReply* reply = _RedisCommand(Context, { "EXISTS", InKey });
+		redisReply* reply = _command({ "EXISTS", InKey });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -142,7 +128,7 @@ namespace Xiao
 	bool Redis::set(const std::string& InKey, const std::string& InVal)
 	{
 		bool bRtn = false;
-		redisReply* reply = _RedisCommand(Context, { "SET", InKey, InVal });
+		redisReply* reply = _command({ "SET", InKey, InVal });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -170,12 +156,12 @@ namespace Xiao
 
 	std::optional<std::string> Redis::get(const std::string& InKey)
 	{
-		redisReply* reply = _RedisCommand(Context, { "GET", InKey});
+		redisReply* reply = _command({ "GET", InKey});
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return std::optional<std::string>();
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		
 		switch (reply->type) 
 		{
@@ -198,7 +184,7 @@ namespace Xiao
 
 	int64_t Redis::llen(const std::string& InKey)
 	{
-		redisReply* reply = _RedisCommand(Context, { "LLEN", InKey });
+		redisReply* reply = _command({ "LLEN", InKey });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		int64_t Len = -1;
 		if (!CheckReply(reply))
@@ -221,7 +207,7 @@ namespace Xiao
 	int64_t Redis::lpush(const std::string& InKey, const std::string& InVal)
 	{
 		int64_t Len = -1;
-		redisReply* reply = _RedisCommand(Context, { "LPUSH", InKey, InVal });
+		redisReply* reply = _command({ "LPUSH", InKey, InVal });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -243,11 +229,11 @@ namespace Xiao
 	void Redis::lrange(const std::string& InKey, const int64_t InStart, const int64_t InStop, std::insert_iterator<std::vector<std::string>> Output)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "LRANGE %s %ld %ld", InKey.c_str(), InStart, InStop));
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_ARRAY)
 		{
@@ -268,11 +254,11 @@ namespace Xiao
 	void Redis::ltrim(const std::string& InKey, const int64_t InStart, const int64_t InStop)
 	{
 		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, "LTRIM %s %ld %ld", InKey.c_str(), InStart, InStop));
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_STATUS) 
 		{
@@ -290,19 +276,19 @@ namespace Xiao
 	int64_t Redis::rpush(const std::string& InKey, std::vector<std::string>::iterator InFirst, std::vector<std::string>::iterator InLast)
 	{
 		int64_t Num = -1;
-		std::string Command = "RPUSH " + InKey;
 		auto Iter = InFirst;
+		std::vector<std::string> Args{ "RPUSH", InKey };
 		while(Iter != InLast)
 		{
-			Command += " " + *Iter;
+			Args.push_back(*Iter);
 			++Iter;
 		}
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, Command.c_str()));
+		redisReply* reply = _command(Args);
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return Num;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
@@ -319,17 +305,17 @@ namespace Xiao
 	int64_t Redis::sadd(const std::string& InKey, const std::initializer_list<std::string>& InList)
 	{
 		int64_t added = -1;
-		std::string Command = "SADD " + InKey;
+		std::vector<std::string> Args{ "SADD", InKey };
 		for (const auto& value : InList)
 		{
-			Command += " " + value;
+			Args.push_back(value);
 		}
-		redisReply* reply = static_cast<redisReply*>(redisCommand(Context, Command.c_str()));
+		redisReply* reply = _command(Args);
+		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
 			return added;
 		}
-		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 
 		if (reply->type == REDIS_REPLY_INTEGER) 
 		{
@@ -345,7 +331,7 @@ namespace Xiao
 
 	bool Redis::hexists(const std::string& InKey, const std::string& InField)
 	{
-		redisReply* reply = _RedisCommand(Context, { "HEXISTS", InKey, InField });
+		redisReply* reply = _command({ "HEXISTS", InKey, InField });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -367,7 +353,7 @@ namespace Xiao
 
 	int64_t Redis::hlen(const std::string& InKey)
 	{
-		redisReply* reply = _RedisCommand(Context, { "HLEN", InKey });
+		redisReply* reply = _command({ "HLEN", InKey });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		int64_t Len = -1;
 		if (!CheckReply(reply))
@@ -390,7 +376,7 @@ namespace Xiao
 
 	int64_t Redis::hset(const std::string& InKey, const std::string& InField, const std::string& InVal)
 	{
-		redisReply* reply = _RedisCommand(Context, { "HSET", InKey, InField, InVal });
+		redisReply* reply = _command({ "HSET", InKey, InField, InVal });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		int64_t Val = -1;
 		if (!CheckReply(reply))
@@ -413,7 +399,7 @@ namespace Xiao
 	int64_t Redis::hset(const std::string& InKey, const std::pair<std::string, std::string>& InItem)
 	{
 		int64_t Val = -1;
-		redisReply* reply = _RedisCommand(Context, { "HSET", InKey, InItem.first, InItem.second });
+		redisReply* reply = _command({ "HSET", InKey, InItem.first, InItem.second });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -434,7 +420,7 @@ namespace Xiao
 
 	std::optional<std::string> Redis::hget(const std::string& InKey, const std::string& InField)
 	{
-		redisReply* reply = _RedisCommand(Context, { "HGET", InKey, InField });
+		redisReply* reply = _command({ "HGET", InKey, InField });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -462,7 +448,7 @@ namespace Xiao
 
 	int64_t Redis::hdel(const std::string& InKey, const std::string& InField)
 	{
-		redisReply* reply = _RedisCommand(Context, { "HDEL", InKey, InField });
+		redisReply* reply = _command({ "HDEL", InKey, InField });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		int64_t Val = -1;
 		if (!CheckReply(reply))
@@ -484,7 +470,7 @@ namespace Xiao
 
 	void Redis::hgetall(const std::string& InKey, std::insert_iterator<std::unordered_map<std::string, std::string>> OutMap)
 	{
-		redisReply* reply = _RedisCommand(Context, { "HGETALL", InKey });
+		redisReply* reply = _command({ "HGETALL", InKey });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -518,7 +504,7 @@ namespace Xiao
 
 	void Redis::hkeys(const std::string& InKey, std::insert_iterator<std::vector<std::string>> Output)
 	{
-		redisReply* reply = _RedisCommand(Context, { "HKEYS", InKey });
+		redisReply* reply = _command({ "HKEYS", InKey });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -551,7 +537,7 @@ namespace Xiao
 	int64_t Redis::publish(const std::string& InKey, const std::string& InVal)
 	{
 		int64_t Result = -1;
-		redisReply* reply = _RedisCommand(Context, { "PUBLISH", InKey, InVal });
+		redisReply* reply = _command({ "PUBLISH", InKey, InVal });
 		ON_SCOPE_EXIT{ freeReplyObject(reply); };
 		if (!CheckReply(reply))
 		{
@@ -572,13 +558,27 @@ namespace Xiao
 
 	redisReply* Redis::command(const std::vector<std::string>& InArgs, const bool bDiscardReply)
 	{
-		redisReply* reply = _RedisCommand(Context, InArgs);
+		redisReply* reply = _command(InArgs);
 		if (bDiscardReply)
 		{
 			(void)CheckReply(reply);
 			freeReplyObject(reply);
 		}
 		return reply;
+	}
+
+	redisReply* Redis::_command(const std::vector<std::string>& InArgs)
+	{
+		std::vector<const char*> Argv;
+		std::vector<size_t> ArgvLen;
+
+		for (const auto& Arg : InArgs)
+		{
+			Argv.push_back(Arg.c_str());
+			ArgvLen.push_back(Arg.size());
+		}
+
+		return static_cast<redisReply*>(redisCommandArgv(Context, static_cast<int>(Argv.size()), Argv.data(), ArgvLen.data()));
 	}
 
 	bool Redis::CheckReply(redisReply* InReply)
@@ -595,7 +595,6 @@ namespace Xiao
 			{
 				const auto ErrNo = Context->err;
 				const std::string ErrStr(Context->errstr);
-				freeReplyObject(InReply);
 				if (ErrNo == REDIS_ERR_IO)
 				{
 					throw IoError(ErrStr);

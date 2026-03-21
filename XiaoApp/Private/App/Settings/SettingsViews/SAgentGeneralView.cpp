@@ -368,9 +368,9 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 #pragma region ComponentTable
 				+ SVerticalBox::Slot().THR_PADDING.HAlign(HAlign_Fill).VAlign(VAlign_Fill)
 				[
-					SNew(SScrollBox)
-					.Orientation(Orient_Horizontal)
-					+ SScrollBox::Slot()
+					SNew(SBorder)
+					.BorderImage(FAppStyle::GetBrush("ToolPanel.GroupBorder"))
+					.Padding(0.0f)
 					[
 						SAssignNew(FolderListView, SListView<TSharedPtr<FInstallFolder>>)
 						.IsEnabled_Lambda([this]() {
@@ -380,7 +380,6 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 						.Orientation(Orient_Vertical)
 						.SelectionMode(ESelectionMode::Type::Multi)
 						.EnableAnimatedScrolling(true)
-						// .ItemHeight(50.0f)
 						.AllowOverscroll(EAllowOverscroll::Yes)
 						.OnGenerateRow_Raw(this, &SAgentGeneralView::OnGenerateRow)
 						.HeaderRow(
@@ -403,7 +402,7 @@ void SAgentGeneralView::Construct(const FArguments& InArgs)
 							.SortMode_Raw(this, &SAgentGeneralView::GetSortModeForColumn, SIDType)
 
 							+ SHeaderRow::Column(SIDPath)
-							.FillSized(300.0f)
+							.FillWidth(0.5f)
 							.VAlignHeader(VAlign_Center)
 							.DefaultLabel(LOCTEXT("EngineRoot_Text", "引擎目录"))
 							.DefaultTooltip(LOCTEXT("EngineRoot_Tooltip", "UE引擎目录"))
