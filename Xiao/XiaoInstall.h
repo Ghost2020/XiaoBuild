@@ -952,9 +952,24 @@ static bool InstallComponent(const FInstallFolder& InDesc)
 		const FString DesXiaoExecutorPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(InDesc.Folder, SEngineStr, SourceToUBT, TEXT("Executors/Experimental/UBACompatibleExecutor.cs")));
 		_CopyFile(InDesc.bInstall, SrcXiaoExecutorPath, DesXiaoExecutorPath, SCSStr);
 
-		const FString SrcActionGraphPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(SrcUBTDir, EngineVersion, TEXT("ActionGraph.cs")));
-		const FString DesActionGraphPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(InDesc.Folder, SEngineStr, SourceToUBT, TEXT("System/ActionGraph.cs")));
-		_CopyFile(InDesc.bInstall, SrcActionGraphPath, DesActionGraphPath, SCSStr);
+		TArray<FString> Parts;
+		EngineVersion.ParseIntoArray(Parts, TEXT("."));
+		FString ActionFile = TEXT("ActionGraph.cs");
+		FString ActionWithFolder = TEXT("System/ActionGraph.cs");
+		if (Parts.Num() >= 2)
+		{
+			const int MajorVersion = FCString::Atoi(*Parts[0]);
+			const int MinorVersion = FCString::Atoi(*Parts[1]);
+			if ((MajorVersion > 5) || (MajorVersion == 5 && MinorVersion >= 8))
+			{
+				ActionFile = TEXT("ExecutorFactory.cs");
+				ActionWithFolder = TEXT("Executors/ExecutorFactory.cs");
+			}
+		}
+
+		const FString SrcActionPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(SrcUBTDir, EngineVersion, ActionFile));
+		const FString DesActionPath = FPaths::ConvertRelativePathToFull(FPaths::Combine(InDesc.Folder, SEngineStr, SourceToUBT, ActionWithFolder));
+		_CopyFile(InDesc.bInstall, SrcActionPath, DesActionPath, SCSStr);
 
 		const FString SrcBuildModePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(SrcUBTDir, EngineVersion, TEXT("BuildMode.cs")));
 		const FString DesBuildModePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(InDesc.Folder, SEngineStr, SourceToUBT, TEXT("Modes/BuildMode.cs")));

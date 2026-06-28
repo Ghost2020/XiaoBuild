@@ -22,7 +22,7 @@ static constexpr int32 GAboutWindow_Height = 200;
 static FText GetEngineSupportInformation()
 {
 #if PLATFORM_WINDOWS
-	return LOCTEXT("CurrentSupport_Text", "\t\t\t\t\tUE4.26;UE4.27\nUE5.0;UE5.1;UE5.2;UE5.3;UE5.4;UE5.5;UE5.6");
+	return LOCTEXT("CurrentSupport_Text", "UE4.26-UE4.27\tUE5.0-UE5.8");
 #else
 	return LOCTEXT("OnlySupportSource_Text", "暂时只支持源码版本");
 #endif
@@ -75,7 +75,7 @@ void SAboutWindow::Construct(const FArguments& Args)
 
 				+SVerticalBox::Slot().VAlign(VAlign_Bottom).HAlign(HAlign_Center).Padding(0.0f, 0.0f, 0.0f, 10.0f).AutoHeight()
 				[
-					SNew(STextBlock).Text(LOCTEXT("CopyRight_Text", "Copyright © 2025-至今 XiaoBuild Software Ltd."))
+					SNew(STextBlock).Text(LOCTEXT("CopyRight_Text", "Copyright © 2026-至今 XiaoBuild Software Ltd."))
 				]
 			]
 #pragma endregion

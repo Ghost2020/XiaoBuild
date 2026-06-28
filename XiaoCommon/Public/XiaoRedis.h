@@ -234,5 +234,6 @@ namespace Xiao
 	private:
 		redisOptions Options;
 		redisContext* Context;
+		std::string LastCommand;
 	};
 }

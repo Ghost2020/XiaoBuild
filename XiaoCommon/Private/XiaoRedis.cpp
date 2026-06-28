@@ -572,8 +572,10 @@ namespace Xiao
 		std::vector<const char*> Argv;
 		std::vector<size_t> ArgvLen;
 
+		LastCommand.clear();
 		for (const auto& Arg : InArgs)
 		{
+			LastCommand += Arg + " ";
 			Argv.push_back(Arg.c_str());
 			ArgvLen.push_back(Arg.size());
 		}
@@ -585,7 +587,7 @@ namespace Xiao
 	{
 		if (InReply == nullptr)
 		{
-			throw ClosedError("Unknown Error");
+			throw ClosedError("Unknown Error::" + LastCommand);
 			return false;
 		}
 
@@ -615,7 +617,7 @@ namespace Xiao
 				{
 					throw TimeoutError(ErrStr);
 				}
-				else if (ErrNo == REDIS_ERR_OTHER)
+				else
 				{
 					throw Error(ErrStr);
 				}
