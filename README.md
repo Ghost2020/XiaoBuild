@@ -29,6 +29,7 @@ Release Date: ：2025-12-07
 | 5_5     | ✔ [▶️](https://youtu.be/QL_PEHftOOs?si=-QcaSyq6IM7EdPRT&t=152)     | ✔  | ✔ [▶️](https://www.bilibili.com/video/BV1pghCzWEEF/?share_source=copy_web&vd_source=13d934120a59d113eda5c8f73bff2c65) |
 | 5_6     | ✔       | ✔       | ✔ |
 | 5_7     | ✔       | ✔       | ✔ |
+| 5_8_0   | ✔       | ✔       | ✔ |
 
 ---
 
